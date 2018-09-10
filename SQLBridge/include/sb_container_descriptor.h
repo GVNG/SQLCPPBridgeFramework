@@ -1,0 +1,245 @@
+//
+//  sb_container_descriptor.h
+//  SQLCPPBridgeFramework
+//
+//  Created by Roman Makhnenko on 22/05/2016.
+//  Copyright © 2016, DataArt.
+//  All rights reserved.
+//
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions are met:
+//      * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//      * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//      * Neither the name of the DataArt nor the
+//      names of its contributors may be used to endorse or promote products
+//      derived from this software without specific prior written permission.
+//
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//  DISCLAIMED. IN NO EVENT SHALL DataArt BE LIABLE FOR ANY
+//  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#pragma once
+#ifndef sb_container_descriptor_h
+#define sb_container_descriptor_h
+
+#include "sb_core.h"
+#include "sb_foundation.h"
+#include "sb_members_descriptor.h"
+#include "sb_inheritance_descriptor.h"
+#include "sb_trivial_members_descriptor.h"
+
+namespace sql_bridge
+{
+
+    template<typename TStrategy, typename T> class _t_container_descriptor
+        : public class_descriptor
+    {
+    public:
+        _t_container_descriptor()
+            : class_descriptor(typeid(T).hash_code())
+            {}
+        
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundefined-var-template"
+        class_descriptors_container const& members() const {return members_;}
+        std::string const& table_name() const {return table_name_;}
+#pragma clang diagnostic pop // And unhide them again!
+
+        class_descriptors_pair reference_description() const {return empty_descriptors_pair;}
+        class_descriptors_pair prefix_description() const {return empty_descriptors_pair;}
+        std::string const& sql_type() const {static std::string const def; return def;}
+        void bind(void const*,data_update_context&) {};
+        void bind_comp(void const* src,data_update_context& cont,sql_value const& extkey) {_bind_comp<T>(*static_cast<T const*>(src),cont,extkey);};
+        sql_value expand(void const*) {return sql_value();}
+        void read(void* dst,data_update_context& cont) {read_comp(dst,cont,sql_value());}
+        void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) {_read_comp<T>(*static_cast<T*>(dst),cont,extkey);};
+        
+        inline static class_descriptors_container create_members() {return _create_members<T>();}
+    private:
+        // methods
+#pragma mark - create members
+        template<typename TFn> inline static typename std::enable_if<is_container<TFn>::value && !is_trivial_container<TFn>::value,class_descriptors_container>::type _create_members()
+        {
+            typedef _t_link_member_descriptor<TStrategy, typename TFn::value_type> type;
+            class_descriptors_container ret = {std::make_shared<type>(),};
+            return ret;
+        }
+        template<typename TFn> inline static typename std::enable_if<is_trivial_container<TFn>::value,class_descriptors_container>::type _create_members()
+        {
+            typedef _t_trivial_member_descriptor<TStrategy, typename TFn::value_type> type;
+            class_descriptors_container ret = {std::make_shared<type>(g_value_field_name),};
+            return ret;
+        }
+        template<typename TFn> inline static typename std::enable_if<is_map<TFn>::value && !is_trivial_map<TFn>::value,class_descriptors_container>::type _create_members()
+        {
+            typedef _t_trivial_member_descriptor<TStrategy, typename TFn::key_type> k_type;
+            typedef _t_link_member_descriptor<TStrategy, typename TFn::mapped_type> m_type;
+            class_descriptors_container ret =
+            {
+                std::make_shared<k_type>(g_key_field_name,e_db_index_type::Basic),
+                std::make_shared<m_type>(),
+            };
+            return ret;
+        }
+        template<typename TFn> inline static typename std::enable_if<is_trivial_map<TFn>::value,class_descriptors_container>::type _create_members()
+        {
+            typedef _t_trivial_member_descriptor<TStrategy, typename TFn::key_type> k_type;
+            typedef _t_trivial_member_descriptor<TStrategy, typename TFn::mapped_type> m_type;
+            class_descriptors_container ret = {std::make_shared<k_type>(g_key_field_name),std::make_shared<m_type>(g_value_field_name),};
+            return ret;
+        }
+#pragma mark - bind
+        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value && !is_trivial_container<TFn>::value>::type _bind_comp(TFn const& src,data_update_context& cont,sql_value const& extkey)
+        {
+            size_t tid = typeid(typename TFn::value_type).hash_code();
+            std::string const& refname(cont.forward_ref());
+            for(auto const& v : src)
+            {
+                if (!extkey.empty())
+                    cont.add(extkey);
+                cont.next();
+                sql_value extid = cont.id_for_members(&v);
+                if (extid.empty())
+                    throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the forward link", "You should configure any type of index at least at one field in the definition of table");
+                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname));
+                ncnt->bind_comp(&v, extid);
+            }
+        }
+        template<typename TFn> inline typename std::enable_if<is_trivial_container<TFn>::value>::type _bind_comp(TFn const& src,data_update_context& cont,sql_value const& extkey)
+        {
+            for(auto const& v : src)
+            {
+                cont.add(sql_value(v));
+                if (!extkey.empty())
+                    cont.add(extkey);
+                cont.next();
+            }
+        }
+        template<typename TFn> inline typename std::enable_if<is_map<TFn>::value && !is_trivial_map<TFn>::value>::type _bind_comp(TFn const& src,data_update_context& cont,sql_value const& extkey)
+        {
+            size_t tid = typeid(typename TFn::mapped_type).hash_code();
+            std::string const& refname(cont.forward_ref());
+            for(auto const& v : src)
+            {
+                cont.add(sql_value(v.first));
+                if (!extkey.empty())
+                    cont.add(extkey);
+                cont.next();
+                sql_value extid = cont.id_for_members(&v);
+                if (extid.empty())
+                    throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
+                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname));
+                ncnt->bind_comp(&v.second, extid);
+            }
+        }
+        template<typename TFn> inline typename std::enable_if<is_trivial_map<TFn>::value>::type _bind_comp(TFn const& src,data_update_context& cont,sql_value const& extkey)
+        {
+            for(auto const& v : src)
+            {
+                cont.add(sql_value(v.first));
+                cont.add(sql_value(v.second));
+                if (!extkey.empty())
+                    cont.add(extkey);
+                cont.next();
+            }
+        }
+        
+#pragma mark - read
+        
+        template<typename TFn> inline typename std::enable_if<is_kind_of_array<TFn>::value>::type _read_comp(TFn& dst,data_update_context& cont,sql_value const& extkey)
+        {
+            typedef typename TFn::value_type type;
+            sql_value val((type()));
+            for(auto& n : dst)
+            {
+                if (!cont.is_ok()) break;
+                cont.read(val);
+                cont.next();
+                n = val.value<type>();
+            }
+        }
+
+        template<typename TFn, typename TVal> inline typename std::enable_if<is_back_pushable_container<TFn>::value>::type add_to_container(TFn& dst, TVal&& v) const {dst.push_back(std::move(v));}
+        template<typename TFn, typename TVal> inline typename std::enable_if<!is_back_pushable_container<TFn>::value>::type add_to_container(TFn& dst, TVal&& v) const {dst.insert(dst.end(),std::move(v));}
+
+        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value && !is_trivial_container<TFn>::value && !is_kind_of_array<TFn>::value>::type _read_comp(TFn& dst,data_update_context& cont,sql_value const& extkey)
+        {
+            typedef typename TFn::value_type type;
+            size_t tid = typeid(type).hash_code();
+            std::string const& refname(cont.forward_ref());
+            while(cont.is_ok())
+            {
+                cont.next();
+                sql_value extid = cont.id_for_members(&dst);
+                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname));
+                type v;
+                ncnt->read_comp(&v, extid);
+                add_to_container(dst, std::move(v));
+            }
+        }
+
+        template<typename TFn> inline typename std::enable_if<is_trivial_container<TFn>::value &&
+                                                              !is_kind_of_array<TFn>::value>::type _read_comp(TFn& dst,data_update_context& cont,sql_value const& extkey)
+        {
+            typedef typename TFn::value_type type;
+            sql_value val((type()));
+            while(cont.is_ok())
+            {
+                cont.read(val);
+                cont.next();
+                add_to_container(dst,val.value<type>());
+            }
+        }
+
+        template<typename TFn> inline typename std::enable_if<is_map<TFn>::value && !is_trivial_map<TFn>::value>::type _read_comp(TFn& dst,data_update_context& cont,sql_value const& extkey)
+        {
+            typedef typename TFn::key_type k_type;
+            typedef typename TFn::mapped_type m_type;
+            sql_value key((k_type()));
+            size_t tid = typeid(typename TFn::mapped_type).hash_code();
+            std::string const& refname(cont.forward_ref());
+            while(cont.is_ok())
+            {
+                cont.read(key);
+                cont.next();
+                sql_value extid = cont.id_for_members(&dst);
+                if (extid.empty())
+                    throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
+                m_type v;
+                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname));
+                ncnt->read_comp(&v, extid);
+                dst.insert(typename TFn::value_type(key.value<k_type>(),std::move(v)));
+            }
+        }
+
+        template<typename TFn> inline typename std::enable_if<is_trivial_map<TFn>::value>::type _read_comp(TFn& dst,data_update_context& cont,sql_value const& extkey)
+        {
+            typedef typename TFn::key_type k_type;
+            typedef typename TFn::mapped_type m_type;
+            sql_value key((k_type())),val((m_type()));
+            while(cont.is_ok())
+            {
+                cont.read(key);
+                cont.read(val);
+                cont.next();
+                dst.insert(typename TFn::value_type(key.value<k_type>(),val.value<m_type>()));
+            }
+        }
+        
+        // members
+        static std::string const table_name_;
+        static class_descriptors_container const members_;
+    };
+};
+
+#endif /* sb_container_descriptor_h */
