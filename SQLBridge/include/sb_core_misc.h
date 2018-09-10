@@ -37,7 +37,6 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include <assert.h>
 #include <thread>
 #include <mutex>
 #include <set>
