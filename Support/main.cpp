@@ -427,7 +427,6 @@ int main(int argc, char** argv)
             assert(src21[1]==dst21[0]);
             std::cout << "is ok. ";
         }
-#endif
         
         {
             sql_bridge::time_tracker trk;
@@ -443,7 +442,8 @@ int main(int argc, char** argv)
             assert(src==dst);
             std::cout << "is ok. ";
         }
-        
+#endif
+
 
     }
     catch (std::exception& ex)

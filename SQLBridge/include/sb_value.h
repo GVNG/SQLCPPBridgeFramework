@@ -31,6 +31,8 @@
 #ifndef sb_value_h
 #define sb_value_h
 
+#include "sb_exceptions.h"
+
 namespace sql_bridge
 {
     struct sql_value
@@ -68,10 +70,31 @@ namespace sql_bridge
             , rValue_(static_cast<double>(rv.time_since_epoch().count()) / T::clock::period::den * T::clock::period::num)
             , iValue_(0)
             {};
-        template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value,T>::type value() const {assert(type_==e_key_type::Real);return static_cast<T>(rValue_);}
-        template<typename T> inline typename std::enable_if<is_convertible_to_int<T>::value,T>::type value() const {assert(type_==e_key_type::Integer);return static_cast<T>(iValue_);}
-        template<typename T> inline typename std::enable_if<is_convertible_to_text<T>::value,T const&>::type value() const {assert(type_==e_key_type::String);return static_cast<T const&>(tValue_);}
-        template<typename T> inline typename std::enable_if<is_chrono<T>::value,T>::type value() const {assert(type_==e_key_type::Real);typename T::clock::duration ret(static_cast<int64_t>(rValue_ / T::clock::period::num * T::clock::period::den));return T(ret);}
+        template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value,T>::type value() const
+        {
+            if (type_!=e_key_type::Real)
+                throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
+            return static_cast<T>(rValue_);
+        }
+        template<typename T> inline typename std::enable_if<is_convertible_to_int<T>::value,T>::type value() const
+        {
+            if (type_!=e_key_type::Integer)
+                throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
+            return static_cast<T>(iValue_);
+        }
+        template<typename T> inline typename std::enable_if<is_convertible_to_text<T>::value,T const&>::type value() const
+        {
+            if (type_!=e_key_type::String)
+                throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
+            return static_cast<T const&>(tValue_);
+        }
+        template<typename T> inline typename std::enable_if<is_chrono<T>::value,T>::type value() const
+        {
+            if (type_!=e_key_type::Real)
+                throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
+            typename T::clock::duration ret(static_cast<int64_t>(rValue_ / T::clock::period::num * T::clock::period::den));
+            return T(ret);
+        }
         
         // data
         e_key_type type_;
