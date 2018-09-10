@@ -21,31 +21,31 @@ In 'Cases' directory there are several samples of using the library.
 
 Key features:
 -------------
-• versioning of the database structure. That means that creation of all the
+* versioning of the database structure. That means that creation of all the
 necessary tables/indexes is supported automatically; if necessary custom
 SQL-scripts for updating tables/indexes are called or a simple deleting
 followed by recreating the tables is made (this is the only place where you
 may need SQL knowledge);
-• Storing of base types (here and below) arithmetic/enum/std::string by
+* Storing of base types (here and below) arithmetic/enum/std::string by
 string keys (the so-called KV-storage);
-• Storing iterable containers with the values ​​of all base types in the
+* Storing iterable containers with the values ​​of all base types in the
 KV-storage;
-• storing of classes' instances with members of base types in a single
+* storing of classes' instances with members of base types in a single
 repository with creation of required indexes and control of objects'
 uniqueness; with ability to load these objects on arbitrary criteria into in
 an arbitrary provided iterable STL-container;
-• storing of classes' instances with arbitrary hierarchy of inheritance
+* storing of classes' instances with arbitrary hierarchy of inheritance
 (including multiple and virtual) and with arbitrary size of the hierarchy
 itself;
-• storing of classes' instances with members containing other compound
+* storing of classes' instances with members containing other compound
 classes or containers of base or compound types; in principle, there are no
 depth limitations of such nesting at all.
 
 Restrictions:
 -------------
-• At the current moment inheritance of enumerated containers of basic types
+* At the current moment inheritance of enumerated containers of basic types
 is not supported;
-• Containers stack, queue (obviously non-iterable) and forward_list 
+* Containers stack, queue (obviously non-iterable) and forward_list 
 are not supported either.
 
 Build:
