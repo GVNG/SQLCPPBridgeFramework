@@ -72,7 +72,7 @@ LIB :=
 ifdef ARCH
 CFLAGS += -arch $(ARCH) -isysroot $(DEVPATH)
 ifeq ($(TOS),ios)
-CFLAGS += -mios-version-min=9.0
+CFLAGS += -mios-version-min=10.0
 endif
 ifeq ($(TOS),osx)
 CFLAGS += -mmacosx-version-min=10.7
