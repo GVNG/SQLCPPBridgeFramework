@@ -268,6 +268,10 @@ namespace sql_bridge
         std::string create_section(sql_file const& db,std::string const& name, std::string const& path, fn_change_file_name fnch);
 
         static void create_statements(class_links_container&);
+        static std::string sql_order_by(std::string const&) {return "ORDER BY";}
+        static std::string sql_order_asc(std::string const& fld) {return to_string() << fld << " ASC";}
+        static std::string sql_order_desc(std::string const& fld) {return to_string() << fld << " DESC";}
+
     private:
         static void create_statements(class_link&, std::string const& relfrom = "");
         size_t create_table_for_versions(sql_file const& db,std::string const& name); // return the version for the 'name'

@@ -48,6 +48,21 @@ namespace sql_bridge
         template<typename T> inline void load(T& dst, std::string const& flt) {_load<T>(dst,flt);};
         template<typename T> inline void remove(T const& src) {_remove<T>(src);}
         template<typename T> inline void replace(T const& src) {_replace<T>(src);}
+        template<typename T, typename TMem> inline std::string field_name(TMem const T::*mem_offs) const
+        {
+            size_t tid = typeid(T).hash_code();
+            class_descriptors_ptr desc((*descriptor_)[tid]);
+            T const* base((T const*)sizeof(T const*)); // trick for the members detection
+            void const* mem_ptr = &(base->*mem_offs);
+            for(auto const& mem : desc->members())
+                if (mem->is_this_mem_ptr(base, mem_ptr))
+                    return mem->field_name();
+            return "";
+        }
+        // statemets creation helpers
+        virtual std::string order_by(std::string const&) = 0;
+        virtual std::string order_asc(std::string const&) = 0;
+        virtual std::string order_desc(std::string const&) = 0;
 
         virtual ~data_section() {};
     protected:
@@ -449,6 +464,11 @@ namespace sql_bridge
             class_descriptors_ptr desc = (*descriptor_)[tid];
             return data_update_context_ptr(new _t_data_read_context<TStrategy>(*this,desc,desc->depends(),descriptor_,flt,sql_value()));
         }
+        
+        std::string order_by(std::string const& fld) {return TStrategy::sql_order_by(fld);}
+        std::string order_asc(std::string const& fld) {return TStrategy::sql_order_asc(fld);}
+        std::string order_desc(std::string const& fld) {return TStrategy::sql_order_desc(fld);}
+
     };
     
 };

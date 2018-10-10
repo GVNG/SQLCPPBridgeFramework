@@ -54,6 +54,11 @@ namespace sql_bridge
         sql_value expand(void const* src) {return _expand<TMb>(*static_cast<T const*>(src));}
         void read(void* dst, data_update_context& cnt) {_read<TMb>(*static_cast<T*>(dst),cnt);}
         void read_comp(void* dst, data_update_context& cnt, sql_value const& extkey) {_read_comp<TMb>(*static_cast<T*>(dst),cnt,extkey);}
+        bool is_this_mem_ptr(void const* base, void const* memptr) const
+        {
+            T const* chk = static_cast<T const*>(base);
+            return &(chk->*member_)==memptr;
+        }
 
     protected:
 #pragma mark - constructor

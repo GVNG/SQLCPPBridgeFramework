@@ -143,6 +143,7 @@ namespace sql_bridge
         {
             while (!ready_proc_) std::this_thread::yield();
             while (!ready_flush_) std::this_thread::yield();
+            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
         }
         ~local_storage()
         {
@@ -216,16 +217,12 @@ namespace sql_bridge
         db_proc_queue_ptr proc_queue_;
         std::thread proc_thread_,proc_flush_thread_;
         // methods
-        void proc()
-        {
-            ready_proc_ = true;
-            for(db_task_ptr task = proc_queue_->next(); task; task = proc_queue_->next())
-                task->operator()(task.get());
-        }
+        void proc() {proc_queue_->do_proc(ready_proc_);}
         void proc_flush()
         {
+            mt_event::locker shtd(shutdown_);
             ready_flush_ = true;
-            while(!shutdown_.wait_for(std::chrono::seconds(10)))
+            while(!shutdown_.wait_for(std::chrono::seconds(10),shtd))
             {
                 std::lock_guard<std::mutex> lk(data_section_access_);
                 for(typename sections_cache::iterator pos = section_keepers_.begin(); pos!=section_keepers_.end();)

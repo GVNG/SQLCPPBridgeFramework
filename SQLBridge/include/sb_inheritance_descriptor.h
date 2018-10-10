@@ -50,6 +50,7 @@ namespace sql_bridge
         sql_value expand(void const*) {return sql_value();}
         void read(void* dst,data_update_context& cont) {}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) {_read_comp<TParent>(*static_cast<TChild*>(dst),cont,extkey);}
+        bool is_this_mem_ptr(void const* base, void const* memptr) const {return false;}
 
     protected:
         _t_inheritance_descriptor(class_descriptors_ptr desc)

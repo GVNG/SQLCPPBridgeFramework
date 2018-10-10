@@ -65,7 +65,7 @@ INCDIRS := $(shell find $(INCDIR)/** -name '*.h*' -exec dirname {} \; | sort | u
 INCLIST := $(patsubst $(INCDIR)/%,-I $(INCDIR)/%,$(INCDIRS))
 
 # Shared Compiler Flags
-CFLAGS := -c
+CFLAGS := -c -fembed-bitcode
 INC := -I $(INCLIST)
 LIB := 
 

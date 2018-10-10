@@ -88,16 +88,20 @@ namespace sql_bridge
     class mt_event
     {
     public:
-        mt_event()
-            : locker_(mtx_)
-            {};
+        typedef std::unique_lock<std::mutex> locker;
+
+        mt_event() {};
+        mt_event(mt_event const&) = delete;
+        mt_event(mt_event&) = delete;
+
+        inline operator locker() {return mt_event::locker(mtx_);}
         inline void fire() {var_.notify_one();}
-        template<typename T> inline bool wait_for(T const& dl) {return var_.wait_for(locker_, dl)!=std::cv_status::timeout;}
-        inline void wait() {var_.wait(locker_);}
+        inline void fire_all() {var_.notify_all();}
+        template<typename T> inline bool wait_for(T const& dl,locker& lk) {return var_.wait_for(lk, dl)!=std::cv_status::timeout;}
+        inline void wait(locker& lk) {var_.wait(lk);}
     private:
         std::mutex mtx_;
         std::condition_variable var_;
-        std::unique_lock<std::mutex> locker_;
     };
 };
 

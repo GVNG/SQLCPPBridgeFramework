@@ -74,9 +74,9 @@ make
 export ARCH="i386"
 make clean
 make
-export DEVPATH=
-export ARCH=
-export TOS=
+unset DEVPATH
+unset ARCH
+unset TOS
 
 FRAMEWORK_NAME="sqlcppbridge-osx"
 FRAMEWORK="./build/${FRAMEWORK_NAME}.framework"

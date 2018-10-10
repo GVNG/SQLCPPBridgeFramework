@@ -81,6 +81,7 @@ namespace sql_bridge
             {}
         void add(db_task_ptr tsk)
         {
+            mt_event::locker newev(new_data_);
             std::lock_guard<std::mutex> lck(access_);
             if (tsk->out_of_band() && !tasks_queue_.empty())
             {
@@ -93,26 +94,30 @@ namespace sql_bridge
                 tasks_queue_.push_back(tsk);
             new_data_.fire();
         }
-        db_task_ptr next()
+        void do_proc(std::atomic_bool& ready)
         {
-            db_task_ptr task;
+            mt_event::locker newev(new_data_);
+            ready = true;
             for(;;)
             {
+                db_task_ptr task;
                 {
                     std::lock_guard<std::mutex> lck(access_);
                     if (!tasks_queue_.empty())
                     {
                         task = tasks_queue_.front();
                         tasks_queue_.pop_front();
-                        return task;
                     }
                     else
                         if (shutdown_) break;
                 }
-                new_data_.wait();
+                if (task!=nullptr)
+                    task->operator()(task.get());
+                else
+                    new_data_.wait(newev);
             }
-            return task;
         }
+        
         void shutdown()
         {
             shutdown_ = true;

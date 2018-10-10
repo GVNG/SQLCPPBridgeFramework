@@ -34,6 +34,7 @@
 
 #include "sb_tasks_queue.h"
 #include "sb_data_section.h"
+#include "sb_stm_builder.h"
 
 namespace sql_bridge
 {
@@ -165,6 +166,7 @@ namespace sql_bridge
         {
             std::swap(queue_, src.queue_);
             std::swap(data_, src.data_);
+            std::swap(suffixes_, src.suffixes_);
         }
 
 #pragma mark - public methods
@@ -173,9 +175,9 @@ namespace sql_bridge
         template<typename T> inline context& save(T& src) {_save<T>(src);return *this;}
         template<typename T> inline context& save(T&& src) {_save_m<T>(std::move(src));return *this;}
         
-        template<typename T> inline context& load(T& dst, std::string const& flt = "") {_load<T>(dst,flt);return *this;}
-        template<typename T> inline context& load(T const& dst, std::string const& flt, typename async_load_task<T>::_fn_failed fl, typename async_load_task<T>::_fn_success_load fs) {_load<T>(dst,flt,fl,fs);return *this;}
-        template<typename T> inline context& load(T const& dst, std::string const& flt, typename async_load_task<T>::_fn_success_load fs) {_load<T>(dst,flt,nullptr,fs);return *this;}
+        template<typename T> inline context& load(T& dst, std::string const& flt = "") {_load<T>(dst,build_suffix(flt));return *this;}
+        template<typename T> inline context& load(T const& dst, std::string const& flt, typename async_load_task<T>::_fn_failed fl, typename async_load_task<T>::_fn_success_load fs) {_load<T>(dst,build_suffix(flt),fl,fs);return *this;}
+        template<typename T> inline context& load(T const& dst, std::string const& flt, typename async_load_task<T>::_fn_success_load fs) {_load<T>(dst,build_suffix(flt),nullptr,fs);return *this;}
 
         template<typename T> inline context& remove(T const& src) {_remove<T>(src);return *this;}
         template<typename T> inline context& remove(T& src) {_remove<T>(src);return *this;}
@@ -185,6 +187,8 @@ namespace sql_bridge
         template<typename T> inline context& replace(T& src) {_replace<T>(src);return *this;}
         template<typename T> inline context& replace(T&& src) {_replace_m<T>(std::move(src));return *this;}
 
+        template<typename T, typename TFn> inline context& order(TFn const T::*mem_ptr) {_order<T>(mem_ptr);return *this;}
+        
     private:
         // methods
 #pragma mark - save
@@ -336,10 +340,52 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<replace_task<T> >(std::move(src),data_));
         }
+        
+#pragma mark - order
+        template<typename T,typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _order(TFn const T::*mem_ptr)
+        {
+            std::string field = data_->field_name(mem_ptr);
+            suffixes_.push_back(std::make_shared<suffix_order>(field,false));
+        }
 
+#pragma mark - members
         // members
         db_tasks_queue_interface_weak_ptr queue_;
         data_sections_ptr data_;
+        suffixes_container suffixes_;
+        
+        std::string build_suffix(std::string const& usr)
+        {
+            if (usr.empty())
+            {
+                to_string ret;
+                std::stable_sort(suffixes_.begin(),suffixes_.end(),[](suffix_bare_ptr lv,suffix_bare_ptr rv){return *lv < *rv;});
+                e_weight cw = e_weight::BASE;
+                bool repeat = false;
+                for(auto const& sfx : suffixes_)
+                {
+                    if (sfx->weight()!=cw)
+                    {
+                        ret << sfx->general(data_) << " " << sfx->build(data_);
+                        repeat = false;
+                        cw = sfx->weight();
+                    }
+                    else
+                    {
+                        if (repeat) ret << ",";
+                        repeat = true;
+                        ret << " " << sfx->build(data_);
+                    }
+                }
+                suffixes_.clear();
+                return ret;
+            }
+            else
+            {
+                suffixes_.clear();
+                return usr;
+            }
+        }
     };
     
 };

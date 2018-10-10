@@ -63,7 +63,8 @@ namespace sql_bridge
         sql_value expand(void const*) {return sql_value();}
         void read(void* dst,data_update_context& cont) {read_comp(dst,cont,sql_value());}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) {_read_comp<T>(*static_cast<T*>(dst),cont,extkey);};
-        
+        bool is_this_mem_ptr(void const* base, void const* memptr) const {return false;}
+
         inline static class_descriptors_container create_members() {return _create_members<T>();}
     private:
         // methods
