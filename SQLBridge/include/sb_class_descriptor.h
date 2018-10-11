@@ -61,6 +61,7 @@ namespace sql_bridge
         sql_value expand(void const*) {return sql_value();}
         void read(void* dst,data_update_context& cont) {_read<T>(*static_cast<T*>(dst),cont);}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) {_read_comp<T>(*static_cast<T*>(dst),cont,extkey);}
+        bool is_this_mem_ptr(void const* base, void const* memptr) const {return false;}
 
         template<typename TFn> static class_descriptors_ptr create_description() {return _create_description_pub<TFn>();}
         template<typename TFn> static class_descriptors_ptr create_inheritance(class_descriptors_ptr desc)
@@ -158,8 +159,6 @@ namespace sql_bridge
                     md->read_comp(&dst, cont, uid);
             }
         }
-            
-
 
         static std::string const table_name_;
         static class_descriptors_container const members_;

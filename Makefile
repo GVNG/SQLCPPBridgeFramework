@@ -65,14 +65,14 @@ INCDIRS := $(shell find $(INCDIR)/** -name '*.h*' -exec dirname {} \; | sort | u
 INCLIST := $(patsubst $(INCDIR)/%,-I $(INCDIR)/%,$(INCDIRS))
 
 # Shared Compiler Flags
-CFLAGS := -c
+CFLAGS := -c -fembed-bitcode
 INC := -I $(INCLIST)
 LIB := 
 
 ifdef ARCH
 CFLAGS += -arch $(ARCH) -isysroot $(DEVPATH)
 ifeq ($(TOS),ios)
-CFLAGS += -mios-version-min=9.0
+CFLAGS += -mios-version-min=10.0
 endif
 ifeq ($(TOS),osx)
 CFLAGS += -mmacosx-version-min=10.7

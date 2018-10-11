@@ -54,6 +54,7 @@ namespace sql_bridge
         sql_value expand(void const*) {return sql_value();}
         void read(void*,data_update_context&) {}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) {};
+        bool is_this_mem_ptr(void const* base, void const* memptr) const {return false;}
     private:
     };
     
@@ -75,6 +76,7 @@ namespace sql_bridge
         sql_value expand(void const*) {return sql_value();}
         void read(void*,data_update_context&) {}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) {};
+        bool is_this_mem_ptr(void const* base, void const* memptr) const {return false;}
 
     private:
 #pragma mark - sql types

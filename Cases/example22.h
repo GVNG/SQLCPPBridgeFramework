@@ -48,7 +48,7 @@ public:
         , value_(v)
         {}
     inline bool operator == (Case22Ext const& rv) const {return text_==rv.text_ && value_==rv.value_ && key_==rv.key_;}
-protected:
+public:
     std::string key_;
 private:
     std::string text_;

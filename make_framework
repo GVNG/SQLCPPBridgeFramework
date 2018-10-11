@@ -28,7 +28,16 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-export DEVPATH=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk
+CROSS_TOP_SIM="`xcode-select --print-path`/Platforms/iPhoneSimulator.platform/Developer"
+CROSS_SDK_SIM="iPhoneSimulator.sdk"
+
+CROSS_TOP_IOS="`xcode-select --print-path`/Platforms/iPhoneOS.platform/Developer"
+CROSS_SDK_IOS="iPhoneOS.sdk"
+
+CROSS_TOP_OSX="`xcode-select --print-path`/Platforms/MacOSX.platform/Developer"
+CROSS_SDK_OSX="MacOSX.sdk"
+
+export DEVPATH=${CROSS_TOP_IOS}/SDKs/${CROSS_SDK_IOS}
 export ARCH="armv7"
 export TOS="ios"
 make clean
@@ -39,7 +48,7 @@ make
 export ARCH="arm64"
 make clean
 make
-export DEVPATH=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk
+export DEVPATH=${CROSS_TOP_SIM}/SDKs/${CROSS_SDK_SIM}
 export ARCH="x86_64"
 make clean
 make
@@ -57,7 +66,7 @@ lipo -arch armv7 "lib/$FRAMEWORK_NAME-ios-armv7.a" \
 	 -arch x86_64 "lib/$FRAMEWORK_NAME-ios-x86_64.a" \
 	 -create -output "$FRAMEWORK/$FRAMEWORK_NAME"
 
-export DEVPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk
+export DEVPATH=${CROSS_TOP_OSX}/SDKs/${CROSS_SDK_OSX}
 export ARCH="x86_64"
 export TOS="osx"
 make clean
@@ -65,9 +74,9 @@ make
 export ARCH="i386"
 make clean
 make
-export DEVPATH=
-export ARCH=
-export TOS=
+unset DEVPATH
+unset ARCH
+unset TOS
 
 FRAMEWORK_NAME="sqlcppbridge-osx"
 FRAMEWORK="./build/${FRAMEWORK_NAME}.framework"
