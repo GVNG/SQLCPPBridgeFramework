@@ -51,6 +51,21 @@ namespace sql_bridge
         bool desc_;
     };
     
+    class suffix_limit : public suffix_bare
+    {
+    public:
+        suffix_limit(size_t cnt, size_t ofs)
+            : suffix_bare("",e_weight::LIMIT)
+            , count_(cnt)
+            , offset_(ofs)
+            {}
+        std::string general(data_sections_ptr data) const {return data->limit(count_);}
+        std::string build(data_sections_ptr data) const {return offset_?data->limit_offset(offset_):"";}
+    private:
+        size_t count_;
+        size_t offset_;
+    };
+    
 };
 
 #endif /* sb_stm_builder_h */

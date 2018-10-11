@@ -53,7 +53,7 @@ Build:
 You can use the script:
 ./make_framework
 to create ./build/sqlcppbridge.framework
-which includes armv7,armv7s, arm64 and x86_64 architectures to use in the 
+which includes armv7, armv7s, arm64 and x86_64 architectures to use in the 
 whole set of iOS-devices and iOS-simulators
 
 ...or you can simple run 'make' utility to create the static library for the default environment

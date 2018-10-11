@@ -428,6 +428,7 @@ int main(int argc, char** argv)
             std::cout << "is ok. ";
         }
 
+#endif
         {
             sql_bridge::time_tracker trk;
             sql_bridge::context cont(storage["case22"]);
@@ -438,11 +439,11 @@ int main(int argc, char** argv)
                 {"key_12",Case22(2)},
             },dst;
             cont.save(src);
-            cont.order(&Case22::key_).load(dst);
+            src.erase("key_12");
+            cont.limit(1,1).order_desc(&Case22::key_).load(dst);
             assert(src==dst);
             std::cout << "is ok. ";
         }
-#endif
 
 
     }

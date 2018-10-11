@@ -188,6 +188,9 @@ namespace sql_bridge
         template<typename T> inline context& replace(T&& src) {_replace_m<T>(std::move(src));return *this;}
 
         template<typename T, typename TFn> inline context& order(TFn const T::*mem_ptr) {_order<T>(mem_ptr);return *this;}
+        template<typename T, typename TFn> inline context& order_desc(TFn const T::*mem_ptr) {_order_desc<T>(mem_ptr);return *this;}
+
+        inline context& limit(size_t count, size_t offset = 0) {_limit(count,offset);return *this;}
         
     private:
         // methods
@@ -242,7 +245,6 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add(task);
         }
-
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load(T&,std::string const&) const
         {
             throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
@@ -348,6 +350,22 @@ namespace sql_bridge
             suffixes_.push_back(std::make_shared<suffix_order>(field,false));
         }
 
+        template<typename T,typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _order_desc(TFn const T::*mem_ptr)
+        {
+            std::string field = data_->field_name(mem_ptr);
+            suffixes_.push_back(std::make_shared<suffix_order>(field,true));
+        }
+
+#pragma mark - limit
+
+        void _limit(size_t count, size_t offset)
+        {
+            suffixes_.erase(std::remove_if(suffixes_.begin(),
+                                           suffixes_.end(),
+                                           [](suffix_bare_ptr sfx){return sfx->weight()==e_weight::LIMIT;}),suffixes_.end());
+            suffixes_.push_back(std::make_shared<suffix_limit>(count,offset));
+        }
+
 #pragma mark - members
         // members
         db_tasks_queue_interface_weak_ptr queue_;
@@ -366,7 +384,7 @@ namespace sql_bridge
                 {
                     if (sfx->weight()!=cw)
                     {
-                        ret << sfx->general(data_) << " " << sfx->build(data_);
+                        ret << " " << sfx->general(data_) << " " << sfx->build(data_);
                         repeat = false;
                         cw = sfx->weight();
                     }
