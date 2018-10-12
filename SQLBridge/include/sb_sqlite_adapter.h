@@ -275,6 +275,9 @@ namespace sql_bridge
         static std::string sql_limit(size_t lim) {return to_string() << "LIMIT " << lim;}
         static std::string sql_limit_offset(size_t ofs) {return to_string() << "OFFSET " << ofs;}
 
+        static std::string sql_where() {return "WHERE ";}
+        static std::string sql_where(std::string const& fld, std::string const& cond) {return to_string() << fld << cond;}
+
     private:
         static void create_statements(class_link&, std::string const& relfrom = "");
         size_t create_table_for_versions(sql_file const& db,std::string const& name); // return the version for the 'name'

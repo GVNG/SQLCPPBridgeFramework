@@ -187,11 +187,13 @@ namespace sql_bridge
         template<typename T> inline context& replace(T& src) {_replace<T>(src);return *this;}
         template<typename T> inline context& replace(T&& src) {_replace_m<T>(std::move(src));return *this;}
 
+        inline context& limit(size_t count, size_t offset = 0) {_limit(count,offset);return *this;}
+
         template<typename T, typename TFn> inline context& order(TFn const T::*mem_ptr) {_order<T>(mem_ptr);return *this;}
         template<typename T, typename TFn> inline context& order_desc(TFn const T::*mem_ptr) {_order_desc<T>(mem_ptr);return *this;}
 
-        inline context& limit(size_t count, size_t offset = 0) {_limit(count,offset);return *this;}
-        
+        template<typename T, typename TFn> inline context& where(TFn const T::*mem_ptr, std::string const& op, TFn const& val) {_where<T>(mem_ptr,op,val);return *this;}
+
     private:
         // methods
 #pragma mark - save
@@ -364,6 +366,20 @@ namespace sql_bridge
                                            suffixes_.end(),
                                            [](suffix_bare_ptr sfx){return sfx->weight()==e_weight::LIMIT;}),suffixes_.end());
             suffixes_.push_back(std::make_shared<suffix_limit>(count,offset));
+        }
+
+#pragma mark - where
+        
+        template<typename T,typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _where(TFn const T::*mem_ptr, std::string const& op, TFn const& val) {_where_def<T,TFn>(mem_ptr,op,val);}
+        template<typename T,typename TFn> inline typename std::enable_if<is_convertible_to_text<TFn>::value>::type _where_def(TFn const T::*mem_ptr, std::string const& op, TFn const& val)
+        {
+            std::string field = data_->field_name(mem_ptr);
+            suffixes_.push_back(std::make_shared<suffix_where>(field,to_string() << op << "'" << val << "'"));
+        }
+        template<typename T,typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_def(TFn const T::*mem_ptr, std::string const& op, TFn const& val)
+        {
+            std::string field = data_->field_name(mem_ptr);
+            suffixes_.push_back(std::make_shared<suffix_where>(field,to_string() << op << val));
         }
 
 #pragma mark - members

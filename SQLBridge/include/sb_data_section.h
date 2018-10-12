@@ -65,6 +65,8 @@ namespace sql_bridge
         virtual std::string order_desc(std::string const&) = 0;
         virtual std::string limit(size_t) = 0;
         virtual std::string limit_offset(size_t) = 0;
+        virtual std::string where() = 0;
+        virtual std::string where(std::string const&,std::string const&) = 0;
         
         virtual ~data_section() {};
     protected:
@@ -472,6 +474,8 @@ namespace sql_bridge
         std::string order_desc(std::string const& fld) {return TStrategy::sql_order_desc(fld);}
         std::string limit(size_t lim) {return TStrategy::sql_limit(lim);}
         std::string limit_offset(size_t ofs) {return TStrategy::sql_limit_offset(ofs);}
+        std::string where() {return TStrategy::sql_where();}
+        std::string where(std::string const& fld,std::string const& cnd) {return TStrategy::sql_where(fld,cnd);}
 
     };
     
