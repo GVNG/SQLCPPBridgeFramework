@@ -64,7 +64,6 @@ public:
         , data_(i)
         {}
     inline bool operator == (Case22 const& rv) const {return static_cast<Case22Ext const&>(rv)==*this && data_==rv.data_;}
-private:
     long data_;
 };
 

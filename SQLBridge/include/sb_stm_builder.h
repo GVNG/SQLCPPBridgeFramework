@@ -17,7 +17,7 @@ namespace sql_bridge
     class suffix_bare;
     typedef std::shared_ptr<suffix_bare> suffix_bare_ptr;
     typedef std::vector<suffix_bare_ptr> suffixes_container;
-    enum class e_weight {BASE, WHERE, GROUP, ORDER, LIMIT};
+    enum class e_weight {BASE, WHERE, ORDER, LIMIT};
 
     class suffix_bare
     {
@@ -64,6 +64,19 @@ namespace sql_bridge
     private:
         size_t count_;
         size_t offset_;
+    };
+    
+    class suffix_where : public suffix_bare
+    {
+    public:
+        suffix_where(std::string const& fld, std::string const& cond)
+            : suffix_bare(fld,e_weight::WHERE)
+            , condition_(cond)
+            {}
+        std::string general(data_sections_ptr data) const {return data->where();}
+        std::string build(data_sections_ptr data) const {return data->where(field_,condition_);}
+    private:
+        std::string condition_;
     };
     
 };
