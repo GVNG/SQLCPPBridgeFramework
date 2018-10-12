@@ -188,6 +188,8 @@ namespace sql_bridge
         template<typename T> inline context& replace(T&& src) {_replace_m<T>(std::move(src));return *this;}
 
         inline context& limit(size_t count, size_t offset = 0) {_limit(count,offset);return *this;}
+        inline context& sql_or() {_sql_or();return *this;}
+        inline context& sql_and() {_sql_and();return *this;}
 
         template<typename T, typename TFn> inline context& order(TFn const T::*mem_ptr) {_order<T>(mem_ptr);return *this;}
         template<typename T, typename TFn> inline context& order_desc(TFn const T::*mem_ptr) {_order_desc<T>(mem_ptr);return *this;}
@@ -382,6 +384,11 @@ namespace sql_bridge
             suffixes_.push_back(std::make_shared<suffix_where>(field,to_string() << op << val));
         }
 
+#pragma mark - and/or
+        
+        void _sql_or() {suffixes_.push_back(std::make_shared<suffix_simple_operator>(e_simple_operator::OR));}
+        void _sql_and() {suffixes_.push_back(std::make_shared<suffix_simple_operator>(e_simple_operator::AND));}
+        
 #pragma mark - members
         // members
         db_tasks_queue_interface_weak_ptr queue_;
@@ -406,7 +413,7 @@ namespace sql_bridge
                     }
                     else
                     {
-                        if (repeat) ret << ",";
+                        if (repeat) ret << sfx->repeat_delimiter();
                         repeat = true;
                         ret << " " << sfx->build(data_);
                     }

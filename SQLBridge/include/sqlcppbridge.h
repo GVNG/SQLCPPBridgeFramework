@@ -52,8 +52,7 @@
     sql_bridge::_t_container_descriptor<STRAT,CLASSNAME>::create_members();
 
 #define DECLARE_SQL_ACCESS_EXT(STRAT,CLASSNAME...)\
-    friend class sql_bridge::_t_class_descriptor< STRAT, CLASSNAME >;\
-    friend class sql_bridge::context;
+    friend class sql_bridge::_t_class_descriptor< STRAT, CLASSNAME >;
 
 // defines for the default strategy (sqlite)
 

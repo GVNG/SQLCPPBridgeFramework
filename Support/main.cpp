@@ -438,8 +438,11 @@ int main(int argc, char** argv)
                 {"key_12",Case22(2)},
             },dst;
             cont.save(src);
-            src.erase("key_12");
-            cont.where(&Case22::data_,"=",1l).order_desc(&Case22::key_).load(dst);
+            cont.where(&Case22::data_,"=",1l)
+                .sql_or()
+                .where(&Case22::key_,"=",std::string("key_12"))
+                .order_desc(&Case22::key_)
+                .load(dst);
             assert(src==dst);
             std::cout << "is ok. ";
         }

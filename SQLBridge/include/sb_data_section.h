@@ -67,7 +67,9 @@ namespace sql_bridge
         virtual std::string limit_offset(size_t) = 0;
         virtual std::string where() = 0;
         virtual std::string where(std::string const&,std::string const&) = 0;
-        
+        virtual std::string operator_or() = 0;
+        virtual std::string operator_and() = 0;
+
         virtual ~data_section() {};
     protected:
         data_section(std::string const& sn)
@@ -476,6 +478,8 @@ namespace sql_bridge
         std::string limit_offset(size_t ofs) {return TStrategy::sql_limit_offset(ofs);}
         std::string where() {return TStrategy::sql_where();}
         std::string where(std::string const& fld,std::string const& cnd) {return TStrategy::sql_where(fld,cnd);}
+        std::string operator_or() {return TStrategy::sql_operator_or();}
+        std::string operator_and() {return TStrategy::sql_operator_and();}
 
     };
     
