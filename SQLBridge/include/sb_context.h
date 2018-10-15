@@ -55,7 +55,7 @@ namespace sql_bridge
                 , data_(std::move(src))
                 {};
             
-            inline void run_task() {section_->save(data_);};
+            inline void run_task() {section_->save(data_);}
             void error(base_sql_error const& err) {std::cerr << err.what() << std::endl;}
         private:
             data_sections_ptr section_;
@@ -74,7 +74,7 @@ namespace sql_bridge
                 : section_(section)
                 , data_(std::move(src))
                 {};
-            inline void run_task() {section_->replace(data_);};
+            inline void run_task() {section_->replace(data_);}
             void error(base_sql_error const& err) {std::cerr << err.what() << std::endl;}
         private:
             data_sections_ptr section_;
@@ -89,7 +89,7 @@ namespace sql_bridge
                 : section_(section)
                 , filter_(flt)
                 {};
-            inline void run_task() {section_->load(data_,filter_);};
+            inline void run_task() {section_->load(data_,filter_);}
             inline _t_base&& data() {return std::move(data_);}
             void error(base_sql_error const& err) {throw err;}
         private:
@@ -146,13 +146,27 @@ namespace sql_bridge
                 : section_(section)
                 , data_(std::move(src))
                 {};
-            inline void run_task() {section_->remove(data_);};
+            inline void run_task() {section_->remove(data_);}
             void error(base_sql_error const& err) {std::cerr << err.what() << std::endl;}
         private:
             data_sections_ptr section_;
             _t_base data_;
         };
         
+        template<typename T> class remove_if_task : public db_task
+        {
+            typedef typename std::decay<T>::type _t_base;
+        public:
+            remove_if_task(std::string const& flt, data_sections_ptr section)
+                : section_(section)
+                , condition_(flt)
+                {};
+            inline void run_task() {section_->remove_if<T>(condition_);}
+        private:
+            data_sections_ptr section_;
+            std::string const condition_;
+        };
+
     protected:
         context(db_tasks_queue_interface_ptr q, data_sections_ptr ds)
             : queue_(q)
@@ -182,11 +196,12 @@ namespace sql_bridge
         template<typename T> inline context& remove(T const& src) {_remove<T>(src);return *this;}
         template<typename T> inline context& remove(T& src) {_remove<T>(src);return *this;}
         template<typename T> inline context& remove(T&& src) {_remove_m<T>(std::move(src));return *this;}
-        
+        template<typename T> inline context& remove_if(std::string const& flt = "") {typedef typename types_selector<T>::type type;_remove_if<type>(build_suffix(flt));return *this;}
+
         template<typename T> inline context& replace(T const& src) {_replace<T>(src);return *this;}
         template<typename T> inline context& replace(T& src) {_replace<T>(src);return *this;}
         template<typename T> inline context& replace(T&& src) {_replace_m<T>(std::move(src));return *this;}
-
+        
         inline context& limit(size_t count, size_t offset = 0) {_limit(count,offset);return *this;}
         inline context& sql_or() {_sql_or();return *this;}
         inline context& sql_and() {_sql_and();return *this;}
@@ -315,6 +330,15 @@ namespace sql_bridge
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<remove_task<T> >(std::move(src),data_));
+        }
+        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _remove_if(std::string const&) const
+        {
+            throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
+        }
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _remove_if(std::string const& flt) const
+        {
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr) qp->add( std::make_shared<remove_if_task<T> >(flt,data_));
         }
 
 #pragma mark - replace
