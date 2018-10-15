@@ -54,6 +54,7 @@
 #include "example20.h"
 #include "example21.h"
 #include "example22.h"
+#include "example23.h"
 
 int main(int argc, char** argv)
 {
@@ -438,13 +439,36 @@ int main(int argc, char** argv)
                 {"key_12",Case22(2)},
             },dst;
             cont.save(src);
-            src.erase("key_12");
-            cont.where(&Case22::data_,"=",1l).order_desc(&Case22::key_).load(dst);
+            cont.where(&Case22::data_,"=",1l)
+                .sql_or()
+                .where(&Case22::key_,"=",std::string("key_12"))
+                .order_desc(&Case22::key_)
+                .load(dst);
             assert(src==dst);
             std::cout << "is ok. ";
         }
 #endif
-
+        {
+            sql_bridge::time_tracker trk;
+            sql_bridge::context cont(storage["case23"]);
+            std::cout << "Case 23 ";
+            Case23Container src,dst;
+            for(int i=0; i<100; ++i)
+                src.push_back(i);
+            cont.save(src);
+            cont.where_not_between(&Case23::data_, 10l, 90l)
+                .remove_if<Case23>();
+            cont.where_in(&Case23::data_,std::set<long>({50,60}))
+                .remove_if<Case23>();
+            Case23Container chk;
+            std::remove_copy_if(src.begin(),
+                                src.end(),
+                                std::back_inserter(chk),
+                                [](Case23 const& v){return v.data_<10 || v.data_>90 || v.data_==50 || v.data_==60;});
+            cont.load(dst);
+            assert(chk==dst);
+            std::cout << "is ok. ";
+        }
 
     }
     catch (std::exception& ex)

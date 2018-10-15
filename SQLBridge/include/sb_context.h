@@ -55,7 +55,7 @@ namespace sql_bridge
                 , data_(std::move(src))
                 {};
             
-            inline void run_task() {section_->save(data_);};
+            inline void run_task() {section_->save(data_);}
             void error(base_sql_error const& err) {std::cerr << err.what() << std::endl;}
         private:
             data_sections_ptr section_;
@@ -74,7 +74,7 @@ namespace sql_bridge
                 : section_(section)
                 , data_(std::move(src))
                 {};
-            inline void run_task() {section_->replace(data_);};
+            inline void run_task() {section_->replace(data_);}
             void error(base_sql_error const& err) {std::cerr << err.what() << std::endl;}
         private:
             data_sections_ptr section_;
@@ -89,7 +89,7 @@ namespace sql_bridge
                 : section_(section)
                 , filter_(flt)
                 {};
-            inline void run_task() {section_->load(data_,filter_);};
+            inline void run_task() {section_->load(data_,filter_);}
             inline _t_base&& data() {return std::move(data_);}
             void error(base_sql_error const& err) {throw err;}
         private:
@@ -146,13 +146,27 @@ namespace sql_bridge
                 : section_(section)
                 , data_(std::move(src))
                 {};
-            inline void run_task() {section_->remove(data_);};
+            inline void run_task() {section_->remove(data_);}
             void error(base_sql_error const& err) {std::cerr << err.what() << std::endl;}
         private:
             data_sections_ptr section_;
             _t_base data_;
         };
         
+        template<typename T> class remove_if_task : public db_task
+        {
+            typedef typename std::decay<T>::type _t_base;
+        public:
+            remove_if_task(std::string const& flt, data_sections_ptr section)
+                : section_(section)
+                , condition_(flt)
+                {};
+            inline void run_task() {section_->remove_if<T>(condition_);}
+        private:
+            data_sections_ptr section_;
+            std::string const condition_;
+        };
+
     protected:
         context(db_tasks_queue_interface_ptr q, data_sections_ptr ds)
             : queue_(q)
@@ -182,17 +196,24 @@ namespace sql_bridge
         template<typename T> inline context& remove(T const& src) {_remove<T>(src);return *this;}
         template<typename T> inline context& remove(T& src) {_remove<T>(src);return *this;}
         template<typename T> inline context& remove(T&& src) {_remove_m<T>(std::move(src));return *this;}
-        
+        template<typename T> inline context& remove_if(std::string const& flt = "") {typedef typename types_selector<T>::type type;_remove_if<type>(build_suffix(flt));return *this;}
+
         template<typename T> inline context& replace(T const& src) {_replace<T>(src);return *this;}
         template<typename T> inline context& replace(T& src) {_replace<T>(src);return *this;}
         template<typename T> inline context& replace(T&& src) {_replace_m<T>(std::move(src));return *this;}
-
+        
         inline context& limit(size_t count, size_t offset = 0) {_limit(count,offset);return *this;}
+        inline context& sql_or() {_sql_or();return *this;}
+        inline context& sql_and() {_sql_and();return *this;}
 
         template<typename T, typename TFn> inline context& order(TFn const T::*mem_ptr) {_order<T>(mem_ptr);return *this;}
         template<typename T, typename TFn> inline context& order_desc(TFn const T::*mem_ptr) {_order_desc<T>(mem_ptr);return *this;}
 
         template<typename T, typename TFn> inline context& where(TFn const T::*mem_ptr, std::string const& op, TFn const& val) {_where<T>(mem_ptr,op,val);return *this;}
+        template<typename T, typename TFn> inline context& where_between(TFn const T::*mem_ptr, TFn const& from, TFn const& to) {_where_between<T>(mem_ptr,from,to);return *this;}
+        template<typename T, typename TFn> inline context& where_not_between(TFn const T::*mem_ptr, TFn const& from, TFn const& to) {_where_not_between<T>(mem_ptr,from,to);return *this;}
+        template<typename T, typename TFn, typename TCont> inline context& where_in(TFn const T::*mem_ptr, TCont const& cnt) {_where_in<T,TCont,TFn>(mem_ptr,cnt); return *this;}
+        template<typename T, typename TFn, typename TCont> inline context& where_not_in(TFn const T::*mem_ptr, TCont const& cnt) {_where_not_in<T,TCont,TFn>(mem_ptr,cnt); return *this;}
 
     private:
         // methods
@@ -314,6 +335,15 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<remove_task<T> >(std::move(src),data_));
         }
+        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _remove_if(std::string const&) const
+        {
+            throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
+        }
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _remove_if(std::string const& flt) const
+        {
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr) qp->add( std::make_shared<remove_if_task<T> >(flt,data_));
+        }
 
 #pragma mark - replace
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _replace(T const&) const
@@ -370,18 +400,87 @@ namespace sql_bridge
 
 #pragma mark - where
         
-        template<typename T,typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _where(TFn const T::*mem_ptr, std::string const& op, TFn const& val) {_where_def<T,TFn>(mem_ptr,op,val);}
-        template<typename T,typename TFn> inline typename std::enable_if<is_convertible_to_text<TFn>::value>::type _where_def(TFn const T::*mem_ptr, std::string const& op, TFn const& val)
+        template<typename T, typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _where(TFn const T::*mem_ptr, std::string const& op, TFn const& val) {_where_def<T,TFn>(mem_ptr,op,val);}
+        template<typename T, typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _where_between(TFn const T::*mem_ptr, TFn const& from, TFn const& to) {_where_between_def<T,TFn>(mem_ptr,from,to);}
+        template<typename T, typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _where_not_between(TFn const T::*mem_ptr, TFn const& from, TFn const& to) {_where_not_between_def<T,TFn>(mem_ptr,from,to);}
+        template<typename T, typename TCont, typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value && is_container<TCont>::value>::type _where_in(TFn const T::*mem_ptr, TCont const& inval) {_where_in_def<T,TCont,TFn>(mem_ptr,inval);}
+        template<typename T, typename TCont, typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value && is_container<TCont>::value && std::is_same<typename types_selector<TCont>::type, TFn>::value>::type _where_not_in(TFn const T::*mem_ptr, TCont const& inval) {_where_not_in_def<T,TCont,TFn>(mem_ptr,inval);}
+        template<typename T, typename TFn> inline typename std::enable_if<is_convertible_to_text<TFn>::value>::type _where_def(TFn const T::*mem_ptr, std::string const& op, TFn const& val)
         {
             std::string field = data_->field_name(mem_ptr);
             suffixes_.push_back(std::make_shared<suffix_where>(field,to_string() << op << "'" << val << "'"));
         }
-        template<typename T,typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_def(TFn const T::*mem_ptr, std::string const& op, TFn const& val)
+        template<typename T, typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_def(TFn const T::*mem_ptr, std::string const& op, TFn const& val)
         {
             std::string field = data_->field_name(mem_ptr);
             suffixes_.push_back(std::make_shared<suffix_where>(field,to_string() << op << val));
         }
+        template<typename T, typename TFn> inline typename std::enable_if<is_convertible_to_text<TFn>::value>::type _where_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
+        {
+            std::string field = data_->field_name(mem_ptr);
+            suffixes_.push_back(std::make_shared<suffix_between>(field,to_string() << "'" << from << "'", to_string() << "'" << to << "'", false));
+        }
+        template<typename T, typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
+        {
+            std::string field = data_->field_name(mem_ptr);
+            suffixes_.push_back(std::make_shared<suffix_between>(field,to_string() << from, to_string() << to, false));
+        }
+        template<typename T, typename TFn> inline typename std::enable_if<is_convertible_to_text<TFn>::value>::type _where_not_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
+        {
+            std::string field = data_->field_name(mem_ptr);
+            suffixes_.push_back(std::make_shared<suffix_between>(field,to_string() << "'" << from << "'", to_string() << "'" << to << "'", true));
+        }
+        template<typename T, typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_not_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
+        {
+            std::string field = data_->field_name(mem_ptr);
+            suffixes_.push_back(std::make_shared<suffix_between>(field,to_string() << from, to_string() << to, true));
+        }
+        template<typename T, typename TCont, typename TFn> inline typename std::enable_if<is_convertible_to_text<typename types_selector<TCont>::type>::value>::type _where_in_def(TFn const T::*mem_ptr, TCont const& from)
+        {
+            to_string ts;
+            std::string field = data_->field_name(mem_ptr);
+            for(auto const& v : from)
+                ts << "'" << v << "',";
+            ts.remove_from_tail(1);
+            ts << " ";
+            suffixes_.push_back(std::make_shared<suffix_where_in>(field,ts,false));
+        }
+        template<typename T, typename TCont, typename TFn> inline typename std::enable_if<!is_convertible_to_text<typename types_selector<TCont>::type>::value>::type _where_in_def(TFn const T::*mem_ptr, TCont const& from)
+        {
+            to_string ts;
+            std::string field = data_->field_name(mem_ptr);
+            for(auto const& v : from)
+                ts << v << ",";
+            ts.remove_from_tail(1);
+            ts << " ";
+            suffixes_.push_back(std::make_shared<suffix_where_in>(field,ts,false));
+        }
+        template<typename T, typename TCont, typename TFn> inline typename std::enable_if<is_convertible_to_text<typename types_selector<TCont>::type>::value>::type _where_not_in_def(TFn const T::*mem_ptr, TCont const& from)
+        {
+            to_string ts;
+            std::string field = data_->field_name(mem_ptr);
+            for(auto const& v : from)
+                ts << "'" << v << "',";
+            ts.remove_from_tail(1);
+            ts << " ";
+            suffixes_.push_back(std::make_shared<suffix_where_in>(field,ts,true));
+        }
+        template<typename T, typename TCont, typename TFn> inline typename std::enable_if<!is_convertible_to_text<typename types_selector<TCont>::type>::value>::type _where_not_in_def(TFn const T::*mem_ptr, TCont const& from)
+        {
+            to_string ts;
+            std::string field = data_->field_name(mem_ptr);
+            for(auto const& v : from)
+                ts << v << ",";
+            ts.remove_from_tail(1);
+            ts << " ";
+            suffixes_.push_back(std::make_shared<suffix_where_in>(field,ts,false));
+        }
 
+#pragma mark - and/or
+        
+        void _sql_or() {suffixes_.push_back(std::make_shared<suffix_simple_operator>(e_simple_operator::OR));}
+        void _sql_and() {suffixes_.push_back(std::make_shared<suffix_simple_operator>(e_simple_operator::AND));}
+        
 #pragma mark - members
         // members
         db_tasks_queue_interface_weak_ptr queue_;
@@ -406,7 +505,7 @@ namespace sql_bridge
                     }
                     else
                     {
-                        if (repeat) ret << ",";
+                        if (repeat) ret << sfx->repeat_delimiter();
                         repeat = true;
                         ret << " " << sfx->build(data_);
                     }

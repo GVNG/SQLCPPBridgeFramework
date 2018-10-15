@@ -47,6 +47,7 @@ namespace sql_bridge
         template<typename T> inline void save(T const& src) {_save<T>(src);}
         template<typename T> inline void load(T& dst, std::string const& flt) {_load<T>(dst,flt);};
         template<typename T> inline void remove(T const& src) {_remove<T>(src);}
+        template<typename T> inline void remove_if(std::string const& src) {_remove_if<T>(src);}
         template<typename T> inline void replace(T const& src) {_replace<T>(src);}
         template<typename T, typename TMem> inline std::string field_name(TMem const T::*mem_offs) const
         {
@@ -67,14 +68,20 @@ namespace sql_bridge
         virtual std::string limit_offset(size_t) = 0;
         virtual std::string where() = 0;
         virtual std::string where(std::string const&,std::string const&) = 0;
-        
+        virtual std::string operator_or() = 0;
+        virtual std::string operator_and() = 0;
+        virtual std::string where_between(std::string const&,std::string const&,std::string const&) = 0;
+        virtual std::string where_not_between(std::string const&,std::string const&,std::string const&) = 0;
+        virtual std::string where_in(std::string const&,std::string const&) = 0;
+        virtual std::string where_not_in(std::string const&,std::string const&) = 0;
+
         virtual ~data_section() {};
     protected:
         data_section(std::string const& sn)
             : descriptor_(data_section_descriptors::instance()[sn])
             {};
         
-        virtual data_update_context_ptr create_context(size_t) const = 0;
+        virtual data_update_context_ptr create_context(size_t,std::string const& = std::string()) const = 0;
         virtual data_update_context_ptr create_reader(size_t,std::string const&) const = 0;
 
         data_section_descriptors_ptr descriptor_;
@@ -280,7 +287,15 @@ namespace sql_bridge
             for(auto const& el : src)
                 cont->remove_if_possible(&el);
         }
-
+        
+#pragma mark - remove_if
+        template<typename T> inline typename std::enable_if<!is_container<T>::value && !is_map<T>::value>::type _remove_if(std::string const& flt)
+        {
+            size_t tid = typeid(T).hash_code();
+            data_update_context_ptr cont(create_context(tid,flt));
+            cont->remove_all();
+        }
+        
     };
 
     template<typename TStrategy> class _t_data_read_context
@@ -370,13 +385,13 @@ namespace sql_bridge
         , private TTransactionLock
     {
     public:
-        _t_data_update_context(typename TStrategy::sql_file const& fl, class_descriptors_ptr desc, class_link const& lnk, data_section_descriptors_ptr hr)
+        _t_data_update_context(typename TStrategy::sql_file const& fl, class_descriptors_ptr desc, class_link const& lnk, data_section_descriptors_ptr hr, std::string const& flt)
             : data_update_context(desc,lnk)
             , TTransactionLock(fl)
             , file_(fl)
             , inserter_(fl,link_.statements().insert_)
             , remover_(fl,link_.statements().remove_)
-            , remover_for_all_(fl,link_.statements().remove_all_)
+            , remover_for_all_(fl,link_.statements().remove_all_.empty()?std::string():(to_string() << link_.statements().remove_all_ << " " << flt))
             , hierarhy_(hr)
             , last_insert_id_(0)
             , use_last_id_(false)
@@ -402,7 +417,7 @@ namespace sql_bridge
         {
             for(auto const& tl : link_.target())
                 if (tl.source_id()==etid && ref==tl.ref_field_name())
-                    return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::no_transactions_lock>(file_,(*hierarhy_)[etid],tl,hierarhy_));
+                    return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::no_transactions_lock>(file_,(*hierarhy_)[etid],tl,hierarhy_,""));
             throw sql_bridge_error(to_string() << "Table: " << table_name() <<". " << g_internal_error_text, g_architecture_error_text);
         }
         bool next()
@@ -458,10 +473,10 @@ namespace sql_bridge
             , TStrategy::sql_file(fname)
             {};
     private:
-        data_update_context_ptr create_context(size_t tid) const
+        data_update_context_ptr create_context(size_t tid, std::string const& flt) const
         {
             class_descriptors_ptr desc = (*descriptor_)[tid];
-            return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::transactions_lock>(*this,desc,desc->depends(),descriptor_));
+            return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::transactions_lock>(*this,desc,desc->depends(),descriptor_,flt));
         }
         data_update_context_ptr create_reader(size_t tid, std::string const& flt) const
         {
@@ -476,6 +491,12 @@ namespace sql_bridge
         std::string limit_offset(size_t ofs) {return TStrategy::sql_limit_offset(ofs);}
         std::string where() {return TStrategy::sql_where();}
         std::string where(std::string const& fld,std::string const& cnd) {return TStrategy::sql_where(fld,cnd);}
+        std::string operator_or() {return TStrategy::sql_operator_or();}
+        std::string operator_and() {return TStrategy::sql_operator_and();}
+        std::string where_between(std::string const& fld,std::string const& from,std::string const& to) {return TStrategy::sql_where_between(fld,from,to);}
+        std::string where_not_between(std::string const& fld,std::string const& from,std::string const& to) {return TStrategy::sql_where_not_between(fld,from,to);}
+        std::string where_in(std::string const& fld,std::string const& val) {return TStrategy::sql_where_in(fld,val);}
+        std::string where_not_in(std::string const& fld,std::string const& val) {return TStrategy::sql_where_not_in(fld,val);}
 
     };
     

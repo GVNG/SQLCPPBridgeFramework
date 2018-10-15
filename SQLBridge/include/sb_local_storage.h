@@ -160,6 +160,7 @@ namespace sql_bridge
             std::future<void> ret(task->get_future());
             proc_queue_->add(task);
             ret.wait();
+            ret.get(); // exceptions check
             return static_cast<load_task<T>*>(task.get())->data();
         }
         inline std::string load(std::string const& key) const {return load(key,std::string());}
@@ -186,6 +187,7 @@ namespace sql_bridge
             std::future<void> ret(task->get_future());
             proc_queue_->add(task);
             ret.wait();
+            ret.get(); // exceptions check
             data_sections_ptr sect(static_cast<create_task*>(task.get())->section());
             {
                 std::lock_guard<std::mutex> lk(data_section_access_);

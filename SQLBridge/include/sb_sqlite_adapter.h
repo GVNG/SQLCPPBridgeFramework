@@ -278,6 +278,14 @@ namespace sql_bridge
         static std::string sql_where() {return "WHERE ";}
         static std::string sql_where(std::string const& fld, std::string const& cond) {return to_string() << fld << cond;}
 
+        static std::string sql_operator_or() {return "OR";}
+        static std::string sql_operator_and() {return "AND";}
+
+        static std::string sql_where_between(std::string const& fld, std::string const& from, std::string const& to) {return to_string() << fld << " BETWEEN " << from << " AND " << to;}
+        static std::string sql_where_not_between(std::string const& fld, std::string const& from, std::string const& to) {return to_string() << fld << " NOT BETWEEN " << from << " AND " << to;}
+        static std::string sql_where_in(std::string const& fld, std::string const& val) {return to_string() << fld << " IN ( " << val << ")";}
+        static std::string sql_where_not_in(std::string const& fld, std::string const& val) {return to_string() << fld << " NOT IN ( " << val << ")";}
+
     private:
         static void create_statements(class_link&, std::string const& relfrom = "");
         size_t create_table_for_versions(sql_file const& db,std::string const& name); // return the version for the 'name'
