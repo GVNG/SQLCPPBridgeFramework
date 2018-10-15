@@ -457,7 +457,7 @@ int main(int argc, char** argv)
                 src.push_back(i);
             cont.save(src);
             
-            cont.where(&Case23::data_, ">", 20l).remove_if<Case23>();
+            cont.where_not_between(&Case23::data_, 10l, 90l).remove_if<Case23>();
             cont.load(dst);
             assert(src==dst);
             std::cout << "is ok. ";
