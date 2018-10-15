@@ -212,6 +212,8 @@ namespace sql_bridge
         template<typename T, typename TFn> inline context& where(TFn const T::*mem_ptr, std::string const& op, TFn const& val) {_where<T>(mem_ptr,op,val);return *this;}
         template<typename T, typename TFn> inline context& where_between(TFn const T::*mem_ptr, TFn const& from, TFn const& to) {_where_between<T>(mem_ptr,from,to);return *this;}
         template<typename T, typename TFn> inline context& where_not_between(TFn const T::*mem_ptr, TFn const& from, TFn const& to) {_where_not_between<T>(mem_ptr,from,to);return *this;}
+        template<typename T, typename TFn, typename TCont> inline context& where_in(TFn const T::*mem_ptr, TCont const& cnt) {_where_in<T,TCont,TFn>(mem_ptr,cnt); return *this;}
+        template<typename T, typename TFn, typename TCont> inline context& where_not_in(TFn const T::*mem_ptr, TCont const& cnt) {_where_not_in<T,TCont,TFn>(mem_ptr,cnt); return *this;}
 
     private:
         // methods
@@ -398,40 +400,80 @@ namespace sql_bridge
 
 #pragma mark - where
         
-        template<typename T,typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _where(TFn const T::*mem_ptr, std::string const& op, TFn const& val) {_where_def<T,TFn>(mem_ptr,op,val);}
-        template<typename T,typename TFn> inline typename std::enable_if<is_convertible_to_text<TFn>::value>::type _where_def(TFn const T::*mem_ptr, std::string const& op, TFn const& val)
+        template<typename T, typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _where(TFn const T::*mem_ptr, std::string const& op, TFn const& val) {_where_def<T,TFn>(mem_ptr,op,val);}
+        template<typename T, typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _where_between(TFn const T::*mem_ptr, TFn const& from, TFn const& to) {_where_between_def<T,TFn>(mem_ptr,from,to);}
+        template<typename T, typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _where_not_between(TFn const T::*mem_ptr, TFn const& from, TFn const& to) {_where_not_between_def<T,TFn>(mem_ptr,from,to);}
+        template<typename T, typename TCont, typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value && is_container<TCont>::value>::type _where_in(TFn const T::*mem_ptr, TCont const& inval) {_where_in_def<T,TCont,TFn>(mem_ptr,inval);}
+        template<typename T, typename TCont, typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value && is_container<TCont>::value && std::is_same<typename types_selector<TCont>::type, TFn>::value>::type _where_not_in(TFn const T::*mem_ptr, TCont const& inval) {_where_not_in_def<T,TCont,TFn>(mem_ptr,inval);}
+        template<typename T, typename TFn> inline typename std::enable_if<is_convertible_to_text<TFn>::value>::type _where_def(TFn const T::*mem_ptr, std::string const& op, TFn const& val)
         {
             std::string field = data_->field_name(mem_ptr);
             suffixes_.push_back(std::make_shared<suffix_where>(field,to_string() << op << "'" << val << "'"));
         }
-        template<typename T,typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_def(TFn const T::*mem_ptr, std::string const& op, TFn const& val)
+        template<typename T, typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_def(TFn const T::*mem_ptr, std::string const& op, TFn const& val)
         {
             std::string field = data_->field_name(mem_ptr);
             suffixes_.push_back(std::make_shared<suffix_where>(field,to_string() << op << val));
         }
-
-        template<typename T,typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _where_between(TFn const T::*mem_ptr, TFn const& from, TFn const& to) {_where_between_def<T,TFn>(mem_ptr,from,to);}
-        template<typename T,typename TFn> inline typename std::enable_if<is_convertible_to_text<TFn>::value>::type _where_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
+        template<typename T, typename TFn> inline typename std::enable_if<is_convertible_to_text<TFn>::value>::type _where_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
         {
             std::string field = data_->field_name(mem_ptr);
             suffixes_.push_back(std::make_shared<suffix_between>(field,to_string() << "'" << from << "'", to_string() << "'" << to << "'", false));
         }
-        template<typename T,typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
+        template<typename T, typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
         {
             std::string field = data_->field_name(mem_ptr);
             suffixes_.push_back(std::make_shared<suffix_between>(field,to_string() << from, to_string() << to, false));
         }
-
-        template<typename T,typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _where_not_between(TFn const T::*mem_ptr, TFn const& from, TFn const& to) {_where_not_between_def<T,TFn>(mem_ptr,from,to);}
-        template<typename T,typename TFn> inline typename std::enable_if<is_convertible_to_text<TFn>::value>::type _where_not_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
+        template<typename T, typename TFn> inline typename std::enable_if<is_convertible_to_text<TFn>::value>::type _where_not_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
         {
             std::string field = data_->field_name(mem_ptr);
             suffixes_.push_back(std::make_shared<suffix_between>(field,to_string() << "'" << from << "'", to_string() << "'" << to << "'", true));
         }
-        template<typename T,typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_not_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
+        template<typename T, typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_not_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
         {
             std::string field = data_->field_name(mem_ptr);
             suffixes_.push_back(std::make_shared<suffix_between>(field,to_string() << from, to_string() << to, true));
+        }
+        template<typename T, typename TCont, typename TFn> inline typename std::enable_if<is_convertible_to_text<typename types_selector<TCont>::type>::value>::type _where_in_def(TFn const T::*mem_ptr, TCont const& from)
+        {
+            to_string ts;
+            std::string field = data_->field_name(mem_ptr);
+            for(auto const& v : from)
+                ts << "'" << v << "',";
+            ts.remove_from_tail(1);
+            ts << " ";
+            suffixes_.push_back(std::make_shared<suffix_where_in>(field,ts,false));
+        }
+        template<typename T, typename TCont, typename TFn> inline typename std::enable_if<!is_convertible_to_text<typename types_selector<TCont>::type>::value>::type _where_in_def(TFn const T::*mem_ptr, TCont const& from)
+        {
+            to_string ts;
+            std::string field = data_->field_name(mem_ptr);
+            for(auto const& v : from)
+                ts << v << ",";
+            ts.remove_from_tail(1);
+            ts << " ";
+            suffixes_.push_back(std::make_shared<suffix_where_in>(field,ts,false));
+        }
+        template<typename T, typename TCont, typename TFn> inline typename std::enable_if<is_convertible_to_text<typename types_selector<TCont>::type>::value>::type _where_not_in_def(TFn const T::*mem_ptr, TCont const& from)
+        {
+            to_string ts;
+            std::string field = data_->field_name(mem_ptr);
+            for(auto const& v : from)
+                ts << "'" << v << "',";
+            ts.remove_from_tail(1);
+            ts << " ";
+            suffixes_.push_back(std::make_shared<suffix_where_in>(field,ts,true));
+        }
+        template<typename T, typename TCont, typename TFn> inline typename std::enable_if<!is_convertible_to_text<typename types_selector<TCont>::type>::value>::type _where_not_in_def(TFn const T::*mem_ptr, TCont const& from)
+        {
+            to_string ts;
+            std::string field = data_->field_name(mem_ptr);
+            for(auto const& v : from)
+                ts << v << ",";
+            ts.remove_from_tail(1);
+            ts << " ";
+            suffixes_.push_back(std::make_shared<suffix_where_in>(field,ts,false));
         }
 
 #pragma mark - and/or

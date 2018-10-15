@@ -63,7 +63,7 @@ int main(int argc, char** argv)
     {
         mkdir("DB", 0777);
         sql_bridge::local_storage<sql_bridge::sqlite_adapter> storage("./DB");
-#if 0
+#if 1
         {
             std::cout << "Case KVDB ";
             sql_bridge::time_tracker trk;
@@ -456,10 +456,17 @@ int main(int argc, char** argv)
             for(int i=0; i<100; ++i)
                 src.push_back(i);
             cont.save(src);
-            
-            cont.where_not_between(&Case23::data_, 10l, 90l).remove_if<Case23>();
+            cont.where_not_between(&Case23::data_, 10l, 90l)
+                .remove_if<Case23>();
+            cont.where_in(&Case23::data_,std::set<long>({50,60}))
+                .remove_if<Case23>();
+            Case23Container chk;
+            std::remove_copy_if(src.begin(),
+                                src.end(),
+                                std::back_inserter(chk),
+                                [](Case23 const& v){return v.data_<10 || v.data_>90 || v.data_==50 || v.data_==60;});
             cont.load(dst);
-            assert(src==dst);
+            assert(chk==dst);
             std::cout << "is ok. ";
         }
 

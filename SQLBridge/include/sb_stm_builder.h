@@ -123,7 +123,27 @@ namespace sql_bridge
         std::string from_,to_;
         bool flag_not_;
     };
-    
+
+    class suffix_where_in : public suffix_bare
+    {
+    public:
+        suffix_where_in(std::string const& fld, std::string const& val, bool nf)
+            : suffix_bare(fld,e_weight::WHERE)
+            , values_(val)
+            , flag_not_(nf)
+            {}
+        std::string general(data_sections_ptr data) const {return data->where();}
+        std::string build(data_sections_ptr data) const
+        {
+            return flag_not_
+                ? data->where_not_in(field_,values_)
+                : data->where_in(field_,values_);
+        }
+    private:
+        std::string values_;
+        bool flag_not_;
+    };
+
 };
 
 #endif /* sb_stm_builder_h */
