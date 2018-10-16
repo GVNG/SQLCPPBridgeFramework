@@ -124,6 +124,27 @@ namespace sql_bridge
         bool flag_not_;
     };
 
+    class suffix_between_rev : public suffix_bare
+    {
+    public:
+        suffix_between_rev(std::string const& fld, std::string const& fld2, std::string const& val, bool nf)
+            : suffix_bare(fld, e_weight::WHERE)
+            , field2_(fld2)
+            , val_(val)
+            , flag_not_(nf)
+            {}
+        std::string general(data_sections_ptr data) const {return data->where();}
+        std::string build(data_sections_ptr data) const
+        {
+            return flag_not_
+                ? data->where_not_between(val_, field_, field2_)
+                : data->where_between(val_, field_, field2_);
+        }
+    private:
+        std::string field2_,val_;
+        bool flag_not_;
+    };
+
     class suffix_where_in : public suffix_bare
     {
     public:
