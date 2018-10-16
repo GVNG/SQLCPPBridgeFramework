@@ -55,6 +55,7 @@
 #include "example21.h"
 #include "example22.h"
 #include "example23.h"
+#include "example24.h"
 
 int main(int argc, char** argv)
 {
@@ -447,7 +448,7 @@ int main(int argc, char** argv)
             assert(src==dst);
             std::cout << "is ok. ";
         }
-#endif
+        
         {
             sql_bridge::time_tracker trk;
             sql_bridge::context cont(storage["case23"]);
@@ -466,6 +467,27 @@ int main(int argc, char** argv)
                                 std::back_inserter(chk),
                                 [](Case23 const& v){return v.data_<10 || v.data_>90 || v.data_==50 || v.data_==60;});
             cont.load(dst);
+            assert(chk==dst);
+            std::cout << "is ok. ";
+        }
+#endif
+
+        {
+            sql_bridge::time_tracker trk;
+            sql_bridge::context cont(storage["case24"]);
+            std::cout << "Case 24 ";
+            Case24Container src,dst;
+            for(int i=0; i<100; ++i)
+                src.push_back(i);
+            cont.save(src);
+            cont.where_between(60l, &Case24::lower_, &Case24::upper_)
+                .order(&Case24::lower_)
+                .load(dst);
+            Case24Container chk;
+            std::copy_if(src.begin(),
+                         src.end(),
+                         std::back_inserter(chk),
+                         [](Case24 const& v){return 60>=v.lower_ && 60<=v.upper_ && v.lower_<=v.upper_;});
             assert(chk==dst);
             std::cout << "is ok. ";
         }
