@@ -57,6 +57,7 @@
 		931D3CCE2170E3AC00BCD515 /* example23.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example23.cpp; sourceTree = "<group>"; };
 		931D3CE62175CA4F00BCD515 /* example24.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example24.h; sourceTree = "<group>"; };
 		931D3CE72175CAFA00BCD515 /* example24.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example24.cpp; sourceTree = "<group>"; };
+		931D3D06217759A500BCD515 /* LICENSE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
 		931E1F0121455031009F9953 /* example22.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example22.h; sourceTree = "<group>"; };
 		931E1F0221455043009F9953 /* example22.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example22.cpp; sourceTree = "<group>"; };
 		9336AA9C2069143200DF00CA /* sb_members_descriptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_members_descriptor.h; sourceTree = "<group>"; };
@@ -148,6 +149,7 @@
 		93E60D6320557F7A009151ED = {
 			isa = PBXGroup;
 			children = (
+				931D3D06217759A500BCD515 /* LICENSE.md */,
 				93A1349320D24C690041EE2E /* README.md */,
 				93E60D7620557FC7009151ED /* SQLBridge */,
 				93E60D7720557FE1009151ED /* Cases */,
