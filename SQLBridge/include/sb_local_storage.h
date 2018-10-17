@@ -222,9 +222,8 @@ namespace sql_bridge
         void proc() {proc_queue_->do_proc(ready_proc_);}
         void proc_flush()
         {
-            mt_event::locker shtd(shutdown_);
             ready_flush_ = true;
-            while(!shutdown_.wait_for(std::chrono::seconds(10),shtd))
+            while(!shutdown_.wait_for(std::chrono::seconds(10)))
             {
                 std::lock_guard<std::mutex> lk(data_section_access_);
                 for(typename sections_cache::iterator pos = section_keepers_.begin(); pos!=section_keepers_.end();)

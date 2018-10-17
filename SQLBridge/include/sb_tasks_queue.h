@@ -81,7 +81,6 @@ namespace sql_bridge
             {}
         void add(db_task_ptr tsk)
         {
-            mt_event::locker newev(new_data_);
             std::lock_guard<std::mutex> lck(access_);
             if (tsk->out_of_band() && !tasks_queue_.empty())
             {
@@ -96,7 +95,6 @@ namespace sql_bridge
         }
         void do_proc(std::atomic_bool& ready)
         {
-            mt_event::locker newev(new_data_);
             ready = true;
             for(;;)
             {
@@ -114,7 +112,7 @@ namespace sql_bridge
                 if (task!=nullptr)
                     task->operator()(task.get());
                 else
-                    new_data_.wait(newev);
+                    new_data_.wait();
             }
         }
         
