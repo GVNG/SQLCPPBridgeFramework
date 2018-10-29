@@ -40,17 +40,17 @@ namespace sql_bridge
         : public class_descriptor
     {
     public:
-        class_descriptors_container const& members() const {return description_->members();}
-        class_descriptors_pair reference_description() const {return class_descriptors_pair(type_id(),description_);}
-        class_descriptors_pair prefix_description() const {return empty_descriptors_pair;}
-        std::string const& table_name() const {static std::string const def;return def;}
-        std::string const& sql_type() const {static std::string const def;return def;}
-        void bind(void const*, data_update_context&) {};
-        void bind_comp(void const* val, data_update_context& cont, sql_value const& extkey) {_bind_comp<TParent>(*static_cast<TChild const*>(val),cont,extkey);};
-        sql_value expand(void const*) {return sql_value();}
-        void read(void* dst,data_update_context& cont) {}
-        void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) {_read_comp<TParent>(*static_cast<TChild*>(dst),cont,extkey);}
-        bool is_this_mem_ptr(void const* base, void const* memptr) const {return false;}
+        class_descriptors_container const& members() const override {return description_->members();}
+        class_descriptors_pair reference_description() const override {return class_descriptors_pair(type_id(),description_);}
+        class_descriptors_pair prefix_description() const override {return empty_descriptors_pair;}
+        std::string const& table_name() const override {static std::string const def;return def;}
+        std::string const& sql_type() const override {static std::string const def;return def;}
+        void bind(void const*, data_update_context&) override {};
+        void bind_comp(void const* val, data_update_context& cont, sql_value const& extkey) override {_bind_comp<TParent>(*static_cast<TChild const*>(val),cont,extkey);};
+        sql_value expand(void const*) override {return sql_value();}
+        void read(void* dst,data_update_context& cont) override {}
+        void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {_read_comp<TParent>(*static_cast<TChild*>(dst),cont,extkey);}
+        bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
 
     protected:
         _t_inheritance_descriptor(class_descriptors_ptr desc)

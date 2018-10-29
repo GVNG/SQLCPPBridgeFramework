@@ -473,30 +473,30 @@ namespace sql_bridge
             , TStrategy::sql_file(fname)
             {};
     private:
-        data_update_context_ptr create_context(size_t tid, std::string const& flt) const
+        data_update_context_ptr create_context(size_t tid, std::string const& flt) const override
         {
             class_descriptors_ptr desc = (*descriptor_)[tid];
             return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::transactions_lock>(*this,desc,desc->depends(),descriptor_,flt));
         }
-        data_update_context_ptr create_reader(size_t tid, std::string const& flt) const
+        data_update_context_ptr create_reader(size_t tid, std::string const& flt) const override
         {
             class_descriptors_ptr desc = (*descriptor_)[tid];
             return data_update_context_ptr(new _t_data_read_context<TStrategy>(*this,desc,desc->depends(),descriptor_,flt,sql_value()));
         }
         
-        std::string order_by(std::string const& fld) {return TStrategy::sql_order_by(fld);}
-        std::string order_asc(std::string const& fld) {return TStrategy::sql_order_asc(fld);}
-        std::string order_desc(std::string const& fld) {return TStrategy::sql_order_desc(fld);}
-        std::string limit(size_t lim) {return TStrategy::sql_limit(lim);}
-        std::string limit_offset(size_t ofs) {return TStrategy::sql_limit_offset(ofs);}
-        std::string where() {return TStrategy::sql_where();}
-        std::string where(std::string const& fld,std::string const& cnd) {return TStrategy::sql_where(fld,cnd);}
-        std::string operator_or() {return TStrategy::sql_operator_or();}
-        std::string operator_and() {return TStrategy::sql_operator_and();}
-        std::string where_between(std::string const& fld,std::string const& from,std::string const& to) {return TStrategy::sql_where_between(fld,from,to);}
-        std::string where_not_between(std::string const& fld,std::string const& from,std::string const& to) {return TStrategy::sql_where_not_between(fld,from,to);}
-        std::string where_in(std::string const& fld,std::string const& val) {return TStrategy::sql_where_in(fld,val);}
-        std::string where_not_in(std::string const& fld,std::string const& val) {return TStrategy::sql_where_not_in(fld,val);}
+        std::string order_by(std::string const& fld) override {return TStrategy::sql_order_by(fld);}
+        std::string order_asc(std::string const& fld) override {return TStrategy::sql_order_asc(fld);}
+        std::string order_desc(std::string const& fld) override {return TStrategy::sql_order_desc(fld);}
+        std::string limit(size_t lim) override {return TStrategy::sql_limit(lim);}
+        std::string limit_offset(size_t ofs) override {return TStrategy::sql_limit_offset(ofs);}
+        std::string where() override {return TStrategy::sql_where();}
+        std::string where(std::string const& fld,std::string const& cnd) override {return TStrategy::sql_where(fld,cnd);}
+        std::string operator_or() override {return TStrategy::sql_operator_or();}
+        std::string operator_and() override {return TStrategy::sql_operator_and();}
+        std::string where_between(std::string const& fld,std::string const& from,std::string const& to) override {return TStrategy::sql_where_between(fld,from,to);}
+        std::string where_not_between(std::string const& fld,std::string const& from,std::string const& to) override {return TStrategy::sql_where_not_between(fld,from,to);}
+        std::string where_in(std::string const& fld,std::string const& val) override {return TStrategy::sql_where_in(fld,val);}
+        std::string where_not_in(std::string const& fld,std::string const& val) override {return TStrategy::sql_where_not_in(fld,val);}
 
     };
     

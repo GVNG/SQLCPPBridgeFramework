@@ -55,8 +55,8 @@ namespace sql_bridge
                 , data_(std::move(src))
                 {};
             
-            inline void run_task() {section_->save(data_);}
-            void error(base_sql_error const& err) {std::cerr << err.what() << std::endl;}
+            inline void run_task() override {section_->save(data_);}
+            void error(base_sql_error const& err) override {std::cerr << err.what() << std::endl;}
         private:
             data_sections_ptr section_;
             _t_base data_;
@@ -74,8 +74,8 @@ namespace sql_bridge
                 : section_(section)
                 , data_(std::move(src))
                 {};
-            inline void run_task() {section_->replace(data_);}
-            void error(base_sql_error const& err) {std::cerr << err.what() << std::endl;}
+            inline void run_task() override {section_->replace(data_);}
+            void error(base_sql_error const& err) override {std::cerr << err.what() << std::endl;}
         private:
             data_sections_ptr section_;
             _t_base data_;
@@ -89,9 +89,9 @@ namespace sql_bridge
                 : section_(section)
                 , filter_(flt)
                 {};
-            inline void run_task() {section_->load(data_,filter_);}
+            inline void run_task() override {section_->load(data_,filter_);}
             inline _t_base&& data() {return std::move(data_);}
-            void error(base_sql_error const& err) {throw err;}
+            void error(base_sql_error const& err) override {throw err;}
         private:
             data_sections_ptr section_;
             std::string filter_;
@@ -112,13 +112,13 @@ namespace sql_bridge
                 , fn_success_(fs)
                 , fn_failed_(fl)
                 {};
-            void run_task()
+            void run_task() override
             {
                 section_->load(data_,filter_);
                 if (fn_success_)
                     fn_success_(std::move(data_));
             };
-            void error(base_sql_error const& err)
+            void error(base_sql_error const& err) override
             {
                 if (fn_failed_)
                     fn_failed_(err);
@@ -146,8 +146,8 @@ namespace sql_bridge
                 : section_(section)
                 , data_(std::move(src))
                 {};
-            inline void run_task() {section_->remove(data_);}
-            void error(base_sql_error const& err) {std::cerr << err.what() << std::endl;}
+            inline void run_task() override {section_->remove(data_);}
+            void error(base_sql_error const& err) override {std::cerr << err.what() << std::endl;}
         private:
             data_sections_ptr section_;
             _t_base data_;
@@ -161,7 +161,7 @@ namespace sql_bridge
                 : section_(section)
                 , condition_(flt)
                 {};
-            inline void run_task() {section_->remove_if<T>(condition_);}
+            inline void run_task() override {section_->remove_if<T>(condition_);}
         private:
             data_sections_ptr section_;
             std::string const condition_;
