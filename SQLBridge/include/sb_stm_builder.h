@@ -47,9 +47,9 @@ namespace sql_bridge
             , desc_(ds)
             {}
         
-        std::string general(data_sections_ptr data) const {return data->order_by(field_);}
-        std::string build(data_sections_ptr data) const {return desc_?data->order_desc(field_):data->order_asc(field_);}
-        std::string repeat_delimiter() const {return ",";}
+        std::string general(data_sections_ptr data) const override {return data->order_by(field_);}
+        std::string build(data_sections_ptr data) const override {return desc_?data->order_desc(field_):data->order_asc(field_);}
+        std::string repeat_delimiter() const override {return ",";}
     private:
         bool desc_;
     };
@@ -62,8 +62,8 @@ namespace sql_bridge
             , count_(cnt)
             , offset_(ofs)
             {}
-        std::string general(data_sections_ptr data) const {return data->limit(count_);}
-        std::string build(data_sections_ptr data) const {return offset_?data->limit_offset(offset_):"";}
+        std::string general(data_sections_ptr data) const override {return data->limit(count_);}
+        std::string build(data_sections_ptr data) const override {return offset_?data->limit_offset(offset_):"";}
     private:
         size_t count_;
         size_t offset_;
@@ -76,8 +76,8 @@ namespace sql_bridge
             : suffix_bare(fld,e_weight::WHERE)
             , condition_(cond)
             {}
-        std::string general(data_sections_ptr data) const {return data->where();}
-        std::string build(data_sections_ptr data) const {return data->where(field_,condition_);}
+        std::string general(data_sections_ptr data) const override {return data->where();}
+        std::string build(data_sections_ptr data) const override {return data->where(field_,condition_);}
     private:
         std::string condition_;
     };
@@ -89,8 +89,8 @@ namespace sql_bridge
             : suffix_bare("",e_weight::WHERE)
             , op_(op)
             {}
-        std::string general(data_sections_ptr) const {return "";}
-        std::string build(data_sections_ptr data) const
+        std::string general(data_sections_ptr) const override {return "";}
+        std::string build(data_sections_ptr data) const override
         {
             switch (op_)
             {
@@ -112,8 +112,8 @@ namespace sql_bridge
             , to_(to)
             , flag_not_(nf)
             {}
-        std::string general(data_sections_ptr data) const {return data->where();}
-        std::string build(data_sections_ptr data) const
+        std::string general(data_sections_ptr data) const override {return data->where();}
+        std::string build(data_sections_ptr data) const override
         {
             return flag_not_
                 ? data->where_not_between(field_, from_, to_)
@@ -133,8 +133,8 @@ namespace sql_bridge
             , val_(val)
             , flag_not_(nf)
             {}
-        std::string general(data_sections_ptr data) const {return data->where();}
-        std::string build(data_sections_ptr data) const
+        std::string general(data_sections_ptr data) const override {return data->where();}
+        std::string build(data_sections_ptr data) const override
         {
             return flag_not_
                 ? data->where_not_between(val_, field_, field2_)
@@ -153,8 +153,8 @@ namespace sql_bridge
             , values_(val)
             , flag_not_(nf)
             {}
-        std::string general(data_sections_ptr data) const {return data->where();}
-        std::string build(data_sections_ptr data) const
+        std::string general(data_sections_ptr data) const override {return data->where();}
+        std::string build(data_sections_ptr data) const override
         {
             return flag_not_
                 ? data->where_not_in(field_,values_)

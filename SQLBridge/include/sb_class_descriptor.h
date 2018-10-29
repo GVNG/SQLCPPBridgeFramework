@@ -50,18 +50,18 @@ namespace sql_bridge
             {}
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundefined-var-template"
-        virtual class_descriptors_container const& members() const {return members_;}
-        std::string const& table_name() const {return table_name_;}
+        virtual class_descriptors_container const& members() const override {return members_;}
+        std::string const& table_name() const override {return table_name_;}
 #pragma clang diagnostic pop // And unhide them again!
-        class_descriptors_pair reference_description() const {return empty_descriptors_pair;}
-        class_descriptors_pair prefix_description() const {return empty_descriptors_pair;}
-        std::string const& sql_type() const {static std::string const def; return def;}
-        void bind(void const* val, data_update_context& cont) {}
-        void bind_comp(void const* val, data_update_context& cont, sql_value const& extkey) {_bind_comp<T>(*static_cast<T const*>(val),cont,extkey);}
-        sql_value expand(void const*) {return sql_value();}
-        void read(void* dst,data_update_context& cont) {_read<T>(*static_cast<T*>(dst),cont);}
-        void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) {_read_comp<T>(*static_cast<T*>(dst),cont,extkey);}
-        bool is_this_mem_ptr(void const* base, void const* memptr) const {return false;}
+        class_descriptors_pair reference_description() const override {return empty_descriptors_pair;}
+        class_descriptors_pair prefix_description() const override {return empty_descriptors_pair;}
+        std::string const& sql_type() const override {static std::string const def; return def;}
+        void bind(void const* val, data_update_context& cont) override {}
+        void bind_comp(void const* val, data_update_context& cont, sql_value const& extkey) override {_bind_comp<T>(*static_cast<T const*>(val),cont,extkey);}
+        sql_value expand(void const*) override {return sql_value();}
+        void read(void* dst,data_update_context& cont) override {_read<T>(*static_cast<T*>(dst),cont);}
+        void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {_read_comp<T>(*static_cast<T*>(dst),cont,extkey);}
+        bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
 
         template<typename TFn> static class_descriptors_ptr create_description() {return _create_description_pub<TFn>();}
         template<typename TFn> static class_descriptors_ptr create_inheritance(class_descriptors_ptr desc)

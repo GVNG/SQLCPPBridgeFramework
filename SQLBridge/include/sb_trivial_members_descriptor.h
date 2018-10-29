@@ -44,17 +44,17 @@ namespace sql_bridge
             : class_descriptor(0,"",e_db_index_type::None)
             {}
 
-        class_descriptors_container const& members() const {static const class_descriptors_container def;return def;}
-        class_descriptors_pair reference_description() const {return class_descriptors_pair(typeid(T).hash_code(),class_descriptors_ptr());}
-        class_descriptors_pair prefix_description() const {return empty_descriptors_pair;}
-        std::string const& table_name() const {static std::string const def;return def;}
-        std::string const& sql_type() const {static std::string const def;return def;}
-        void bind(void const*,data_update_context&) {};
-        void bind_comp(void const*,data_update_context&,sql_value const&) {};
-        sql_value expand(void const*) {return sql_value();}
-        void read(void*,data_update_context&) {}
-        void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) {};
-        bool is_this_mem_ptr(void const* base, void const* memptr) const {return false;}
+        class_descriptors_container const& members() const override {static const class_descriptors_container def;return def;}
+        class_descriptors_pair reference_description() const override {return class_descriptors_pair(typeid(T).hash_code(),class_descriptors_ptr());}
+        class_descriptors_pair prefix_description() const override {return empty_descriptors_pair;}
+        std::string const& table_name() const override {static std::string const def;return def;}
+        std::string const& sql_type() const override {static std::string const def;return def;}
+        void bind(void const*,data_update_context&) override {};
+        void bind_comp(void const*,data_update_context&,sql_value const&) override {};
+        sql_value expand(void const*) override {return sql_value();}
+        void read(void*,data_update_context&) override {}
+        void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {};
+        bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
     private:
     };
     
@@ -66,17 +66,17 @@ namespace sql_bridge
             : class_descriptor(0,fn,idt)
             {}
         
-        class_descriptors_container const& members() const {static const class_descriptors_container def;return def;}
-        class_descriptors_pair reference_description() const {return empty_descriptors_pair;}
-        class_descriptors_pair prefix_description() const {return empty_descriptors_pair;}
-        std::string const& table_name() const {static std::string const def;return def;}
-        std::string const& sql_type() const {return _sql_type<T>();}
-        void bind(void const*,data_update_context&) {};
-        void bind_comp(void const*,data_update_context&,sql_value const&) {};
-        sql_value expand(void const*) {return sql_value();}
-        void read(void*,data_update_context&) {}
-        void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) {};
-        bool is_this_mem_ptr(void const* base, void const* memptr) const {return false;}
+        class_descriptors_container const& members() const override {static const class_descriptors_container def;return def;}
+        class_descriptors_pair reference_description() const override {return empty_descriptors_pair;}
+        class_descriptors_pair prefix_description() const override {return empty_descriptors_pair;}
+        std::string const& table_name() const override {static std::string const def;return def;}
+        std::string const& sql_type() const override {return _sql_type<T>();}
+        void bind(void const*,data_update_context&) override {};
+        void bind_comp(void const*,data_update_context&,sql_value const&) override {};
+        sql_value expand(void const*) override {return sql_value();}
+        void read(void*,data_update_context&) override {}
+        void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {};
+        bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
 
     private:
 #pragma mark - sql types

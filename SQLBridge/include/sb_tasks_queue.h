@@ -96,6 +96,7 @@ namespace sql_bridge
         void do_proc(std::atomic_bool& ready)
         {
             ready = true;
+            new_data_.wait();
             for(;;)
             {
                 db_task_ptr task;

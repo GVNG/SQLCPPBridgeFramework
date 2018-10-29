@@ -44,17 +44,17 @@ namespace sql_bridge
     {
     public:
 #pragma mark - public methods
-        inline class_descriptors_container const& members() const {return _members<TMb>();}
-        class_descriptors_pair reference_description() const {return class_descriptors_pair(type_id(),description_);}
-        inline class_descriptors_pair prefix_description() const {return _prefix<TMb>();}
-        std::string const& table_name() const {static std::string const def;return def;}
-        std::string const& sql_type() const {return _sql_type<TMb>();}
-        void bind(void const* src, data_update_context& cnt) {_bind_elem<TMb>(*static_cast<T const*>(src),cnt);};
-        void bind_comp(void const* src, data_update_context& cnt, sql_value const& extkey) {_bind_comp_elem<TMb>(*static_cast<T const*>(src),cnt,extkey);};
-        sql_value expand(void const* src) {return _expand<TMb>(*static_cast<T const*>(src));}
-        void read(void* dst, data_update_context& cnt) {_read<TMb>(*static_cast<T*>(dst),cnt);}
-        void read_comp(void* dst, data_update_context& cnt, sql_value const& extkey) {_read_comp<TMb>(*static_cast<T*>(dst),cnt,extkey);}
-        bool is_this_mem_ptr(void const* base, void const* memptr) const
+        inline class_descriptors_container const& members() const override {return _members<TMb>();}
+        class_descriptors_pair reference_description() const override {return class_descriptors_pair(type_id(),description_);}
+        inline class_descriptors_pair prefix_description() const override {return _prefix<TMb>();}
+        std::string const& table_name() const override {static std::string const def;return def;}
+        std::string const& sql_type() const override {return _sql_type<TMb>();}
+        void bind(void const* src, data_update_context& cnt) override {_bind_elem<TMb>(*static_cast<T const*>(src),cnt);};
+        void bind_comp(void const* src, data_update_context& cnt, sql_value const& extkey) override {_bind_comp_elem<TMb>(*static_cast<T const*>(src),cnt,extkey);};
+        sql_value expand(void const* src) override {return _expand<TMb>(*static_cast<T const*>(src));}
+        void read(void* dst, data_update_context& cnt) override {_read<TMb>(*static_cast<T*>(dst),cnt);}
+        void read_comp(void* dst, data_update_context& cnt, sql_value const& extkey) override {_read_comp<TMb>(*static_cast<T*>(dst),cnt,extkey);}
+        bool is_this_mem_ptr(void const* base, void const* memptr) const override
         {
             T const* chk = static_cast<T const*>(base);
             return &(chk->*member_)==memptr;
