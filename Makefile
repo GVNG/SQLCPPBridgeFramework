@@ -59,14 +59,9 @@ SRCEXT := cpp
 SOURCES := $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS := $(patsubst %.o,build/%.o,$(notdir $(patsubst $(SRCDIR)/%.cpp,%.o,$(SOURCES))))
 
-# Folder Lists
-# Note: Intentionally excludes the root of the include folder so the lists are clean
-INCDIRS := $(shell find $(INCDIR)/** -name '*.h*' -exec dirname {} \; | sort | uniq)
-INCLIST := $(patsubst $(INCDIR)/%,-I $(INCDIR)/%,$(INCDIRS))
-
 # Shared Compiler Flags
 CFLAGS := -c -fembed-bitcode
-INC := -I $(INCLIST)
+INC := -I $(INCDIR)
 LIB := 
 
 ifdef ARCH
