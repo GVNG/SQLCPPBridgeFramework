@@ -2,8 +2,8 @@
 #  Makefile
 #  SQLCPPBridge
 #
-#  Created by Roman Makhnenko on 2018-06-13.
-#  Copyright © 2013, DataArt.
+#  Created by Roman Makhnenko on 23/06/2018
+#  Copyright © 2018, DataArt.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
