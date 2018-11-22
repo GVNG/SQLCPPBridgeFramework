@@ -73,20 +73,20 @@ namespace sql_bridge
     
     template <typename T> struct has_begin_end
     {
-        template<typename C> static char (&f(typename std::enable_if<
-                                             std::is_same<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::begin)),
-                                             typename C::const_iterator(C::*)() const>::value, void>::type*))[1];
+    private:
+        typedef char                      yes;
+        typedef struct { char array[2]; } no;
         
-        template<typename C> static char (&f(...))[2];
+        template<typename C, typename C::const_iterator(C::*)() const> struct validator {};
+        template<typename C> static yes test_b(validator<C, &C::begin>*) {};
+        template<typename C> static yes test_e(validator<C, &C::end>*) {};
+        template<typename C> static no test_b(...) {};
+        template<typename C> static no test_e(...) {};
         
-        template<typename C> static char (&g(typename std::enable_if<
-                                             std::is_same<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::end)),
-                                             typename C::const_iterator(C::*)() const>::value, void>::type*))[1];
-        
-        template<typename C> static char (&g(...))[2];
-        
-        static bool const beg_value = sizeof(f<T>(0)) == 1;
-        static bool const end_value = sizeof(g<T>(0)) == 1;
+    public:
+        static bool const beg_value = sizeof(test_b<T>(0)) == sizeof(yes);
+        static bool const end_value = sizeof(test_e<T>(0)) == sizeof(yes);
+        typedef T type;
     };
     
     template<typename T> struct is_any_container
