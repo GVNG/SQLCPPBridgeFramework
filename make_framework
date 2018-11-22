@@ -89,5 +89,5 @@ lipo -arch i386 "lib/$FRAMEWORK_NAME-i386.a" \
      -arch x86_64 "lib/$FRAMEWORK_NAME-x86_64.a" \
      -create -output "$FRAMEWORK/$FRAMEWORK_NAME"
 
-rm -r     ./lib
-rm -r     build/sb_*
+rm -r ./lib
+rm -r ./build/sb_*
