@@ -77,22 +77,24 @@ namespace sql_bridge
         typedef char                      yes;
         typedef struct { char array[2]; } no;
         
-        template<typename C, typename C::const_iterator(C::*)() const> struct validator {};
-        template<typename C> static yes test_b(validator<C, &C::begin>*) {};
-        template<typename C> static yes test_e(validator<C, &C::end>*) {};
+        template<typename C> static yes test_b(typename std::enable_if<
+                                               std::is_same<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::begin)),
+                                               typename C::const_iterator(C::*)() const>::value, void>::type*) {};
+        template<typename C> static yes test_e(typename std::enable_if<
+                                               std::is_same<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::end)),
+                                               typename C::const_iterator(C::*)() const>::value, void>::type*) {};
         template<typename C> static no test_b(...) {};
         template<typename C> static no test_e(...) {};
         
     public:
-        static bool const beg_value = sizeof(test_b<T>(0)) == sizeof(yes);
-        static bool const end_value = sizeof(test_e<T>(0)) == sizeof(yes);
+        static bool const value =   sizeof(test_b<T>(0)) == sizeof(yes) &&
+                                    sizeof(test_e<T>(0)) == sizeof(yes);
         typedef T type;
     };
     
     template<typename T> struct is_any_container
         : std::integral_constant<bool,  has_const_iterator<T>::value &&
-                                        has_begin_end<T>::beg_value &&
-                                        has_begin_end<T>::end_value>
+                                        has_begin_end<T>::value>
     {
     };
     
@@ -220,7 +222,7 @@ namespace sql_bridge
     };
 
     template<typename T> struct is_trivial_container
-        : std::integral_constant<bool, containers_type_check_for_trivial<is_container<T>::value, T>::value>
+        : std::integral_constant<bool, containers_type_check_for_trivial<is_container<T>::value,T>::value>
     {
     };
 

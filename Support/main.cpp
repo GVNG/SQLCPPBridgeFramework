@@ -64,6 +64,11 @@ int main(int argc, char** argv)
     {
         mkdir("DB", 0777);
         sql_bridge::local_storage<sql_bridge::sqlite_adapter> storage("./DB");
+        
+//        typedef std::set<std::string> _t_string_set;
+//        struct chkstruct : _t_string_set {};
+//        std::cout << sql_bridge::is_trivial_container<chkstruct>::value << std::endl;
+        
 #if 1
         {
             std::cout << "Case KVDB ";
@@ -111,6 +116,12 @@ int main(int argc, char** argv)
             storage.save("IntStringMap",mapstr1_src);
             mapstr1_dst = storage.load("IntStringMap",std::map<int,std::string>());
             assert(mapstr1_src==mapstr1_dst);
+            
+            std::chrono::system_clock::time_point srcnow(std::chrono::system_clock::now()),dstnow;
+            storage.save("NOW", srcnow);
+            dstnow = storage.load("NOW", std::chrono::system_clock::time_point());
+            assert(srcnow==dstnow);
+            
             std::cout << "is ok. ";
         }
         

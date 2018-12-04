@@ -104,6 +104,12 @@ namespace sql_bridge
             template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value>::type read_value(T& v, int fld) const {v=static_cast<T>(sqlite3_column_double(state_, fld));}
             template<typename T> inline typename std::enable_if<is_convertible_to_text<T>::value>::type read_value(T& v, int fld) const {v=reinterpret_cast<const char*>(sqlite3_column_text(state_, fld));}
             template<typename T> inline typename std::enable_if<is_convertible_to_int<T>::value>::type read_value(T& v, int fld) const {v=static_cast<T>(sqlite3_column_int64(state_, fld));}
+            template<typename T> inline typename std::enable_if<is_chrono<T>::value>::type read_value(T& v, int fld) const
+            {
+                double val = sqlite3_column_double(state_, fld);
+                typename T::clock::duration ret(static_cast<int64_t>(val / T::clock::period::num * T::clock::period::den));
+                v = T(ret);
+            }
         protected:
         private:
             // data
@@ -136,6 +142,12 @@ namespace sql_bridge
             template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value>::type bind_value(T const& val, int fld) {need_step_=true;sqlite3_bind_double(state_, fld, val);}
             template<typename T> inline typename std::enable_if<is_convertible_to_int<T>::value>::type bind_value(T const& val, int fld) {need_step_=true;sqlite3_bind_int64(state_, fld, static_cast<sqlite3_int64>(val));}
             template<typename T> inline typename std::enable_if<is_convertible_to_text<T>::value>::type bind_value(T const& val, int fld) {need_step_=true;sqlite3_bind_text(state_, fld, val.c_str(), (int)val.size(), SQLITE_STATIC);}
+            template<typename T> inline typename std::enable_if<is_chrono<T>::value>::type bind_value(T const& val, int fld)
+            {
+                need_step_=true;
+                double tv = static_cast<double>(val.time_since_epoch().count()) / T::period::den * T::period::num;
+                sqlite3_bind_double(state_, fld, tv);
+            }
         protected:
         private:
             // data
