@@ -111,6 +111,12 @@ int main(int argc, char** argv)
             storage.save("IntStringMap",mapstr1_src);
             mapstr1_dst = storage.load("IntStringMap",std::map<int,std::string>());
             assert(mapstr1_src==mapstr1_dst);
+            
+            std::chrono::system_clock::time_point srcnow(std::chrono::system_clock::now()),dstnow;
+            storage.save("NOW", srcnow);
+            dstnow = storage.load("NOW", std::chrono::system_clock::time_point());
+            assert(srcnow==dstnow);
+            
             std::cout << "is ok. ";
         }
         
