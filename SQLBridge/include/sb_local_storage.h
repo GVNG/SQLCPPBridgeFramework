@@ -143,6 +143,7 @@ namespace sql_bridge
         {
             while (!ready_proc_) std::this_thread::yield();
             while (!ready_flush_) std::this_thread::yield();
+            std::this_thread::sleep_for(std::chrono::microseconds(1));
         }
         ~local_storage()
         {
