@@ -41,16 +41,18 @@ namespace sql_bridge
     class to_string
     {
     public:
-        template<typename T> inline to_string& operator << (const T& src) {write(src);return *this;}
+        template<typename T> inline to_string& operator << (T const& src) {_write(src);return *this;}
         inline operator std::string() const {return str();}
-        inline std::string str() const {return buf_.str();}
+        inline std::string str() const {return buf_.str().substr(0,buf_.tellp());}
         inline void remove_from_tail(long offs) {buf_.seekp(-offs, std::ios_base::cur);buf_.put(0);buf_.seekp(-1, std::ios_base::cur);}
+        inline operator std::ostringstream&() {return buf_;}
     private:
-        std::ostringstream buf_;
-        template<typename T> inline typename std::enable_if<std::is_enum<T>::value>::type write(const T& src) {buf_ << static_cast<typename std::underlying_type<T>::type>(src);}
-        template<typename T> inline typename std::enable_if<!std::is_enum<T>::value>::type write(const T& src) {buf_ << src;}
+        mutable std::ostringstream buf_;
+        template<typename T> inline typename std::enable_if<std::is_enum<T>::value>::type _write(T const& src) {buf_ << static_cast<typename std::underlying_type<T>::type>(src);}
+        template<typename T> inline typename std::enable_if<is_chrono<T>::value>::type _write(T const& src) {double pr = static_cast<double>(src.time_since_epoch().count()) / T::period::den * T::period::num; buf_ << pr;}
+        template<typename T> inline typename std::enable_if<!std::is_enum<T>::value && !is_chrono<T>::value>::type _write(T const& src) {buf_ << src;}
     };
-    
+
 #pragma mark - class singleton -
 
     #pragma GCC visibility push(hidden)

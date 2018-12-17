@@ -93,7 +93,7 @@ namespace sql_bridge
                 tasks_queue_.push_back(tsk);
             new_data_.fire();
         }
-        void do_proc(std::atomic_bool& ready)
+        void do_proc(bool& ready)
         {
             ready = true;
             new_data_.wait();

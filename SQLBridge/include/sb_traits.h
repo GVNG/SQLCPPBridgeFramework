@@ -44,7 +44,7 @@
 
 namespace sql_bridge
 {
-    template<typename T> struct has_pairs_inside
+    template<typename T> struct is_key_mapped
     {
     private:
         typedef char                      yes;
@@ -58,6 +58,21 @@ namespace sql_bridge
         static const bool value = sizeof(ft<T>(0)) == sizeof(yes) && sizeof(st<T>(0)) == sizeof(yes);
     };
     
+    template<typename T> struct is_pair
+    {
+    private:
+        typedef char                      yes;
+        typedef struct { char array[2]; } no;
+        
+        template<typename C> static yes ft(typename C::first_type*);
+        template<typename C> static yes st(typename C::second_type*);
+        template<typename C> static no  ft(...);
+        template<typename C> static no  st(...);
+    public:
+        static const bool value =   sizeof(ft<T>(0)) == sizeof(yes) &&
+        sizeof(st<T>(0)) == sizeof(yes);
+    };
+
     template<typename T> struct has_const_iterator
     {
     private:
@@ -100,7 +115,7 @@ namespace sql_bridge
     
     template<typename T> struct is_map
         : std::integral_constant<bool,  is_any_container<T>::value &&
-                                        has_pairs_inside<T>::value>
+                                        is_key_mapped<T>::value>
     {
     };
     
