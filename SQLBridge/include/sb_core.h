@@ -43,7 +43,7 @@ namespace sql_bridge
     public:
         template<typename T> inline to_string& operator << (T const& src) {_write(src);return *this;}
         inline operator std::string() const {return str();}
-        inline std::string str() const {return buf_.str().substr(0,buf_.tellp());}
+        inline std::string str() const {return buf_.str().substr(0,(size_t)buf_.tellp());}
         inline void remove_from_tail(long offs) {buf_.seekp(-offs, std::ios_base::cur);buf_.put(0);buf_.seekp(-1, std::ios_base::cur);}
         inline operator std::ostringstream&() {return buf_;}
     private:
