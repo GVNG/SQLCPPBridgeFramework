@@ -143,6 +143,7 @@ namespace sql_bridge
         {
             while (!ready_proc_) std::this_thread::yield();
             while (!ready_flush_) std::this_thread::yield();
+            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
         }
         ~local_storage()
         {
@@ -209,7 +210,7 @@ namespace sql_bridge
         }
     private:
         // data
-        std::atomic_bool ready_proc_,ready_flush_;
+        bool ready_proc_,ready_flush_;
         mt_event shutdown_;
         std::string root_path_;
         data_sections_map data_sections_;
