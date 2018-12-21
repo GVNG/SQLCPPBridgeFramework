@@ -41,22 +41,22 @@ export DEVPATH=${CROSS_TOP_IOS}/SDKs/${CROSS_SDK_IOS}
 export ARCH="armv7"
 export TOS="ios"
 make clean
-make
+make || exit 3
 export ARCH="armv7s"
 make clean
-make
+make || exit 4
 export ARCH="arm64"
 make clean
-make
+make || exit 5
 export DEVPATH=${CROSS_TOP_SIM}/SDKs/${CROSS_SDK_SIM}
 export ARCH="x86_64"
 make clean
-make
+make || exit 6
 
 FRAMEWORK_NAME="sqlcppbridge"
-FRAMEWORK="./build/${FRAMEWORK_NAME}.framework"
+FRAMEWORK="./build/iOS/${FRAMEWORK_NAME}.framework"
 rm -rf "$FRAMEWORK"
-mkdir "$FRAMEWORK"
+mkdir -p "$FRAMEWORK"
 
 cp -R "SQLBridge/include/." "$FRAMEWORK/Headers"
 
@@ -70,23 +70,22 @@ export DEVPATH=${CROSS_TOP_OSX}/SDKs/${CROSS_SDK_OSX}
 export ARCH="x86_64"
 export TOS="osx"
 make clean
-make
+make || exit 7
 export ARCH="i386"
 make clean
-make
+make || exit 8
 unset DEVPATH
 unset ARCH
 unset TOS
 
-FRAMEWORK_NAME="sqlcppbridge-osx"
-FRAMEWORK="./build/${FRAMEWORK_NAME}.framework"
+FRAMEWORK="./build/MacOS/${FRAMEWORK_NAME}.framework"
 rm -rf "$FRAMEWORK"
-mkdir "$FRAMEWORK"
+mkdir -p "$FRAMEWORK"
 
 cp -R "SQLBridge/include/." "$FRAMEWORK/Headers"
 
-lipo -arch i386 "lib/$FRAMEWORK_NAME-i386.a" \
-     -arch x86_64 "lib/$FRAMEWORK_NAME-x86_64.a" \
+lipo -arch i386 "lib/$FRAMEWORK_NAME-osx-i386.a" \
+     -arch x86_64 "lib/$FRAMEWORK_NAME-osx-x86_64.a" \
      -create -output "$FRAMEWORK/$FRAMEWORK_NAME"
 
 rm -r ./lib

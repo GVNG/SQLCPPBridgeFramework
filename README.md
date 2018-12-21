@@ -16,7 +16,6 @@ arising from the use of this software.
 
 How to use this library
 -------------
-The library is based on templates and features of C++11 standard.
 For using the library you need to add the framework "sqlcppbridge" into your 
 project and to include the file sqlcppbridge.h in your sources where it is required. 
 In 'Cases' directory there are several samples of using the library.
