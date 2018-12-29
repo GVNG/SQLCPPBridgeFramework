@@ -39,21 +39,21 @@
 
 namespace sql_bridge
 {
+    
     class data_section_descriptors_bare;
     typedef std::map<std::string,data_section_descriptors_ptr> data_section_descriptors_map;
-    typedef singleton<data_section_descriptors_bare> data_section_descriptors;
     typedef std::function<void()> _t_init_routine;
     typedef std::queue<_t_init_routine> _t_init_queue;
     
-    class data_section_descriptors_bare
+    class data_section_descriptors
     {
-    friend data_section_descriptors;
     public:
         data_section_descriptors_ptr operator [](std::string const& name);
         void add_data_section(std::string const& name, data_section_descriptors_ptr sect);
         void add_init(_t_init_routine fn) {init_queue_.push(fn);}
+        static data_section_descriptors& instance();
     private:
-        data_section_descriptors_bare() {};
+        data_section_descriptors() {};
         void proc_init_queue();
         // data
         data_section_descriptors_map index_;

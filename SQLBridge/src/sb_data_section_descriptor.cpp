@@ -34,7 +34,16 @@
 
 namespace sql_bridge
 {
-    data_section_descriptors_ptr data_section_descriptors_bare::operator[](std::string const& name)
+    
+#pragma mark - desctiptors
+    
+    data_section_descriptors& data_section_descriptors::instance()
+    {
+        static data_section_descriptors instance_;
+        return instance_;
+    }
+    
+    data_section_descriptors_ptr data_section_descriptors::operator[](std::string const& name)
     {
         proc_init_queue();
         static std::string const rec("You should use DEFINE_SQL_DATABASE macro somewhere in your code");
@@ -45,7 +54,7 @@ namespace sql_bridge
         return pos->second;
     }
     
-    void data_section_descriptors_bare::add_data_section(std::string const& name, data_section_descriptors_ptr sect)
+    void data_section_descriptors::add_data_section(std::string const& name, data_section_descriptors_ptr sect)
     {
         static std::string const rec("Use the different name");
         std::lock_guard<std::mutex> lck(access_);
@@ -55,7 +64,7 @@ namespace sql_bridge
         index_.insert({name,sect});
     }
   
-    void data_section_descriptors_bare::proc_init_queue()
+    void data_section_descriptors::proc_init_queue()
     {
         while(!init_queue_.empty())
         {
@@ -63,6 +72,8 @@ namespace sql_bridge
             init_queue_.pop();
         }
     }
+    
+#pragma mark - descriptor
     
     void data_section_descriptor::prepare_relations(class_links_container& dst,std::string const& def_internal_type) const
     {

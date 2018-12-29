@@ -52,24 +52,6 @@ namespace sql_bridge
         template<typename T> inline typename std::enable_if<is_chrono<T>::value>::type _write(T const& src) {double pr = static_cast<double>(src.time_since_epoch().count()) / T::period::den * T::period::num; buf_ << pr;}
         template<typename T> inline typename std::enable_if<!std::is_enum<T>::value && !is_chrono<T>::value>::type _write(T const& src) {buf_ << src;}
     };
-
-#pragma mark - class singleton -
-
-    #pragma GCC visibility push(hidden)
-    template<typename T> class singleton
-    {
-    public:
-        static T& instance()
-        {
-            static T instance_;
-            return instance_;
-        }
-    private:
-        singleton() {};
-        singleton(const singleton&) = delete;
-        singleton(singleton&&) = delete;
-    };
-    #pragma GCC visibility pop
     
 #pragma mark - class time_tracker -
     
