@@ -32,6 +32,8 @@
 		931D3CFE2175D0E600BCD515 /* example22.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931E1F0221455043009F9953 /* example22.cpp */; };
 		931D3CFF2175D0E600BCD515 /* example23.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931D3CCE2170E3AC00BCD515 /* example23.cpp */; };
 		9336AAA2206A26EA00DF00CA /* sb_class_descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9336AAA1206A26EA00DF00CA /* sb_class_descriptor.cpp */; };
+		937F848521DA2B4800DD82F8 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F848421DA2B4800DD82F8 /* main.cpp */; };
+		937F848A21DA2C1100DD82F8 /* libgtest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 937F848921DA2C1100DD82F8 /* libgtest.a */; };
 		93B071FB20582B0E008D2FB6 /* sb_sqlite_adapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B071FA20582B0E008D2FB6 /* sb_sqlite_adapter.cpp */; };
 		93B0720320591999008D2FB6 /* sb_data_section_descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B0720220591999008D2FB6 /* sb_data_section_descriptor.cpp */; };
 		93BEDCF020A34894004166EB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E60D7B20558090009151ED /* main.cpp */; };
@@ -40,6 +42,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		937F848021DA2B4800DD82F8 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		93E60D6A20557F7A009151ED /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -57,7 +68,6 @@
 		931D3CCE2170E3AC00BCD515 /* example23.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example23.cpp; sourceTree = "<group>"; };
 		931D3CE62175CA4F00BCD515 /* example24.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example24.h; sourceTree = "<group>"; };
 		931D3CE72175CAFA00BCD515 /* example24.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example24.cpp; sourceTree = "<group>"; };
-		931D3D06217759A500BCD515 /* LICENSE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
 		931E1F0121455031009F9953 /* example22.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example22.h; sourceTree = "<group>"; };
 		931E1F0221455043009F9953 /* example22.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example22.cpp; sourceTree = "<group>"; };
 		9336AA9C2069143200DF00CA /* sb_members_descriptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_members_descriptor.h; sourceTree = "<group>"; };
@@ -65,6 +75,12 @@
 		9336AAA1206A26EA00DF00CA /* sb_class_descriptor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sb_class_descriptor.cpp; sourceTree = "<group>"; };
 		9336AAAA206B692800DF00CA /* sb_foundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_foundation.h; sourceTree = "<group>"; };
 		936C65C120774AFF0033F0FB /* sb_links.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_links.h; sourceTree = "<group>"; };
+		937F847821DA2A5200DD82F8 /* LICENSE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = SOURCE_ROOT; };
+		937F847921DA2A5300DD82F8 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+		937F847A21DA2A6300DD82F8 /* CODE_OF_CONDUCT.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CODE_OF_CONDUCT.md; sourceTree = SOURCE_ROOT; };
+		937F848221DA2B4800DD82F8 /* Tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Tests; sourceTree = BUILT_PRODUCTS_DIR; };
+		937F848421DA2B4800DD82F8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		937F848921DA2C1100DD82F8 /* libgtest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgtest.a; path = UnitTests/Lib/googletest/lib/libgtest.a; sourceTree = "<group>"; };
 		93857ED720B463AB0088B787 /* sb_container_descriptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_container_descriptor.h; sourceTree = "<group>"; };
 		93857EE920BBD8C40088B787 /* example10.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = example10.h; sourceTree = "<group>"; };
 		93857EEA20BBD8C40088B787 /* example10.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = example10.cpp; sourceTree = "<group>"; };
@@ -74,7 +90,6 @@
 		939E0AE520F7651900106D46 /* example21.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example21.cpp; sourceTree = "<group>"; };
 		93A1349020D149E90041EE2E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; usesTabs = 1; };
 		93A1349220D249BD0041EE2E /* make_framework */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = make_framework; sourceTree = SOURCE_ROOT; };
-		93A1349320D24C690041EE2E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		93B071F92058262E008D2FB6 /* sb_sqlite_adapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_sqlite_adapter.h; sourceTree = "<group>"; };
 		93B071FA20582B0E008D2FB6 /* sb_sqlite_adapter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sb_sqlite_adapter.cpp; sourceTree = "<group>"; };
 		93B071FF20590A38008D2FB6 /* sb_context.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_context.h; sourceTree = "<group>"; };
@@ -135,6 +150,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		937F847F21DA2B4800DD82F8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				937F848A21DA2C1100DD82F8 /* libgtest.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		93E60D6920557F7A009151ED /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -146,14 +169,37 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		937F847B21DA2AA100DD82F8 /* UnitTests */ = {
+			isa = PBXGroup;
+			children = (
+				937F847C21DA2AA100DD82F8 /* include */,
+				937F847D21DA2AA100DD82F8 /* src */,
+			);
+			path = UnitTests;
+			sourceTree = "<group>";
+		};
+		937F847C21DA2AA100DD82F8 /* include */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		937F847D21DA2AA100DD82F8 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				937F848421DA2B4800DD82F8 /* main.cpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
 		93E60D6320557F7A009151ED = {
 			isa = PBXGroup;
 			children = (
-				931D3D06217759A500BCD515 /* LICENSE.md */,
-				93A1349320D24C690041EE2E /* README.md */,
 				93E60D7620557FC7009151ED /* SQLBridge */,
 				93E60D7720557FE1009151ED /* Cases */,
 				93E60D7820557FFB009151ED /* Support */,
+				937F847B21DA2AA100DD82F8 /* UnitTests */,
 				93E60D6D20557F7A009151ED /* Products */,
 				93E60DBF20558D16009151ED /* Frameworks */,
 			);
@@ -163,6 +209,7 @@
 			isa = PBXGroup;
 			children = (
 				93E60D6C20557F7A009151ED /* SQLCPPBridgeFramework */,
+				937F848221DA2B4800DD82F8 /* Tests */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -234,6 +281,9 @@
 		93E60D7820557FFB009151ED /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				937F847A21DA2A6300DD82F8 /* CODE_OF_CONDUCT.md */,
+				937F847821DA2A5200DD82F8 /* LICENSE.md */,
+				937F847921DA2A5300DD82F8 /* README.md */,
 				93A1349220D249BD0041EE2E /* make_framework */,
 				93A1349020D149E90041EE2E /* Makefile */,
 				93E60D7B20558090009151ED /* main.cpp */,
@@ -283,6 +333,7 @@
 		93E60DBF20558D16009151ED /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				937F848921DA2C1100DD82F8 /* libgtest.a */,
 				93E60DC020558D16009151ED /* libsqlite3.tbd */,
 			);
 			name = Frameworks;
@@ -291,6 +342,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		937F848121DA2B4800DD82F8 /* Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 937F848621DA2B4800DD82F8 /* Build configuration list for PBXNativeTarget "Tests" */;
+			buildPhases = (
+				937F847E21DA2B4800DD82F8 /* Sources */,
+				937F847F21DA2B4800DD82F8 /* Frameworks */,
+				937F848021DA2B4800DD82F8 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Tests;
+			productName = Tests;
+			productReference = 937F848221DA2B4800DD82F8 /* Tests */;
+			productType = "com.apple.product-type.tool";
+		};
 		93E60D6B20557F7A009151ED /* SQLCPPBridgeFramework */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 93E60D7320557F7A009151ED /* Build configuration list for PBXNativeTarget "SQLCPPBridgeFramework" */;
@@ -317,6 +385,10 @@
 				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = DataArt;
 				TargetAttributes = {
+					937F848121DA2B4800DD82F8 = {
+						CreatedOnToolsVersion = 10.1;
+						ProvisioningStyle = Automatic;
+					};
 					93E60D6B20557F7A009151ED = {
 						CreatedOnToolsVersion = 9.2;
 						ProvisioningStyle = Automatic;
@@ -336,11 +408,20 @@
 			projectRoot = "";
 			targets = (
 				93E60D6B20557F7A009151ED /* SQLCPPBridgeFramework */,
+				937F848121DA2B4800DD82F8 /* Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		937F847E21DA2B4800DD82F8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				937F848521DA2B4800DD82F8 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		93E60D6820557F7A009151ED /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -380,6 +461,49 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		937F848721DA2B4800DD82F8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/UnitTests/Lib/googletest/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/UnitTests/Lib/googletest/lib",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		937F848821DA2B4800DD82F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/UnitTests/Lib/googletest/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/UnitTests/Lib/googletest/lib",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		93E60D7120557F7A009151ED /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -502,6 +626,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		937F848621DA2B4800DD82F8 /* Build configuration list for PBXNativeTarget "Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				937F848721DA2B4800DD82F8 /* Debug */,
+				937F848821DA2B4800DD82F8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		93E60D6720557F7A009151ED /* Build configuration list for PBXProject "SQLCPPBridgeFramework" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
