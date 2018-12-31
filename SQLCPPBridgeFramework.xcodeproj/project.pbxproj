@@ -161,6 +161,7 @@
 		937F84D621DA565200DD82F8 /* t_case22.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case22.cpp; sourceTree = "<group>"; };
 		937F84D821DA565D00DD82F8 /* t_case23.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case23.cpp; sourceTree = "<group>"; };
 		937F84DA21DA566700DD82F8 /* t_case24.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case24.cpp; sourceTree = "<group>"; };
+		937F84DC21DA5B2500DD82F8 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; usesTabs = 1; };
 		93857ED720B463AB0088B787 /* sb_container_descriptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_container_descriptor.h; sourceTree = "<group>"; };
 		93857EE920BBD8C40088B787 /* example10.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = example10.h; sourceTree = "<group>"; };
 		93857EEA20BBD8C40088B787 /* example10.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = example10.cpp; sourceTree = "<group>"; };
@@ -255,6 +256,7 @@
 			children = (
 				937F847C21DA2AA100DD82F8 /* include */,
 				937F847D21DA2AA100DD82F8 /* src */,
+				937F84DC21DA5B2500DD82F8 /* Makefile */,
 			);
 			path = UnitTests;
 			sourceTree = "<group>";

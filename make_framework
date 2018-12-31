@@ -37,6 +37,13 @@ CROSS_SDK_IOS="iPhoneOS.sdk"
 CROSS_TOP_OSX="`xcode-select --print-path`/Platforms/MacOSX.platform/Developer"
 CROSS_SDK_OSX="MacOSX.sdk"
 
+# unit-tests first
+# ---------------------
+make -C ./UnitTests clean
+make -C ./UnitTests || exit 1
+./UnitTests/out/Tests || exit 2
+# ---------------------
+
 export DEVPATH=${CROSS_TOP_IOS}/SDKs/${CROSS_SDK_IOS}
 export ARCH="armv7"
 export TOS="ios"
