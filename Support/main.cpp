@@ -62,7 +62,7 @@ int main(int argc, char** argv)
     sql_bridge::time_tracker tracker;
     try
     {
-        mkdir("DB", 0777);
+        mkdir("./DB", 0777);
         sql_bridge::local_storage<sql_bridge::sqlite_adapter> storage("./DB");
         
 //        typedef std::set<std::string> _t_string_set;

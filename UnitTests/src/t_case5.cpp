@@ -1,5 +1,5 @@
 //
-//  main.cpp
+//  t_case5.cpp
 //  UnitTests
 //
 //  Created by Roman Makhnenko on 31/12/2018.
@@ -28,10 +28,24 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "gtest/gtest.h"
+#include "t_db_fixture.h"
+#include "example5.h"
 
-int main(int argc, char ** argv)
+TEST_F(DBFixture, Case5)
 {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    sql_bridge::context cont(storage()["case5"]);
+    Case5a src5a, dst5a;
+    Case5b src5b, dst5b;
+    for(long long i=0; i<100; ++i)
+        src5a.push_back(sql_bridge::to_string() << "var: " << i+1);
+    for(long long i=0; i<300; ++i)
+        src5b[sql_bridge::to_string() << "key: " << i+1] = i;
+    
+    cont.replace(src5a);
+    cont.replace(src5b);
+    
+    cont.load(dst5a);
+    cont.load(dst5b);
+    ASSERT_EQ(src5a,dst5a);
+    ASSERT_EQ(src5b,dst5b);
 }

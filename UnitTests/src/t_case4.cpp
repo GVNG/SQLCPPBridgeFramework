@@ -1,5 +1,5 @@
 //
-//  main.cpp
+//  t_case4.cpp
 //  UnitTests
 //
 //  Created by Roman Makhnenko on 31/12/2018.
@@ -28,10 +28,16 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "gtest/gtest.h"
+#include "t_db_fixture.h"
+#include "example4.h"
 
-int main(int argc, char ** argv)
+TEST_F(DBFixture, Case4)
 {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    sql_bridge::context cont(storage()["case4"]);
+    std::vector<Case4> src4,dst4;
+    for(long long i=0; i<10000; ++i)
+        src4.push_back(Case4(i+1));
+    cont.replace(src4);
+    cont.load(dst4);
+    ASSERT_EQ(src4,dst4);
 }

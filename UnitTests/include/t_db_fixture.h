@@ -1,5 +1,5 @@
 //
-//  main.cpp
+//  t_db_fixture.h
 //  UnitTests
 //
 //  Created by Roman Makhnenko on 31/12/2018.
@@ -28,10 +28,45 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "gtest/gtest.h"
+#pragma once
+#ifndef t_db_fixture_h
+#define t_db_fixture_h
 
-int main(int argc, char ** argv)
+#include "gtest/gtest.h"
+#include "sqlcppbridge.h"
+#include <ftw.h>
+
+static char const* db_path = "./DBTest";
+
+class DBFixture : public ::testing::Test
 {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+    typedef sql_bridge::local_storage<sql_bridge::sqlite_adapter> _t_storage;
+protected:
+    DBFixture()
+    {
+        rmrf(db_path);
+        mkdir(db_path, 0777);
+        storage_ = std::make_unique<_t_storage>(db_path);
+    }
+    ~DBFixture() override
+    {
+        storage_.reset();
+        rmrf(db_path);
+    }
+    inline _t_storage& storage() {return *storage_.get();}
+    
+private:
+    std::unique_ptr<_t_storage> storage_;
+
+    static int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
+    {
+        int rv = remove(fpath);
+        if (rv) perror(fpath);
+        return rv;
+    }
+    
+    int rmrf(char const* path) {return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);}
+    
+};
+
+#endif /* t_db_fixture_h */

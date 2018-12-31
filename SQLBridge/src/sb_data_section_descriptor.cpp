@@ -207,7 +207,7 @@ namespace sql_bridge
     
     void data_section_descriptor::dump_statements(class_links_container const& src) const
     {
-#ifdef DEBUG
+#ifdef DEBUG_CORE
         std::cerr << "*** The data section '" << section_name_ << "'" << std::endl;
         for(size_t i=0; i<src.size(); ++i)
         {
@@ -221,7 +221,7 @@ namespace sql_bridge
     
     void data_section_descriptor::dump_statements(class_link const& src, std::string const& pref) const
     {
-#ifdef DEBUG
+#ifdef DEBUG_CORE
         
         std::cerr << pref << std::endl;
         statements_set const& stm(src.statements());

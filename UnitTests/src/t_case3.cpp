@@ -1,5 +1,5 @@
 //
-//  main.cpp
+//  t_case3.cpp
 //  UnitTests
 //
 //  Created by Roman Makhnenko on 31/12/2018.
@@ -28,10 +28,26 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "gtest/gtest.h"
+#include "t_db_fixture.h"
+#include "example3.h"
 
-int main(int argc, char ** argv)
+TEST_F(DBFixture, Case3)
 {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    sql_bridge::context cont(storage()["case3"]);
+    
+    std::deque<Case3> src3,dst3;
+    std::map<long,Case3> dstmap;
+    for(int i=0; i<100; ++i)
+        src3.push_back(Case3(i+1));
+    
+    cont.save(src3);
+    cont.remove(src3[50]);
+    src3.erase(src3.begin()+50);
+    cont.load(dst3);
+    cont.load(dstmap);
+    ASSERT_EQ(src3,dst3);
+    cont.load(std::vector<Case3>(),"WHERE ID>30", [](std::vector<Case3>&& rv)
+    {
+        ASSERT_EQ(rv.size(),69);
+    });
 }

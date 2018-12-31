@@ -34,6 +34,41 @@
 		9336AAA2206A26EA00DF00CA /* sb_class_descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9336AAA1206A26EA00DF00CA /* sb_class_descriptor.cpp */; };
 		937F848521DA2B4800DD82F8 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F848421DA2B4800DD82F8 /* main.cpp */; };
 		937F848A21DA2C1100DD82F8 /* libgtest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 937F848921DA2C1100DD82F8 /* libgtest.a */; };
+		937F848D21DA328600DD82F8 /* t_kvdb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F848C21DA328600DD82F8 /* t_kvdb.cpp */; };
+		937F848E21DA367500DD82F8 /* sb_sqlite_adapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B071FA20582B0E008D2FB6 /* sb_sqlite_adapter.cpp */; };
+		937F848F21DA367500DD82F8 /* sb_tasks_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E60DB9205589C4009151ED /* sb_tasks_queue.cpp */; };
+		937F849021DA367500DD82F8 /* sb_data_section_descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B0720220591999008D2FB6 /* sb_data_section_descriptor.cpp */; };
+		937F849121DA367500DD82F8 /* sb_class_descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9336AAA1206A26EA00DF00CA /* sb_class_descriptor.cpp */; };
+		937F849221DA369500DD82F8 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 93E60DC020558D16009151ED /* libsqlite3.tbd */; };
+		937F849321DA3C8B00DD82F8 /* example1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B072042059359C008D2FB6 /* example1.cpp */; };
+		937F849421DA3C8B00DD82F8 /* example2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCBB209E0B2F004166EB /* example2.cpp */; };
+		937F849521DA3C8B00DD82F8 /* example3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCC320A06CB5004166EB /* example3.cpp */; };
+		937F849621DA3C8B00DD82F8 /* example4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCC720A0939E004166EB /* example4.cpp */; };
+		937F849721DA3C8B00DD82F8 /* example5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCD320A1A60C004166EB /* example5.cpp */; };
+		937F849821DA3C8B00DD82F8 /* example6.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCDD20A3129E004166EB /* example6.cpp */; };
+		937F849921DA3C8B00DD82F8 /* example7.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCE720A32362004166EB /* example7.cpp */; };
+		937F849A21DA3C8B00DD82F8 /* example8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCF220A34DB1004166EB /* example8.cpp */; };
+		937F849B21DA3C8B00DD82F8 /* example9.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCFC20A42306004166EB /* example9.cpp */; };
+		937F849C21DA3C8B00DD82F8 /* example10.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93857EEA20BBD8C40088B787 /* example10.cpp */; };
+		937F849D21DA3C8B00DD82F8 /* example11.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93857F0020BBDB000088B787 /* example11.cpp */; };
+		937F849E21DA3C8B00DD82F8 /* example12.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93D3B1C620C4481000EEFC49 /* example12.cpp */; };
+		937F849F21DA3C8B00DD82F8 /* example13.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD85FA20CA5A79005D37A7 /* example13.cpp */; };
+		937F84A021DA3C8B00DD82F8 /* example14.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD860920CA5D49005D37A7 /* example14.cpp */; };
+		937F84A121DA3C8B00DD82F8 /* example15.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD861920CA85D2005D37A7 /* example15.cpp */; };
+		937F84A221DA3C8B00DD82F8 /* example16.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD861B20CA8713005D37A7 /* example16.cpp */; };
+		937F84A321DA3C8B00DD82F8 /* example17.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD862D20CA9B9B005D37A7 /* example17.cpp */; };
+		937F84A421DA3C8B00DD82F8 /* example18.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93F4421620DE260800CC0B83 /* example18.cpp */; };
+		937F84A521DA3C8B00DD82F8 /* example19.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93F4425020E4C33800CC0B83 /* example19.cpp */; };
+		937F84A621DA3C8B00DD82F8 /* example20.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93F4427C20EF919800CC0B83 /* example20.cpp */; };
+		937F84A721DA3C8B00DD82F8 /* example21.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939E0AE520F7651900106D46 /* example21.cpp */; };
+		937F84A821DA3C8B00DD82F8 /* example22.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931E1F0221455043009F9953 /* example22.cpp */; };
+		937F84A921DA3C8B00DD82F8 /* example23.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931D3CCE2170E3AC00BCD515 /* example23.cpp */; };
+		937F84AA21DA3C8B00DD82F8 /* example24.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931D3CE72175CAFA00BCD515 /* example24.cpp */; };
+		937F84AC21DA3CC000DD82F8 /* t_case1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84AB21DA3CC000DD82F8 /* t_case1.cpp */; };
+		937F84AE21DA3E8400DD82F8 /* t_case2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84AD21DA3E8400DD82F8 /* t_case2.cpp */; };
+		937F84B121DA430D00DD82F8 /* t_case3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84AF21DA430D00DD82F8 /* t_case3.cpp */; };
+		937F84B321DA43C800DD82F8 /* t_case4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84B221DA43C800DD82F8 /* t_case4.cpp */; };
+		937F84B521DA446E00DD82F8 /* t_case5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84B421DA446E00DD82F8 /* t_case5.cpp */; };
 		93B071FB20582B0E008D2FB6 /* sb_sqlite_adapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B071FA20582B0E008D2FB6 /* sb_sqlite_adapter.cpp */; };
 		93B0720320591999008D2FB6 /* sb_data_section_descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B0720220591999008D2FB6 /* sb_data_section_descriptor.cpp */; };
 		93BEDCF020A34894004166EB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E60D7B20558090009151ED /* main.cpp */; };
@@ -81,6 +116,13 @@
 		937F848221DA2B4800DD82F8 /* Tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Tests; sourceTree = BUILT_PRODUCTS_DIR; };
 		937F848421DA2B4800DD82F8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		937F848921DA2C1100DD82F8 /* libgtest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgtest.a; path = UnitTests/Lib/googletest/lib/libgtest.a; sourceTree = "<group>"; };
+		937F848B21DA31DE00DD82F8 /* t_db_fixture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = t_db_fixture.h; sourceTree = "<group>"; };
+		937F848C21DA328600DD82F8 /* t_kvdb.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_kvdb.cpp; sourceTree = "<group>"; };
+		937F84AB21DA3CC000DD82F8 /* t_case1.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case1.cpp; sourceTree = "<group>"; };
+		937F84AD21DA3E8400DD82F8 /* t_case2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case2.cpp; sourceTree = "<group>"; };
+		937F84AF21DA430D00DD82F8 /* t_case3.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case3.cpp; sourceTree = "<group>"; };
+		937F84B221DA43C800DD82F8 /* t_case4.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case4.cpp; sourceTree = "<group>"; };
+		937F84B421DA446E00DD82F8 /* t_case5.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case5.cpp; sourceTree = "<group>"; };
 		93857ED720B463AB0088B787 /* sb_container_descriptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_container_descriptor.h; sourceTree = "<group>"; };
 		93857EE920BBD8C40088B787 /* example10.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = example10.h; sourceTree = "<group>"; };
 		93857EEA20BBD8C40088B787 /* example10.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = example10.cpp; sourceTree = "<group>"; };
@@ -154,6 +196,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				937F849221DA369500DD82F8 /* libsqlite3.tbd in Frameworks */,
 				937F848A21DA2C1100DD82F8 /* libgtest.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -181,6 +224,7 @@
 		937F847C21DA2AA100DD82F8 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				937F848B21DA31DE00DD82F8 /* t_db_fixture.h */,
 			);
 			path = include;
 			sourceTree = "<group>";
@@ -189,6 +233,12 @@
 			isa = PBXGroup;
 			children = (
 				937F848421DA2B4800DD82F8 /* main.cpp */,
+				937F848C21DA328600DD82F8 /* t_kvdb.cpp */,
+				937F84AB21DA3CC000DD82F8 /* t_case1.cpp */,
+				937F84AD21DA3E8400DD82F8 /* t_case2.cpp */,
+				937F84AF21DA430D00DD82F8 /* t_case3.cpp */,
+				937F84B221DA43C800DD82F8 /* t_case4.cpp */,
+				937F84B421DA446E00DD82F8 /* t_case5.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -418,7 +468,41 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				937F84AA21DA3C8B00DD82F8 /* example24.cpp in Sources */,
 				937F848521DA2B4800DD82F8 /* main.cpp in Sources */,
+				937F84A221DA3C8B00DD82F8 /* example16.cpp in Sources */,
+				937F849921DA3C8B00DD82F8 /* example7.cpp in Sources */,
+				937F84A421DA3C8B00DD82F8 /* example18.cpp in Sources */,
+				937F849621DA3C8B00DD82F8 /* example4.cpp in Sources */,
+				937F849E21DA3C8B00DD82F8 /* example12.cpp in Sources */,
+				937F84A821DA3C8B00DD82F8 /* example22.cpp in Sources */,
+				937F84B121DA430D00DD82F8 /* t_case3.cpp in Sources */,
+				937F84B521DA446E00DD82F8 /* t_case5.cpp in Sources */,
+				937F849721DA3C8B00DD82F8 /* example5.cpp in Sources */,
+				937F84A921DA3C8B00DD82F8 /* example23.cpp in Sources */,
+				937F848F21DA367500DD82F8 /* sb_tasks_queue.cpp in Sources */,
+				937F849A21DA3C8B00DD82F8 /* example8.cpp in Sources */,
+				937F849021DA367500DD82F8 /* sb_data_section_descriptor.cpp in Sources */,
+				937F849421DA3C8B00DD82F8 /* example2.cpp in Sources */,
+				937F849D21DA3C8B00DD82F8 /* example11.cpp in Sources */,
+				937F848D21DA328600DD82F8 /* t_kvdb.cpp in Sources */,
+				937F849121DA367500DD82F8 /* sb_class_descriptor.cpp in Sources */,
+				937F84A121DA3C8B00DD82F8 /* example15.cpp in Sources */,
+				937F84A521DA3C8B00DD82F8 /* example19.cpp in Sources */,
+				937F84A621DA3C8B00DD82F8 /* example20.cpp in Sources */,
+				937F84B321DA43C800DD82F8 /* t_case4.cpp in Sources */,
+				937F84A321DA3C8B00DD82F8 /* example17.cpp in Sources */,
+				937F84A721DA3C8B00DD82F8 /* example21.cpp in Sources */,
+				937F849321DA3C8B00DD82F8 /* example1.cpp in Sources */,
+				937F849C21DA3C8B00DD82F8 /* example10.cpp in Sources */,
+				937F849B21DA3C8B00DD82F8 /* example9.cpp in Sources */,
+				937F84AC21DA3CC000DD82F8 /* t_case1.cpp in Sources */,
+				937F84A021DA3C8B00DD82F8 /* example14.cpp in Sources */,
+				937F848E21DA367500DD82F8 /* sb_sqlite_adapter.cpp in Sources */,
+				937F849521DA3C8B00DD82F8 /* example3.cpp in Sources */,
+				937F84AE21DA3E8400DD82F8 /* t_case2.cpp in Sources */,
+				937F849821DA3C8B00DD82F8 /* example6.cpp in Sources */,
+				937F849F21DA3C8B00DD82F8 /* example13.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -611,6 +695,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					DEBUG_CORE,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
