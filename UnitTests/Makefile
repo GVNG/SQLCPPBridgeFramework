@@ -41,55 +41,62 @@ else
 endif
 
 # Folders
-INCDIR := SQLBridge/include
-SRCDIR := SQLBridge/src
+INCDIR := include
+SRCDIR := src
+INCDIR_SB := ../SQLBridge/include
+SRCDIR_SB := ../SQLBridge/src
+INCDIR_GTEST := Lib/googletest/include
+INCDIR_CASES := ../Cases
+SRCDIR_CASES := ../Cases
+
 BUILDDIR := build
-TARGETDIR := lib
+TARGETDIR := out
 
 # Targets
-ifdef ARCH
-	TARGET := $(TARGETDIR)/sqlcppbridge-$(TOS)-$(ARCH).a
-else
-	TARGET := $(TARGETDIR)/libsqlcppbridge.a
-endif
+TARGET := $(TARGETDIR)/Tests
 
 # Code Lists
 # Normal CPP files
 SRCEXT := cpp
 SOURCES := $(wildcard $(SRCDIR)/*.cpp)
+SOURCES_CASES := $(wildcard $(SRCDIR_CASES)/*.$(SRCEXT))
+SOURCES_SB := $(wildcard $(SRCDIR_SB)/*.$(SRCEXT))
 OBJECTS := $(patsubst %.o,build/%.o,$(notdir $(patsubst $(SRCDIR)/%.cpp,%.o,$(SOURCES))))
+OBJECTS += $(patsubst %.o,build/%.o,$(notdir $(patsubst $(SRCDIR_CASES)/%.$(SRCEXT),%.o,$(SOURCES_CASES))))
+OBJECTS += $(patsubst %.o,build/%.o,$(notdir $(patsubst $(SRCDIR_SB)/%.$(SRCEXT),%.o,$(SOURCES_SB))))
 
 # Shared Compiler Flags
 CFLAGS := -c -fembed-bitcode
-INC := -I $(INCDIR)
-LIB := 
+INC := -I $(INCDIR) -I $(INCDIR_SB) -I $(INCDIR_GTEST) -I $(INCDIR_CASES)
+LIB := -lsqlite3 -lgtest
 
-ifdef ARCH
-	CFLAGS += -arch $(ARCH) -isysroot $(DEVPATH)
-	ifeq ($(TOS),ios)
-		CFLAGS += -mios-version-min=10.0
-	endif
-	ifeq ($(TOS),osx)
-		CFLAGS += -mmacosx-version-min=10.7
-	endif
-endif
+CFLAGS += -mmacosx-version-min=10.7
+LDFLAGS := -LLib/googletest/lib
 
 # Platform Specific Compiler Flags
 ifeq ($(UNAME_S),Linux)
 	CFLAGS += -std=gnu++14 -O2 -fPIC
-	LDFLAGS := -static -Wl
+	LDFLAGS += -stdlib=libc++
 else
 	CFLAGS += -std=c++14 -stdlib=libc++ -O2
-	LDFLAGS := -static
+	LDFLAGS += -stdlib=libc++
 endif
 
 # Linking
 $(TARGET): $(OBJECTS)
 	@mkdir -p $(TARGETDIR)
 	@echo "Linking..."
-	@echo "  Linking $(TARGET)..."; $(LIBTOOL) $(LDFLAGS) -o $(TARGET) $(OBJECTS)
+	@echo "  Linking $(TARGET)..."; $(CC) $(LDFLAGS) $(LIB) -o $(TARGET) $(OBJECTS)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
+	@mkdir -p $(BUILDDIR)
+	@echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
+
+$(BUILDDIR)/%.o: $(SRCDIR_SB)/%.$(SRCEXT)
+	@mkdir -p $(BUILDDIR)
+	@echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
+
+$(BUILDDIR)/%.o: $(SRCDIR_CASES)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
 	@echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
 

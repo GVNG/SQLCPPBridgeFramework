@@ -423,7 +423,7 @@ namespace sql_bridge
                                 :(to_string() << path << "/" << name << g_file_suffix);
         if (ver<desc->version())
         { // lets create/upgrate the tables
-#ifdef DEBUG
+#ifdef DEBUG_CORE
             std::cerr << "Create(upgrade) the structure for the table \"" << name << "\" from the version: " << ver << std::endl;
 #endif
             if (ver) desc->update(fname, ver, desc->version());
