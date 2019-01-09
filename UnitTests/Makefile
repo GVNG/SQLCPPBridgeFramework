@@ -87,6 +87,7 @@ $(TARGET): $(OBJECTS)
 	@mkdir -p $(TARGETDIR)
 	@echo "Linking..."
 	@echo "  Linking $(TARGET)..."; $(CC) $(LDFLAGS) $(LIB) -o $(TARGET) $(OBJECTS)
+	@echo "Running..."; $(TARGET)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)

@@ -41,7 +41,6 @@ CROSS_SDK_OSX="MacOSX.sdk"
 # ---------------------
 make -C ./UnitTests clean
 make -C ./UnitTests || exit 1
-./UnitTests/out/Tests || exit 2
 # ---------------------
 
 export DEVPATH=${CROSS_TOP_IOS}/SDKs/${CROSS_SDK_IOS}
