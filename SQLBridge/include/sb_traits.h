@@ -55,10 +55,11 @@ namespace sql_bridge
         template<typename C> static yes st(typename C::mapped_type*);
         template<typename C> static no  st(...);
     public:
-        static const bool value = sizeof(ft<T>(0)) == sizeof(yes) && sizeof(st<T>(0)) == sizeof(yes);
+        static constexpr const bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
+                                            sizeof(st<T>(0)) == sizeof(yes);
     };
     
-    template<typename T> struct is_pair
+    template<typename T> struct is_kind_of_pair
     {
     private:
         typedef char                      yes;
@@ -69,8 +70,15 @@ namespace sql_bridge
         template<typename C> static no  ft(...);
         template<typename C> static no  st(...);
     public:
-        static const bool value =   sizeof(ft<T>(0)) == sizeof(yes) &&
-        sizeof(st<T>(0)) == sizeof(yes);
+        static constexpr const bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
+                                            sizeof(st<T>(0)) == sizeof(yes);
+    };
+
+    template<typename T> struct is_kind_of_set
+        : std::integral_constant<bool,  std::is_base_of<std::set<typename T::value_type>, T>::value ||
+                                        std::is_base_of<std::multiset<typename T::value_type>, T>::value ||
+                                        std::is_base_of<std::unordered_set<typename T::value_type>, T>::value>
+    {
     };
 
     template<typename T> struct has_const_iterator
@@ -82,7 +90,7 @@ namespace sql_bridge
         template<typename C> static yes test(typename C::const_iterator*);
         template<typename C> static no  test(...);
     public:
-        static const bool value = sizeof(test<T>(0)) == sizeof(yes);
+        static constexpr const bool value = sizeof(test<T>(0)) == sizeof(yes);
         typedef T type;
     };
     
@@ -102,8 +110,8 @@ namespace sql_bridge
         template<typename C> static no test_e(...) {};
         
     public:
-        static bool const value =   sizeof(test_b<T>(0)) == sizeof(yes) &&
-                                    sizeof(test_e<T>(0)) == sizeof(yes);
+        static constexpr bool const value = sizeof(test_b<T>(0)) == sizeof(yes) &&
+                                            sizeof(test_e<T>(0)) == sizeof(yes);
         typedef T type;
     };
     
@@ -113,19 +121,24 @@ namespace sql_bridge
     {
     };
     
+    template<typename T> struct is_pair
+        : std::integral_constant<bool, is_kind_of_pair<T>::value>
+    {
+    };
+    
     template<typename T> struct is_map
         : std::integral_constant<bool,  is_any_container<T>::value &&
                                         is_key_mapped<T>::value>
     {
     };
     
-    template<typename T> struct is_any_set
-        : std::integral_constant<bool,  std::is_base_of<std::set<typename T::value_type>, T>::value ||
-                                        std::is_base_of<std::multiset<typename T::value_type>, T>::value ||
-                                        std::is_base_of<std::unordered_set<typename T::value_type>, T>::value>
+    template<bool,typename T> struct check_for_set : std::integral_constant<bool, false>{};
+    template<typename T> struct check_for_set<true,T> : std::integral_constant<bool, is_kind_of_set<T>::value>{};
+
+    template<typename T> struct is_set
+        : std::integral_constant<bool,  check_for_set<is_any_container<T>::value,T>::value>
     {
     };
-    
     
     template<typename T> struct is_container
         : std::integral_constant<bool,  is_any_container<T>::value &&
@@ -203,12 +216,14 @@ namespace sql_bridge
     };
     
     template<typename T> struct is_raw_init_allow
-        : std::integral_constant<bool,  !std::is_default_constructible<T>::value && std::is_pod<T>::value>
+        : std::integral_constant<bool,  !std::is_default_constructible<T>::value &&
+                                        std::is_pod<T>::value>
     {
     };
     
     template<typename T> struct can_create_by_default
-        : std::integral_constant<bool,  std::is_default_constructible<T>::value || std::is_pod<T>::value>
+        : std::integral_constant<bool,  std::is_default_constructible<T>::value ||
+                                        std::is_pod<T>::value>
     {
     };
     
