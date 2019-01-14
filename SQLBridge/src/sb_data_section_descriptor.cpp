@@ -46,11 +46,11 @@ namespace sql_bridge
     data_section_descriptors_ptr data_section_descriptors::operator[](std::string const& name)
     {
         proc_init_queue();
-        static std::string const rec(to_string() << "You should use \"DEFINE_SQL_DATABASE(" << name << "...\" macro somewhere in your compile unit");
         std::lock_guard<std::mutex> lck(access_);
         data_section_descriptors_map::const_iterator pos = index_.find(name);
         if (pos==index_.end())
-            throw sql_bridge_error(to_string() << "The data section with the name \"" << name << "\" doesn't exist",rec);
+            throw sql_bridge_error(to_string() << "The data section with the name \"" << name << "\" doesn't exist",
+                                   to_string() << "You should use \"DEFINE_SQL_DATABASE(" << name << "...\" macro somewhere in one of yours compile unit");
         return pos->second;
     }
     
@@ -97,7 +97,8 @@ namespace sql_bridge
     {
         class_descriptors_map::const_iterator cur = classes_map_.find(dp.source_id());
         if (cur==classes_map_.end())
-            throw sql_bridge_error(to_string() << "Unspecified table with name \"" << dp.table_name() <<"\"","You should use the DEFINE_SQL_DATABASE macro somewhere in your code");
+            throw sql_bridge_error(to_string() << "Unspecified table with name \"" << dp.table_name() <<"\"",
+                                   to_string() << "You should use \"DEFINE_SQL_TABLE(" << dp.table_name() << "...\" macro somewhere in one of yours compile unit");
         member_for_index_ref ret;
         fields_definition chld_index_ref{"","",false,false};
         for(auto& mb : cur->second->members())
