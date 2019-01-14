@@ -46,7 +46,7 @@ namespace sql_bridge
     data_section_descriptors_ptr data_section_descriptors::operator[](std::string const& name)
     {
         proc_init_queue();
-        static std::string const rec("You should use DEFINE_SQL_DATABASE macro somewhere in your code");
+        static std::string const rec(to_string() << "You should use \"DEFINE_SQL_DATABASE(" << name << "...\" macro somewhere in your compile unit");
         std::lock_guard<std::mutex> lck(access_);
         data_section_descriptors_map::const_iterator pos = index_.find(name);
         if (pos==index_.end())
