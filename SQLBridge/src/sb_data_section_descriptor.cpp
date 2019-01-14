@@ -50,7 +50,7 @@ namespace sql_bridge
         data_section_descriptors_map::const_iterator pos = index_.find(name);
         if (pos==index_.end())
             throw sql_bridge_error(to_string() << "The data section with the name \"" << name << "\" doesn't exist",
-                                   to_string() << "You should use \"DEFINE_SQL_DATABASE(" << name << "...\" macro somewhere in one of yours compile unit");
+                                   to_string() << "You should use \"DEFINE_SQL_DATABASE(" << name << "...\" macro somewhere in one of yours compile units");
         return pos->second;
     }
     
@@ -98,7 +98,7 @@ namespace sql_bridge
         class_descriptors_map::const_iterator cur = classes_map_.find(dp.source_id());
         if (cur==classes_map_.end())
             throw sql_bridge_error(to_string() << "Unspecified table with name \"" << dp.table_name() <<"\"",
-                                   to_string() << "You should use \"DEFINE_SQL_TABLE(" << dp.table_name() << "...\" macro somewhere in one of yours compile unit");
+                                   to_string() << "You should use \"DEFINE_SQL_TABLE(" << dp.table_name() << "...\" macro somewhere in one of yours compile units");
         member_for_index_ref ret;
         fields_definition chld_index_ref{"","",false,false};
         for(auto& mb : cur->second->members())
