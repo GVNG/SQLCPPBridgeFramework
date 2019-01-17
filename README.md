@@ -58,3 +58,8 @@ which includes armv7, armv7s, arm64 and x86_64 architectures to use in the
 whole set of iOS-devices and iOS-simulators
 
 ...or you can simple run 'make' utility to create the static library for the default environment
+
+Install:
+-------------
+For Linux environment use "make install" to put assembled with 'make' utility 
+static library & headers to system foders 
