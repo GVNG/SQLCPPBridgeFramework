@@ -41,6 +41,7 @@
 #include <list>
 #include <queue>
 #include <tuple>
+#include <typeinfo>
 
 namespace sql_bridge
 {

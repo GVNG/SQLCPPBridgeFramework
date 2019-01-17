@@ -63,39 +63,39 @@ SOURCES_CASES := $(wildcard $(SRCDIR_CASES)/*.$(SRCEXT))
 SOURCES_SB := $(wildcard $(SRCDIR_SB)/*.$(SRCEXT))
 OBJECTS := $(patsubst %.o,build/%.o,$(notdir $(patsubst $(SRCDIR)/%.cpp,%.o,$(SOURCES))))
 OBJECTS += $(patsubst %.o,build/%.o,$(notdir $(patsubst $(SRCDIR_CASES)/%.$(SRCEXT),%.o,$(SOURCES_CASES))))
-OBJECTS += $(patsubst %.o,build/%.o,$(notdir $(patsubst $(SRCDIR_SB)/%.$(SRCEXT),%.o,$(SOURCES_SB))))
 
-# Shared Compiler Flags
-CFLAGS := -c -fembed-bitcode
-INC := -I $(INCDIR) -I $(INCDIR_SB) -I $(INCDIR_GTEST) -I $(INCDIR_CASES)
-LIB := -lsqlite3 -lgtest
-
-CFLAGS += -mmacosx-version-min=10.7
-LDFLAGS := -LLib/googletest/lib
 
 # Platform Specific Compiler Flags
-ifeq ($(UNAME_S),Linux)
-	CFLAGS += -std=gnu++14 -O2 -fPIC
-	LDFLAGS += -stdlib=libc++
+CFLAGS := -c
+LIB := -lsqlite3 -lgtest
+ifeq ($(UNAME_S), Linux)
+	CFLAGS += -std=gnu++14 -O2 -fpermissive
+	LDFLAGS := -L../lib/
+	INC := -I $(INCDIR) -I $(INCDIR_SB) -I $(INCDIR_CASES)
+	LIB += -lsqlcppbridge -lpthread -lm
 else
-	CFLAGS += -std=c++14 -stdlib=libc++ -O2
+	LDFLAGS := -LLib/googletest/lib
+	INC := -I $(INCDIR) -I $(INCDIR_SB) -I $(INCDIR_GTEST) -I $(INCDIR_CASES)
+	CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fPIC  -fembed-bitcode -mmacosx-version-min=10.7
 	LDFLAGS += -stdlib=libc++
+	OBJECTS += $(patsubst %.o,build/%.o,$(notdir $(patsubst $(SRCDIR_SB)/%.$(SRCEXT),%.o,$(SOURCES_SB))))
 endif
 
 # Linking
 $(TARGET): $(OBJECTS)
 	@mkdir -p $(TARGETDIR)
 	@echo "Linking..."
-	@echo "  Linking $(TARGET)..."; $(CC) $(LDFLAGS) $(LIB) -o $(TARGET) $(OBJECTS)
+	@echo "  Linking $(TARGET)..."; $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(LIB) 
 	@echo "Running..."; $(TARGET)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
 	@echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
-
+ifneq ($(UNAME_S), Linux)
 $(BUILDDIR)/%.o: $(SRCDIR_SB)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
 	@echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
+endif
 
 $(BUILDDIR)/%.o: $(SRCDIR_CASES)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)

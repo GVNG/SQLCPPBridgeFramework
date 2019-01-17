@@ -92,7 +92,7 @@ namespace sql_bridge
         {
             if (type_!=e_key_type::Real)
                 throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
-            typename T::clock::duration ret(static_cast<int64_t>(rValue_ / T::clock::period::num * T::clock::period::den));
+            typename T::clock::duration ret(static_cast<typename T::clock::rep>(rValue_ / T::clock::period::num * T::clock::period::den));
             return T(ret);
         }
         

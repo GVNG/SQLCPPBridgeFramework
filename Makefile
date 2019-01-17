@@ -60,9 +60,8 @@ SOURCES := $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS := $(patsubst %.o,build/%.o,$(notdir $(patsubst $(SRCDIR)/%.cpp,%.o,$(SOURCES))))
 
 # Shared Compiler Flags
-CFLAGS := -c -fembed-bitcode
+CFLAGS := -c
 INC := -I $(INCDIR)
-LIB := 
 
 ifdef ARCH
 	CFLAGS += -arch $(ARCH) -isysroot $(DEVPATH)
@@ -76,18 +75,19 @@ endif
 
 # Platform Specific Compiler Flags
 ifeq ($(UNAME_S),Linux)
-	CFLAGS += -std=gnu++14 -O2 -fPIC
-	LDFLAGS := -static -Wl
+	CFLAGS += -std=gnu++14 -O2
+	LINK_CMD := ar -cr $(TARGET) $(OBJECTS)
 else
-	CFLAGS += -std=c++14 -stdlib=libc++ -O2
+	CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fembed-bitcode
 	LDFLAGS := -static
+	LINK_CMD :=  $(LIBTOOL) $(LDFLAGS) -o $(TARGET) $(OBJECTS)
 endif
 
 # Linking
 $(TARGET): $(OBJECTS)
 	@mkdir -p $(TARGETDIR)
 	@echo "Linking..."
-	@echo "  Linking $(TARGET)..."; $(LIBTOOL) $(LDFLAGS) -o $(TARGET) $(OBJECTS)
+	@echo "  Linking $(TARGET)..."; $(LINK_CMD)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
