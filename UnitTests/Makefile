@@ -30,6 +30,11 @@
 
 # Determine the platform
 UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin) 
+	OSNAME := MacOS
+else ifeq ($(UNAME_S), Linux) 
+	OSNAME := Linux
+endif
 
 # CC
 ifeq ($(UNAME_S),Darwin)
@@ -45,7 +50,7 @@ INCDIR := include
 SRCDIR := src
 INCDIR_SB := ../SQLBridge/include
 SRCDIR_SB := ../SQLBridge/src
-INCDIR_GTEST := Lib/googletest/include
+INCDIR_GTEST := Lib/$(OSNAME)/googletest/include
 INCDIR_CASES := ../Cases
 SRCDIR_CASES := ../Cases
 
@@ -63,22 +68,22 @@ SOURCES_CASES := $(wildcard $(SRCDIR_CASES)/*.$(SRCEXT))
 SOURCES_SB := $(wildcard $(SRCDIR_SB)/*.$(SRCEXT))
 OBJECTS := $(patsubst %.o,build/%.o,$(notdir $(patsubst $(SRCDIR)/%.cpp,%.o,$(SOURCES))))
 OBJECTS += $(patsubst %.o,build/%.o,$(notdir $(patsubst $(SRCDIR_CASES)/%.$(SRCEXT),%.o,$(SOURCES_CASES))))
+OBJECTS += $(patsubst %.o,build/%.o,$(notdir $(patsubst $(SRCDIR_SB)/%.$(SRCEXT),%.o,$(SOURCES_SB))))
 
 
 # Platform Specific Compiler Flags
 CFLAGS := -c
 LIB := -lsqlite3 -lgtest
+LDFLAGS := -LLib/$(OSNAME)/googletest/lib
 ifeq ($(UNAME_S), Linux)
 	CFLAGS += -std=gnu++14 -O2 -fpermissive
-	LDFLAGS := -L../lib/
 	INC := -I $(INCDIR) -I $(INCDIR_SB) -I $(INCDIR_CASES)
 	LIB += -lsqlcppbridge -lpthread -lm
 else
-	LDFLAGS := -LLib/googletest/lib
 	INC := -I $(INCDIR) -I $(INCDIR_SB) -I $(INCDIR_GTEST) -I $(INCDIR_CASES)
 	CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fPIC  -fembed-bitcode -mmacosx-version-min=10.7
 	LDFLAGS += -stdlib=libc++
-	OBJECTS += $(patsubst %.o,build/%.o,$(notdir $(patsubst $(SRCDIR_SB)/%.$(SRCEXT),%.o,$(SOURCES_SB))))
+	
 endif
 
 # Linking
@@ -91,11 +96,11 @@ $(TARGET): $(OBJECTS)
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
 	@echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
-ifneq ($(UNAME_S), Linux)
+#ifneq ($(UNAME_S), Linux)
 $(BUILDDIR)/%.o: $(SRCDIR_SB)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
 	@echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
-endif
+#endif
 
 $(BUILDDIR)/%.o: $(SRCDIR_CASES)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
