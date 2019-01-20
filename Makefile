@@ -97,4 +97,12 @@ clean:
 	@echo "Cleaning...";
 	@echo "  Cleaning $(TARGET)..."; $(RM) -r $(OBJECTS) $(TARGET)
 
-.PHONY: clean
+install:
+	@echo "Installing ...";
+	@sudo cp $(TARGET) /usr/lib/;
+	@sudo mkdir /usr/include/sqlbridge
+	@sudo cp $(INCDIR)/* /usr/include/sqlbridge/
+	
+
+.PHONY: clean install
+
