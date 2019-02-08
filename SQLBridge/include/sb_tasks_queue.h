@@ -93,9 +93,9 @@ namespace sql_bridge
                 tasks_queue_.push_back(tsk);
             new_data_.fire();
         }
-        void do_proc(interlocked<bool>& ready)
+        void do_proc(interlocked<size_t>& ready)
         {
-            ready = true;
+            ready--;
             new_data_.wait();
             for(;;)
             {

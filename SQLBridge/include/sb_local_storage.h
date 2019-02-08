@@ -133,17 +133,14 @@ namespace sql_bridge
         
     public:
         local_storage(std::string const& path)
-            : ready_proc_(false)
-            , ready_flush_(false)
+            : ready_(2)
             , root_path_(path)
             , proc_queue_(std::make_shared<db_queue_entry>(TStrategy::main_db_name(path)))
             , proc_thread_(std::bind(std::mem_fn(&local_storage::proc),this))
             , proc_flush_thread_(std::bind(std::mem_fn(&local_storage::proc_flush),this))
         
         {
-            while (!ready_proc_) std::this_thread::yield();
-            while (!ready_flush_) std::this_thread::yield();
-//            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+            while (ready_) std::this_thread::yield();
         }
         ~local_storage()
         {
@@ -210,7 +207,7 @@ namespace sql_bridge
         }
     private:
         // data
-        interlocked<bool> ready_proc_,ready_flush_;
+        interlocked<size_t> ready_;
         mt_event shutdown_;
         std::string root_path_;
         data_sections_map data_sections_;
@@ -219,10 +216,10 @@ namespace sql_bridge
         db_proc_queue_ptr proc_queue_;
         std::thread proc_thread_,proc_flush_thread_;
         // methods
-        void proc() {proc_queue_->do_proc(ready_proc_);}
+        void proc() {proc_queue_->do_proc(ready_);}
         void proc_flush()
         {
-            ready_flush_ = true;
+            ready_--;
             while(!shutdown_.wait_for(std::chrono::seconds(10)))
             {
                 std::lock_guard<std::mutex> lk(data_section_access_);
