@@ -102,6 +102,32 @@ namespace sql_bridge
         std::mutex mtx_;
         std::condition_variable var_;
     };
+    
+    template<typename T> class interlocked
+    {
+    public:
+        typedef T type;
+        interlocked(T const& v)
+            : val_(v)
+            {}
+        explicit interlocked(interlocked const& v)
+            : val_(v)
+            {};
+        inline operator type() const
+        {
+            std::lock_guard<std::mutex> lk(mtx_);
+            return val_;
+        }
+        inline type operator = (type const& v){std::lock_guard<std::mutex> lk(mtx_);val_ = v;return val_;}
+        inline type operator ++ () {std::lock_guard<std::mutex> lk(mtx_);return val_++;}
+        inline type operator ++ (int) {std::lock_guard<std::mutex> lk(mtx_);return ++val_;}
+        inline type operator -- () {std::lock_guard<std::mutex> lk(mtx_);return val_--;}
+        inline type operator -- (int) {std::lock_guard<std::mutex> lk(mtx_);return --val_;}
+
+    private:
+        type val_;
+        mutable std::mutex mtx_;
+    };
 };
 
 #endif /* sb_core_misc_h */

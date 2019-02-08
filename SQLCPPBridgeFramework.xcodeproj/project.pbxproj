@@ -32,8 +32,8 @@
 		931D3CFE2175D0E600BCD515 /* example22.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931E1F0221455043009F9953 /* example22.cpp */; };
 		931D3CFF2175D0E600BCD515 /* example23.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931D3CCE2170E3AC00BCD515 /* example23.cpp */; };
 		9336AAA2206A26EA00DF00CA /* sb_class_descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9336AAA1206A26EA00DF00CA /* sb_class_descriptor.cpp */; };
+		934A430F220DDE2A00FEC1C9 /* libgtest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 934A430E220DDE2900FEC1C9 /* libgtest.a */; };
 		937F848521DA2B4800DD82F8 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F848421DA2B4800DD82F8 /* main.cpp */; };
-		937F848A21DA2C1100DD82F8 /* libgtest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 937F848921DA2C1100DD82F8 /* libgtest.a */; };
 		937F848E21DA367500DD82F8 /* sb_sqlite_adapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B071FA20582B0E008D2FB6 /* sb_sqlite_adapter.cpp */; };
 		937F848F21DA367500DD82F8 /* sb_tasks_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E60DB9205589C4009151ED /* sb_tasks_queue.cpp */; };
 		937F849021DA367500DD82F8 /* sb_data_section_descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B0720220591999008D2FB6 /* sb_data_section_descriptor.cpp */; };
@@ -129,13 +129,13 @@
 		9336AAA0206A25B800DF00CA /* sb_core_misc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_core_misc.h; sourceTree = "<group>"; };
 		9336AAA1206A26EA00DF00CA /* sb_class_descriptor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sb_class_descriptor.cpp; sourceTree = "<group>"; };
 		9336AAAA206B692800DF00CA /* sb_foundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_foundation.h; sourceTree = "<group>"; };
+		934A430E220DDE2900FEC1C9 /* libgtest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgtest.a; path = UnitTests/Lib/MacOS/googletest/lib/libgtest.a; sourceTree = "<group>"; };
 		936C65C120774AFF0033F0FB /* sb_links.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_links.h; sourceTree = "<group>"; };
 		937F847821DA2A5200DD82F8 /* LICENSE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = SOURCE_ROOT; };
 		937F847921DA2A5300DD82F8 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		937F847A21DA2A6300DD82F8 /* CODE_OF_CONDUCT.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CODE_OF_CONDUCT.md; sourceTree = SOURCE_ROOT; };
 		937F848221DA2B4800DD82F8 /* Tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Tests; sourceTree = BUILT_PRODUCTS_DIR; };
 		937F848421DA2B4800DD82F8 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		937F848921DA2C1100DD82F8 /* libgtest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgtest.a; path = UnitTests/Lib/googletest/lib/libgtest.a; sourceTree = "<group>"; };
 		937F848B21DA31DE00DD82F8 /* t_db_fixture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = t_db_fixture.h; sourceTree = "<group>"; };
 		937F848C21DA328600DD82F8 /* t_kvdb.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_kvdb.cpp; sourceTree = "<group>"; };
 		937F84AB21DA3CC000DD82F8 /* t_case1.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case1.cpp; sourceTree = "<group>"; };
@@ -237,8 +237,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				934A430F220DDE2A00FEC1C9 /* libgtest.a in Frameworks */,
 				937F849221DA369500DD82F8 /* libsqlite3.tbd in Frameworks */,
-				937F848A21DA2C1100DD82F8 /* libgtest.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -445,7 +445,7 @@
 		93E60DBF20558D16009151ED /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				937F848921DA2C1100DD82F8 /* libgtest.a */,
+				934A430E220DDE2900FEC1C9 /* libgtest.a */,
 				93E60DC020558D16009151ED /* libsqlite3.tbd */,
 			);
 			name = Frameworks;
@@ -636,11 +636,11 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/UnitTests/Lib/googletest/include",
+					"$(PROJECT_DIR)/UnitTests/Lib/MacOS/googletest/include",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/UnitTests/Lib/googletest/lib",
+					"$(PROJECT_DIR)/UnitTests/Lib/MacOS/googletest/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -658,11 +658,11 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/UnitTests/Lib/googletest/include",
+					"$(PROJECT_DIR)/UnitTests/Lib/MacOS/googletest/include",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/UnitTests/Lib/googletest/lib",
+					"$(PROJECT_DIR)/UnitTests/Lib/MacOS/googletest/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_FAST_MATH = YES;
