@@ -45,9 +45,9 @@ class DBFixture : public ::testing::Test
 protected:
     DBFixture()
     {
-        rmrf(db_path);
 		#ifndef _WIN32
-            mkdir(db_path, 0777);
+			rmrf(db_path);
+			mkdir(db_path, 0777);
         #else
             mkdir(db_path);
         #endif
@@ -55,9 +55,11 @@ protected:
     }
     ~DBFixture() override
     {
-        storage_.reset();
-        rmrf(db_path);
-    }
+		storage_.reset();
+		#ifndef _WIN32
+			rmrf(db_path);
+		#endif
+	}
     inline _t_storage& storage() {return *storage_.get();}
     
 private:
