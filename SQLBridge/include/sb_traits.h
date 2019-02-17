@@ -103,12 +103,12 @@ namespace sql_bridge
         
         template<typename C> static yes test_b(typename std::enable_if<
                                                std::is_same<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::begin)),
-                                               typename C::const_iterator(C::*)() const>::value, void>::type*) {};
+                                               typename C::const_iterator(C::*)() const>::value, void>::type*);
         template<typename C> static yes test_e(typename std::enable_if<
                                                std::is_same<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::end)),
-                                               typename C::const_iterator(C::*)() const>::value, void>::type*) {};
-        template<typename C> static no test_b(...) {};
-        template<typename C> static no test_e(...) {};
+                                               typename C::const_iterator(C::*)() const>::value, void>::type*);
+        template<typename C> static no test_b(...);
+        template<typename C> static no test_e(...);
         
     public:
         static constexpr bool const value = sizeof(test_b<T>(0)) == sizeof(yes) &&
