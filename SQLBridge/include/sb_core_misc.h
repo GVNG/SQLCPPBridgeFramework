@@ -44,6 +44,7 @@
 #include <chrono>
 #include <algorithm>
 #include <condition_variable>
+#include <functional>
 
 namespace sql_bridge
 {
