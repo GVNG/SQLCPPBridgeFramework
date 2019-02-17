@@ -35,6 +35,7 @@
 #include "gtest/gtest.h"
 #include "sqlcppbridge.h"
 #include <ftw.h>
+#include <cmath>
 
 static char const* db_path = "./DBTest";
 
@@ -45,7 +46,7 @@ protected:
     DBFixture()
     {
         rmrf(db_path);
-        #ifdef S_IRWXO
+		#ifndef _WIN32
             mkdir(db_path, 0777);
         #else
             mkdir(db_path);
