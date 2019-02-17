@@ -45,7 +45,11 @@ protected:
     DBFixture()
     {
         rmrf(db_path);
-        mkdir(db_path, 0777);
+        #ifdef S_IRWXO
+            mkdir(db_path, 0777);
+        #else
+            mkdir(db_path);
+        #endif
         storage_ = std::make_unique<_t_storage>(db_path);
     }
     ~DBFixture() override
