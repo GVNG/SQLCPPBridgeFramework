@@ -74,13 +74,13 @@ ifdef ARCH
 endif
 
 # Platform Specific Compiler Flags
-ifeq ($(UNAME_S),Linux)
-	CFLAGS += -std=gnu++14 -O2
-	LINK_CMD := ar -cr $(TARGET) $(OBJECTS)
+ifeq ($(UNAME_S),Darwin)
+    CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fembed-bitcode
+    LDFLAGS := -static
+    LINK_CMD :=  $(LIBTOOL) $(LDFLAGS) -o $(TARGET) $(OBJECTS)
 else
-	CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fembed-bitcode
-	LDFLAGS := -static
-	LINK_CMD :=  $(LIBTOOL) $(LDFLAGS) -o $(TARGET) $(OBJECTS)
+    CFLAGS += -std=gnu++14 -O2
+    LINK_CMD := ar -cr $(TARGET) $(OBJECTS)
 endif
 
 # Linking

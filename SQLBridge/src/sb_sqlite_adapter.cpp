@@ -111,10 +111,7 @@ namespace sql_bridge
         }
         catch(std::exception& ex)
         {
-            std::cerr << "Unexpected SQL exception: " << ex.what() << std::endl << "Terminating...";
-            // do something important, and...
-            // this is not an error! terminating!
-            throw;
+            std::cerr << "Unexpected SQL exception: " << ex.what();
         }
     }
 
@@ -133,9 +130,8 @@ namespace sql_bridge
     sqlite_adapter::sql_updater::~sql_updater()
     {
         if (!statement_) return;
-        int code(SQLITE_OK);
-        if (need_step_ && (code=sqlite3_step(statement_))!=SQLITE_DONE)
-            throw sql_error(g_err_cantupdate,txt_statement_,code); // this is not an error, we must terminate the application in this case
+        if (need_step_)
+            sqlite3_step(statement_);
     }
     
     bool sqlite_adapter::sql_updater::next()
@@ -175,9 +171,8 @@ namespace sql_bridge
     sqlite_adapter::sql_inserter_kv::~sql_inserter_kv()
     {
         if (!state_) return;
-        int code(SQLITE_OK);
-        if (need_step_ && (code=sqlite3_step(state_))!=SQLITE_DONE)
-            throw sql_error(g_err_cantupdate,txt_statement_,code); // this is not an error, we must terminate the application in this case
+        if (need_step_)
+            sqlite3_step(state_);
     }
 
 #pragma mark - sqlite_adapter::sql_reader
