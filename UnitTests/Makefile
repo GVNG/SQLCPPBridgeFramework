@@ -37,7 +37,7 @@ ifeq ($(UNAME_S), Linux)
 	OSNAME := Linux
 endif
 ifneq (,$(findstring MINGW64,$(UNAME_S)))
-	OSNAME := MinGW
+	OSNAME := MinGW64
 endif
 
 # CC

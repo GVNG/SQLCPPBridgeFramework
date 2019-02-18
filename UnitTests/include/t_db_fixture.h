@@ -45,8 +45,8 @@ class DBFixture : public ::testing::Test
 protected:
     DBFixture()
     {
+        rmrf(db_path);
 		#ifndef _WIN32
-			rmrf(db_path);
 			mkdir(db_path, 0777);
         #else
             mkdir(db_path);
@@ -56,15 +56,15 @@ protected:
     ~DBFixture() override
     {
 		storage_.reset();
-		#ifndef _WIN32
-			rmrf(db_path);
-		#endif
+        rmrf(db_path);
 	}
     inline _t_storage& storage() {return *storage_.get();}
     
 private:
     std::unique_ptr<_t_storage> storage_;
-
+#ifdef _WIN32
+    int rmrf(char const* path) {}
+#else
     static int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
     {
         int rv = remove(fpath);
@@ -73,7 +73,7 @@ private:
     }
     
     int rmrf(char const* path) {return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);}
-    
+#endif
 };
 
 #endif /* t_db_fixture_h */
