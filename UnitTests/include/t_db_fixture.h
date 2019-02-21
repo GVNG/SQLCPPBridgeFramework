@@ -63,7 +63,10 @@ protected:
 private:
     std::unique_ptr<_t_storage> storage_;
 #ifdef _WIN32
-    int rmrf(char const* path) {}
+	int rmrf(char const* path)
+	{
+		return 0;
+	}
 #else
     static int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
     {
