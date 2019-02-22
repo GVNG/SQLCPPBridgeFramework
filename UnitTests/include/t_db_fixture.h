@@ -63,9 +63,29 @@ protected:
 private:
     std::unique_ptr<_t_storage> storage_;
 #ifdef _WIN32
+    class file_enum
+    {
+    public:
+        file_enum(char const* dir)
+            : hDat_(FindFirstFileA(dir,&dat_))
+            {}
+        ~file_enum() {if (hDat_!=INVALID_HANDLE_VALUE) FindClose(hDat_);}
+        bool is_ok() {return hDat_!=INVALID_HANDLE_VALUE;}
+        const WIN32_FIND_DATA& get() {return dat_;}
+        bool next() {return FindNextFileA(hDat_,&dat_);}
+    private:
+        WIN32_FIND_DATA dat_;
+        HANDLE hDat_;
+    };
+    
 	int rmrf(char const* path)
 	{
-		return 0;
+        {
+            file_enum en(path);
+            if (!en.is_ok()) return 0;
+            
+        }
+		return remove(path);
 	}
 #else
     static int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
