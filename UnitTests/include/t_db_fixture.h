@@ -67,15 +67,15 @@ private:
     {
     public:
         file_enum(char const* dir)
-            : hDat_(FindFirstFileA(dir,&dat_))
+			: hDat_(_findfirst(dir,&dat_))
             {}
-        ~file_enum() {if (hDat_!=INVALID_HANDLE_VALUE) FindClose(hDat_);}
-        bool is_ok() {return hDat_!=INVALID_HANDLE_VALUE;}
-        const WIN32_FIND_DATA& get() {return dat_;}
-        bool next() {return FindNextFileA(hDat_,&dat_);}
+		~file_enum() {if (hDat_!=-1) _findclose(hDat_);}
+		bool is_ok() {return hDat_!=-1;}
+		_finddata_t const& get() {return dat_;}
+		bool next() {return _findnext(hDat_,&dat_)!=-1;}
     private:
-        WIN32_FIND_DATA dat_;
-        HANDLE hDat_;
+		_finddata_t dat_;
+		intptr_t hDat_;
     };
     
 	int rmrf(char const* path)
@@ -83,7 +83,11 @@ private:
         {
             file_enum en(path);
             if (!en.is_ok()) return 0;
-            
+			do
+			{
+
+			}
+			while(en.next());
         }
 		return remove(path);
 	}
