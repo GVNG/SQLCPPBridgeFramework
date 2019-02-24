@@ -102,10 +102,9 @@ clean:
 
 install:
 	@echo "Installing ...";
-	@sudo cp $(TARGET) /usr/lib/;
-	@sudo mkdir /usr/include/sqlbridge
-	@sudo cp $(INCDIR)/* /usr/include/sqlbridge/
-	
+	@cp $(TARGET) /usr/lib/;
+	@mkdir -p /usr/include/sqlbridge
+	@cp $(INCDIR)/* /usr/include/sqlbridge/
 
 .PHONY: clean install
 
