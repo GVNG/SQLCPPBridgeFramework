@@ -85,7 +85,12 @@ private:
             if (!en.is_ok()) return 0;
 			do
 			{
-
+                std::string fn(curl_transport::to_string() << path << "\\" << en.get().name);
+                if (fn=="." || fn=="..") continue;
+                if (en.get().attrib&_A_SUBDIR)
+                    rmrf(fn.c_str());
+                else
+                    remove(fn);
 			}
 			while(en.next());
         }
