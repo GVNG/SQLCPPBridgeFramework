@@ -66,8 +66,8 @@ private:
     class file_enum
     {
     public:
-        file_enum(char const* dir)
-			: hDat_(_findfirst(dir,&dat_))
+		file_enum(std::string const& dir)
+			: hDat_(_findfirst(dir.c_str(),&dat_))
             {}
 		~file_enum() {if (hDat_!=-1) _findclose(hDat_);}
 		bool is_ok() {return hDat_!=-1;}
@@ -81,20 +81,21 @@ private:
 	int rmrf(char const* path)
 	{
         {
-            file_enum en(path);
+			file_enum en(sql_bridge::to_string() << path << "\\*.*");
             if (!en.is_ok()) return 0;
 			do
 			{
-                std::string fn(curl_transport::to_string() << path << "\\" << en.get().name);
-                if (fn=="." || fn=="..") continue;
+				std::string chn(en.get().name);
+				std::string fn(sql_bridge::to_string() << path << "\\" << en.get().name);
+				if (chn=="." || chn=="..") continue;
                 if (en.get().attrib&_A_SUBDIR)
                     rmrf(fn.c_str());
                 else
-                    remove(fn);
+					remove(fn.c_str());
 			}
 			while(en.next());
         }
-		return remove(path);
+		return rmdir(path);
 	}
 #else
     static int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
