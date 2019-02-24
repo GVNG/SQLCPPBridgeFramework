@@ -93,5 +93,6 @@ TEST_F(DBFixture, Chrono)
     std::chrono::system_clock::time_point srcnow(std::chrono::system_clock::now()),dstnow;
     storage().save("NOW", srcnow);
     dstnow = storage().load("NOW", std::chrono::system_clock::time_point());
-    ASSERT_EQ(srcnow,dstnow);
+	auto dur = srcnow<dstnow?(dstnow-srcnow):(srcnow-dstnow);
+	ASSERT_LT(dur,std::chrono::microseconds(1));
 }

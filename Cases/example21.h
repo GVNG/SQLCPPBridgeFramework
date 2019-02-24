@@ -33,6 +33,7 @@
 #define example21_h
 
 #include "sqlcppbridge.h"
+#include <cmath>
 
 class Case21;
 class Case21Ext;

@@ -35,6 +35,7 @@
 #include "gtest/gtest.h"
 #include "sqlcppbridge.h"
 #include <ftw.h>
+#include <cmath>
 
 static char const* db_path = "./DBTest";
 
@@ -45,19 +46,58 @@ protected:
     DBFixture()
     {
         rmrf(db_path);
-        mkdir(db_path, 0777);
+		#ifndef _WIN32
+			mkdir(db_path, 0777);
+        #else
+            mkdir(db_path);
+        #endif
         storage_ = std::make_unique<_t_storage>(db_path);
     }
     ~DBFixture() override
     {
-        storage_.reset();
+		storage_.reset();
         rmrf(db_path);
-    }
+	}
     inline _t_storage& storage() {return *storage_.get();}
     
 private:
     std::unique_ptr<_t_storage> storage_;
-
+#ifdef _WIN32
+    class file_enum
+    {
+    public:
+		file_enum(std::string const& dir)
+			: hDat_(_findfirst(dir.c_str(),&dat_))
+            {}
+		~file_enum() {if (hDat_!=-1) _findclose(hDat_);}
+		bool is_ok() {return hDat_!=-1;}
+		_finddata_t const& get() {return dat_;}
+		bool next() {return _findnext(hDat_,&dat_)!=-1;}
+    private:
+		_finddata_t dat_;
+		intptr_t hDat_;
+    };
+    
+	int rmrf(char const* path)
+	{
+        {
+			file_enum en(sql_bridge::to_string() << path << "\\*.*");
+            if (!en.is_ok()) return 0;
+			do
+			{
+				std::string chn(en.get().name);
+				std::string fn(sql_bridge::to_string() << path << "\\" << en.get().name);
+				if (chn=="." || chn=="..") continue;
+                if (en.get().attrib&_A_SUBDIR)
+                    rmrf(fn.c_str());
+                else
+					remove(fn.c_str());
+			}
+			while(en.next());
+        }
+		return rmdir(path);
+	}
+#else
     static int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
     {
         int rv = remove(fpath);
@@ -66,7 +106,7 @@ private:
     }
     
     int rmrf(char const* path) {return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);}
-    
+#endif
 };
 
 #endif /* t_db_fixture_h */

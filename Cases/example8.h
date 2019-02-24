@@ -56,7 +56,7 @@ public:
     {
         return  item_id_==rv.item_id_ &&
                 member_==rv.member_ &&
-                time_stamp_==rv.time_stamp_ &&
+				(std::max(time_stamp_,rv.time_stamp_)-std::min(time_stamp_,rv.time_stamp_))<std::chrono::microseconds(1) &&
                 buffer_==rv.buffer_;
     }
 

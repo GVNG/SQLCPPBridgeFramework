@@ -35,6 +35,9 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
 	CC := clang++
 	LIBTOOL := libtool
+	ifeq ($(DEVPATH),)
+		DEVPATH=$(shell xcode-select --print-path)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+	endif
 else
 	CC := g++
 	LIBTOOL := libtool
@@ -64,7 +67,7 @@ CFLAGS := -c
 INC := -I $(INCDIR)
 
 ifdef ARCH
-	CFLAGS += -arch $(ARCH) -isysroot $(DEVPATH)
+	CFLAGS += -arch $(ARCH)
 	ifeq ($(TOS),ios)
 		CFLAGS += -mios-version-min=10.0
 	endif
@@ -74,13 +77,13 @@ ifdef ARCH
 endif
 
 # Platform Specific Compiler Flags
-ifeq ($(UNAME_S),Linux)
-	CFLAGS += -std=gnu++14 -O2
-	LINK_CMD := ar -cr $(TARGET) $(OBJECTS)
+ifeq ($(UNAME_S),Darwin)
+    CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fembed-bitcode -isysroot $(DEVPATH)
+    LDFLAGS := -static
+    LINK_CMD :=  $(LIBTOOL) $(LDFLAGS) -o $(TARGET) $(OBJECTS)
 else
-	CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fembed-bitcode
-	LDFLAGS := -static
-	LINK_CMD :=  $(LIBTOOL) $(LDFLAGS) -o $(TARGET) $(OBJECTS)
+    CFLAGS += -std=gnu++14 -O2
+    LINK_CMD := ar -cr $(TARGET) $(OBJECTS)
 endif
 
 # Linking
@@ -99,10 +102,9 @@ clean:
 
 install:
 	@echo "Installing ...";
-	@sudo cp $(TARGET) /usr/lib/;
-	@sudo mkdir /usr/include/sqlbridge
-	@sudo cp $(INCDIR)/* /usr/include/sqlbridge/
-	
+	@cp $(TARGET) /usr/lib/;
+	@mkdir -p /usr/include/sqlbridge
+	@cp $(INCDIR)/* /usr/include/sqlbridge/
 
 .PHONY: clean install
 

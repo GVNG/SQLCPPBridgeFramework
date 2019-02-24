@@ -32,8 +32,15 @@
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin) 
 	OSNAME := MacOS
-else ifeq ($(UNAME_S), Linux) 
+	ifeq ($(DEVPATH),)
+		DEVPATH=$(shell xcode-select --print-path)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+	endif
+endif
+ifeq ($(UNAME_S), Linux)
 	OSNAME := Linux
+endif
+ifneq (,$(findstring MINGW64,$(UNAME_S)))
+	OSNAME := MinGW64
 endif
 
 # CC
@@ -75,15 +82,14 @@ OBJECTS += $(patsubst %.o,build/%.o,$(notdir $(patsubst $(SRCDIR_SB)/%.$(SRCEXT)
 CFLAGS := -c
 LIB := -lsqlite3 -lgtest
 LDFLAGS := -LLib/$(OSNAME)/googletest/lib
-ifeq ($(UNAME_S), Linux)
-	CFLAGS += -std=gnu++14 -O2 -fpermissive
-	INC := -I $(INCDIR) -I $(INCDIR_SB) -I $(INCDIR_CASES)
-	LIB += -lsqlcppbridge -lpthread -lm
-else
+ifeq ($(UNAME_S), Darwin)
 	INC := -I $(INCDIR) -I $(INCDIR_SB) -I $(INCDIR_GTEST) -I $(INCDIR_CASES)
-	CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fPIC  -fembed-bitcode -mmacosx-version-min=10.7
+	CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fPIC -mmacosx-version-min=10.7 -isysroot $(DEVPATH)
 	LDFLAGS += -stdlib=libc++
-	
+else
+	CFLAGS += -std=gnu++14 -O2 -fpermissive
+	INC := -I $(INCDIR) -I $(INCDIR_SB) -I $(INCDIR_CASES) -I $(INCDIR_GTEST)
+	LIB += -lpthread -lm
 endif
 
 # Linking
