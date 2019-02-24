@@ -32,6 +32,9 @@
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin) 
 	OSNAME := MacOS
+	ifeq ($(DEVPATH),)
+		DEVPATH=$(shell xcode-select --print-path)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+	endif
 endif
 ifeq ($(UNAME_S), Linux)
 	OSNAME := Linux
@@ -81,7 +84,7 @@ LIB := -lsqlite3 -lgtest
 LDFLAGS := -LLib/$(OSNAME)/googletest/lib
 ifeq ($(UNAME_S), Darwin)
 	INC := -I $(INCDIR) -I $(INCDIR_SB) -I $(INCDIR_GTEST) -I $(INCDIR_CASES)
-	CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fPIC  -fembed-bitcode -mmacosx-version-min=10.7
+	CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fPIC -mmacosx-version-min=10.7 -isysroot $(DEVPATH)
 	LDFLAGS += -stdlib=libc++
 else
 	CFLAGS += -std=gnu++14 -O2 -fpermissive

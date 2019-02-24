@@ -35,6 +35,9 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
 	CC := clang++
 	LIBTOOL := libtool
+	ifeq ($(DEVPATH),)
+		DEVPATH=$(shell xcode-select --print-path)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+	endif
 else
 	CC := g++
 	LIBTOOL := libtool
@@ -64,7 +67,7 @@ CFLAGS := -c
 INC := -I $(INCDIR)
 
 ifdef ARCH
-	CFLAGS += -arch $(ARCH) -isysroot $(DEVPATH)
+	CFLAGS += -arch $(ARCH)
 	ifeq ($(TOS),ios)
 		CFLAGS += -mios-version-min=10.0
 	endif
@@ -75,7 +78,7 @@ endif
 
 # Platform Specific Compiler Flags
 ifeq ($(UNAME_S),Darwin)
-    CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fembed-bitcode
+    CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fembed-bitcode -isysroot $(DEVPATH)
     LDFLAGS := -static
     LINK_CMD :=  $(LIBTOOL) $(LDFLAGS) -o $(TARGET) $(OBJECTS)
 else
