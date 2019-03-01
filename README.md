@@ -61,5 +61,5 @@ whole set of iOS-devices and iOS-simulators
 
 Install:
 -------------
-For Linux environment use "make install" to put assembled with 'make' utility 
+For Linux environment use "sudo make install" to put assembled with 'make' utility 
 static library & headers to system foders 
