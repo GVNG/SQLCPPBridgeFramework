@@ -44,7 +44,7 @@ depth limitations of such nesting at all.
 
 Restrictions:
 -------------
-* At the current moment inheritance of enumerated containers of basic types
+* At the current moment inheritance of iterable containers of basic types
 is not supported;
 * Containers stack, queue (obviously non-iterable) and forward_list 
 are not supported either.
