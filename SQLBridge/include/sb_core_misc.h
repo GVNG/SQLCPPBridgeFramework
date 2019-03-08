@@ -56,14 +56,13 @@ namespace sql_bridge
     enum class e_db_index_type {None, Basic, Unique, PrimaryKey};
     enum class e_db_key_mode {None, Unique, PrimaryKey, ExternalPrimaryKey};
 
-    typedef std::set<size_t> size_t_set;
-    typedef std::set<std::string> string_set;
-    typedef std::vector<std::string> string_container;
-    typedef std::function<std::string(std::string const&)> fn_change_file_name;
-    typedef std::pair<std::string,std::string> strings_pair;
-    
-    typedef std::pair<e_db_index_type,std::string> index_to_field_pair;
-    typedef std::vector<index_to_field_pair> index_to_field_pairs_container;
+    using size_t_set = std::set<size_t>;
+    using string_set = std::set<std::string>;
+    using string_container = std::vector<std::string>;
+    using fn_change_file_name = std::function<std::string(std::string const&)>;
+    using strings_pair = std::pair<std::string,std::string>;
+    using index_to_field_pair = std::pair<e_db_index_type,std::string>;
+    using index_to_field_pairs_container = std::vector<index_to_field_pair>;
 
     class member_for_index_ref
     {
