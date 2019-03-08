@@ -38,21 +38,28 @@
 namespace sql_bridge
 {
     
-    class to_string
+    template<typename T> class _t_to_string
     {
     public:
-        template<typename T> inline to_string& operator << (T const& src) {_write(src);return *this;}
-        inline operator std::string() const {return str();}
-        inline std::string str() const {return buf_.str().substr(0,(size_t)buf_.tellp());}
+        typedef T type;
+        typedef typename T::value_type type_elem;
+        typedef std::basic_ostringstream<type_elem> type_stream;
+        
+        template<typename TFn> inline _t_to_string& operator << (TFn const& src) {_write(src);return *this;}
+        inline operator type() const {return str();}
+        inline type str() const {return buf_.str().substr(0,(size_t)buf_.tellp());}
         inline void remove_from_tail(long offs) {buf_.seekp(-offs, std::ios_base::cur);buf_.put(0);buf_.seekp(-1, std::ios_base::cur);}
-        inline operator std::ostringstream&() {return buf_;}
+        inline operator type_stream&() {return buf_;}
     private:
-        mutable std::ostringstream buf_;
-        template<typename T> inline typename std::enable_if<std::is_enum<T>::value>::type _write(T const& src) {buf_ << static_cast<typename std::underlying_type<T>::type>(src);}
-        template<typename T> inline typename std::enable_if<is_chrono<T>::value>::type _write(T const& src) {double pr = static_cast<double>(src.time_since_epoch().count()) / T::period::den * T::period::num; buf_ << pr;}
-        template<typename T> inline typename std::enable_if<!std::is_enum<T>::value && !is_chrono<T>::value>::type _write(T const& src) {buf_ << src;}
+        mutable type_stream buf_;
+        template<typename TFn> inline typename std::enable_if<std::is_enum<TFn>::value>::type _write(TFn const& src) {buf_ << static_cast<typename std::underlying_type<TFn>::type>(src);}
+        template<typename TFn> inline typename std::enable_if<is_chrono<TFn>::value>::type _write(TFn const& src) {double pr = static_cast<double>(src.time_since_epoch().count()) / TFn::period::den * TFn::period::num; buf_ << pr;}
+        template<typename TFn> inline typename std::enable_if<!std::is_enum<TFn>::value && !is_chrono<TFn>::value>::type _write(TFn const& src) {buf_ << src;}
     };
     
+    using to_string = _t_to_string<std::string>;
+    using to_wstring = _t_to_string<std::wstring>;
+
 #pragma mark - class time_tracker -
     
     class time_tracker
