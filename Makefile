@@ -30,6 +30,7 @@
 
 # Determine the platform
 UNAME_S := $(shell uname -s)
+CNAME_S := sqlcppbridge
 
 # CC
 ifeq ($(UNAME_S),Darwin)
@@ -40,20 +41,20 @@ ifeq ($(UNAME_S),Darwin)
 	endif
 else
 	CC := g++
-	LIBTOOL := libtool
+	LIBTOOL := ar
 endif
 
 # Folders
 INCDIR := SQLBridge/include
 SRCDIR := SQLBridge/src
 BUILDDIR := build
-TARGETDIR := lib
+TARGETDIR := out
 
 # Targets
 ifdef ARCH
-	TARGET := $(TARGETDIR)/sqlcppbridge-$(TOS)-$(ARCH).a
+	TARGET := $(TARGETDIR)/$(CNAME_S)-$(TOS)-$(ARCH).a
 else
-	TARGET := $(TARGETDIR)/libsqlcppbridge.a
+	TARGET := $(TARGETDIR)/lib$(CNAME_S).a
 endif
 
 # Code Lists
@@ -78,12 +79,12 @@ endif
 
 # Platform Specific Compiler Flags
 ifeq ($(UNAME_S),Darwin)
-    CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fembed-bitcode -isysroot $(DEVPATH)
+    CFLAGS += -std=gnu++14 -stdlib=libc++ -O2 -fembed-bitcode -isysroot $(DEVPATH)
     LDFLAGS := -static
     LINK_CMD :=  $(LIBTOOL) $(LDFLAGS) -o $(TARGET) $(OBJECTS)
 else
     CFLAGS += -std=gnu++14 -O2
-    LINK_CMD := ar -cr $(TARGET) $(OBJECTS)
+    LINK_CMD := $(LIBTOOL) -cr $(TARGET) $(OBJECTS)
 endif
 
 # Linking
@@ -101,10 +102,15 @@ clean:
 	@echo "  Cleaning $(TARGET)..."; $(RM) -r $(OBJECTS) $(TARGET)
 
 install:
-	@echo "Installing ...";
-	@cp $(TARGET) /usr/lib/;
-	@mkdir -p /usr/include/sqlbridge
-	@cp $(INCDIR)/* /usr/include/sqlbridge/
+	@echo "Installing ..."
+	@cp $(TARGET) /usr/lib/
+	@mkdir -p /usr/include/$(CNAME_S)
+	@cp $(INCDIR)/* /usr/include/$(CNAME_S)/
+
+uninstall:
+	@echo "Uninstalling ..."
+	@rm /usr/lib/lib$(CNAME_S).a
+	@rm -r /usr/include/$(CNAME_S)/
 
 .PHONY: clean install
 
