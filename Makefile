@@ -103,8 +103,8 @@ clean:
 install:
 	@echo "Installing ...";
 	@cp $(TARGET) /usr/lib/;
-	@mkdir -p /usr/include/sqlbridge
-	@cp $(INCDIR)/* /usr/include/sqlbridge/
+	@mkdir -p /usr/include/sqlcppbridge
+	@cp $(INCDIR)/* /usr/include/sqlcppbridge/
 
 .PHONY: clean install
 
