@@ -30,6 +30,7 @@
 
 # Determine the platform
 UNAME_S := $(shell uname -s)
+CNAME_S := sqlcppbridge
 
 # CC
 ifeq ($(UNAME_S),Darwin)
@@ -51,9 +52,9 @@ TARGETDIR := lib
 
 # Targets
 ifdef ARCH
-	TARGET := $(TARGETDIR)/sqlcppbridge-$(TOS)-$(ARCH).a
+	TARGET := $(TARGETDIR)/$(CNAME_S)-$(TOS)-$(ARCH).a
 else
-	TARGET := $(TARGETDIR)/libsqlcppbridge.a
+	TARGET := $(TARGETDIR)/lib$(CNAME_S).a
 endif
 
 # Code Lists
@@ -98,13 +99,18 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 
 clean:
 	@echo "Cleaning...";
-	@echo "  Cleaning $(TARGET)..."; $(RM) -r $(OBJECTS) $(TARGET)
+	@echo "  Cleaning $(TARGET)..."; rm -r $(OBJECTS) $(TARGET)
 
 install:
 	@echo "Installing ...";
 	@cp $(TARGET) /usr/lib/;
-	@mkdir -p /usr/include/sqlcppbridge
-	@cp $(INCDIR)/* /usr/include/sqlcppbridge/
+	@mkdir -p /usr/include/$(CNAME_S)
+	@cp $(INCDIR)/* /usr/include/$(CNAME_S)/
+
+uninstall:
+	@echo "Uninstalling ...";
+	@rm /usr/$(TARGET)
+	@rm -r /usr/include/$(CNAME_S)/
 
 .PHONY: clean install
 
