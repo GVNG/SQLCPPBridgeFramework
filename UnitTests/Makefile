@@ -103,7 +103,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
 	@echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
 #ifneq ($(UNAME_S), Linux)
-	$(BUILDDIR)/%.o: $(SRCDIR_SB)/%.$(SRCEXT)
+$(BUILDDIR)/%.o: $(SRCDIR_SB)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
 	@echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
 #endif

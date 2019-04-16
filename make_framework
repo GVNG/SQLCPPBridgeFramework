@@ -66,10 +66,10 @@ mkdir -p "$FRAMEWORK"
 
 cp -R "SQLBridge/include/." "$FRAMEWORK/Headers"
 
-lipo -arch armv7 "lib/$FRAMEWORK_NAME-ios-armv7.a" \
-	 -arch armv7s "lib/$FRAMEWORK_NAME-ios-armv7s.a" \
-	 -arch arm64 "lib/$FRAMEWORK_NAME-ios-arm64.a" \
-	 -arch x86_64 "lib/$FRAMEWORK_NAME-ios-x86_64.a" \
+lipo -arch armv7 "out/$FRAMEWORK_NAME-ios-armv7.a" \
+	 -arch armv7s "out/$FRAMEWORK_NAME-ios-armv7s.a" \
+	 -arch arm64 "out/$FRAMEWORK_NAME-ios-arm64.a" \
+	 -arch x86_64 "out/$FRAMEWORK_NAME-ios-x86_64.a" \
 	 -create -output "$FRAMEWORK/$FRAMEWORK_NAME"
 
 export DEVPATH=${CROSS_TOP_OSX}/SDKs/${CROSS_SDK_OSX}
@@ -90,9 +90,9 @@ mkdir -p "$FRAMEWORK"
 
 cp -R "SQLBridge/include/." "$FRAMEWORK/Headers"
 
-lipo -arch i386 "lib/$FRAMEWORK_NAME-osx-i386.a" \
-     -arch x86_64 "lib/$FRAMEWORK_NAME-osx-x86_64.a" \
+lipo -arch i386 "out/$FRAMEWORK_NAME-osx-i386.a" \
+     -arch x86_64 "out/$FRAMEWORK_NAME-osx-x86_64.a" \
      -create -output "$FRAMEWORK/$FRAMEWORK_NAME"
 
-rm -r ./lib
+rm -r ./out
 rm -r ./build/sb_*
