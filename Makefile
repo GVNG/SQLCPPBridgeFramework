@@ -40,7 +40,7 @@ ifeq ($(UNAME_S),Darwin)
 	endif
 else
 	CC := g++
-	LIBTOOL := libtool
+	LIBTOOL := ar
 endif
 
 # Folders
@@ -83,7 +83,7 @@ ifeq ($(UNAME_S),Darwin)
     LINK_CMD :=  $(LIBTOOL) $(LDFLAGS) -o $(TARGET) $(OBJECTS)
 else
     CFLAGS += -std=gnu++14 -O2
-    LINK_CMD := ar -cr $(TARGET) $(OBJECTS)
+    LINK_CMD := $(LIBTOOL) -cr $(TARGET) $(OBJECTS)
 endif
 
 # Linking
