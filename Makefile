@@ -48,7 +48,7 @@ endif
 INCDIR := SQLBridge/include
 SRCDIR := SQLBridge/src
 BUILDDIR := build
-TARGETDIR := lib
+TARGETDIR := out
 
 # Targets
 ifdef ARCH
@@ -79,7 +79,7 @@ endif
 
 # Platform Specific Compiler Flags
 ifeq ($(UNAME_S),Darwin)
-    CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fembed-bitcode -isysroot $(DEVPATH)
+    CFLAGS += -std=gnu++14 -stdlib=libc++ -O2 -fembed-bitcode -isysroot $(DEVPATH)
     LDFLAGS := -static
     LINK_CMD :=  $(LIBTOOL) $(LDFLAGS) -o $(TARGET) $(OBJECTS)
 else
@@ -102,14 +102,14 @@ clean:
 	@echo "  Cleaning $(TARGET)..."; $(RM) -r $(OBJECTS) $(TARGET)
 
 install:
-	@echo "Installing ...";
-	@cp $(TARGET) /usr/lib/;
+	@echo "Installing ..."
+	@cp $(TARGET) /usr/lib/
 	@mkdir -p /usr/include/$(CNAME_S)
 	@cp $(INCDIR)/* /usr/include/$(CNAME_S)/
 
 uninstall:
-	@echo "Uninstalling ...";
-	@rm /usr/$(TARGET)
+	@echo "Uninstalling ..."
+	@rm /usr/lib/lib$(CNAME_S).a
 	@rm -r /usr/include/$(CNAME_S)/
 
 .PHONY: clean install

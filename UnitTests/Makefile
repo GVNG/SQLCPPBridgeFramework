@@ -84,7 +84,7 @@ LIB := -lsqlite3 -lgtest
 LDFLAGS := -LLib/$(OSNAME)/googletest/lib
 ifeq ($(UNAME_S), Darwin)
 	INC := -I $(INCDIR) -I $(INCDIR_SB) -I $(INCDIR_GTEST) -I $(INCDIR_CASES)
-	CFLAGS += -std=c++14 -stdlib=libc++ -O2 -fPIC -mmacosx-version-min=10.7 -isysroot $(DEVPATH)
+	CFLAGS += -std=gnu++14 -stdlib=libc++ -O2 -fPIC -mmacosx-version-min=10.7 -isysroot $(DEVPATH)
 	LDFLAGS += -stdlib=libc++
 else
 	CFLAGS += -std=gnu++14 -O2 -fpermissive
@@ -103,7 +103,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
 	@echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
 #ifneq ($(UNAME_S), Linux)
-$(BUILDDIR)/%.o: $(SRCDIR_SB)/%.$(SRCEXT)
+	$(BUILDDIR)/%.o: $(SRCDIR_SB)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
 	@echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
 #endif
