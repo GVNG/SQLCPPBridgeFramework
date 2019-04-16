@@ -99,7 +99,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 
 clean:
 	@echo "Cleaning...";
-	@echo "  Cleaning $(TARGET)..."; rm -r $(OBJECTS) $(TARGET)
+	@echo "  Cleaning $(TARGET)..."; $(RM) -r $(OBJECTS) $(TARGET)
 
 install:
 	@echo "Installing ...";
