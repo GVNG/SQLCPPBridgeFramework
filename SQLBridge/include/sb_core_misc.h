@@ -92,7 +92,7 @@ namespace sql_bridge
     public:
         mt_event() {};
         mt_event(mt_event const&) = delete;
-        mt_event(mt_event&) = delete;
+        mt_event(mt_event&&) = delete;
         
         inline void fire() {std::unique_lock<std::mutex> lk(mtx_);var_.notify_one();}
         inline void fire_all() {std::unique_lock<std::mutex> lk(mtx_);var_.notify_all();}
