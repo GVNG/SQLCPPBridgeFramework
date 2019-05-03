@@ -103,14 +103,14 @@ namespace sql_bridge
 
         template<typename C> static
         typename std::enable_if<
-            std::is_same<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::begin)),
-            typename C::const_iterator(C::*)() const>::value, yes>::type
+            std::is_member_function_pointer<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::begin))>::value,
+            yes>::type
         test_b(void const*);
 
         template<typename C> static
         typename std::enable_if<
-            std::is_same<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::end)),
-            typename C::const_iterator(C::*)() const>::value, yes>::type
+            std::is_member_function_pointer<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::end))>::value,
+            yes>::type
         test_e(void const*);
         
         template<typename C> static no test_b(...);
