@@ -95,23 +95,23 @@ namespace sql_bridge
         typedef T type;
     };
     
-    template <typename T> struct has_begin_end
+    template<bool,typename T> struct has_begin_end : std::integral_constant<bool, false>{};
+    template <typename T> struct has_begin_end<true,T>
     {
     private:
         typedef char                      yes;
         typedef struct { char array[2]; } no;
+        typedef typename T::const_iterator (T::*mem_fn)() const;
 
-        template<typename C> static
-        typename std::enable_if<
-            std::is_member_function_pointer<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::begin))>::value,
-            yes>::type
-        test_b(void const*);
+        template<typename C> static typename std::enable_if<
+            std::is_same<decltype(static_cast<mem_fn>(&C::begin)),
+            mem_fn>::value,
+            yes>::type test_b(void const*);
 
-        template<typename C> static
-        typename std::enable_if<
-            std::is_member_function_pointer<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::end))>::value,
-            yes>::type
-        test_e(void const*);
+        template<typename C> static typename std::enable_if<
+            std::is_same<decltype(static_cast<mem_fn>(&C::end)),
+            mem_fn>::value,
+            yes>::type test_e(void const*);
         
         template<typename C> static no test_b(...);
         template<typename C> static no test_e(...);
@@ -123,8 +123,7 @@ namespace sql_bridge
     };
     
     template<typename T> struct is_any_container
-        : std::integral_constant<bool,  has_const_iterator<T>::value &&
-                                        has_begin_end<T>::value>
+        : std::integral_constant<bool, has_begin_end<has_const_iterator<T>::value,T>::value>
     {
     };
     
@@ -197,10 +196,7 @@ namespace sql_bridge
     {
     };
     
-    template<typename T> struct sql_array_size : std::extent<T>
-    {
-    };
-    
+    template<typename T> struct sql_array_size : std::extent<T> {};
     template<typename T, size_t N> struct sql_array_size<std::array<T,N> > : std::tuple_size<std::array<T,N> >
     {
     };
