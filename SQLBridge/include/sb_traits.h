@@ -100,13 +100,19 @@ namespace sql_bridge
     private:
         typedef char                      yes;
         typedef struct { char array[2]; } no;
+
+        template<typename C> static
+        typename std::enable_if<
+            std::is_same<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::begin)),
+            typename C::const_iterator(C::*)() const>::value, yes>::type
+        test_b(void const*);
+
+        template<typename C> static
+        typename std::enable_if<
+            std::is_same<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::end)),
+            typename C::const_iterator(C::*)() const>::value, yes>::type
+        test_e(void const*);
         
-        template<typename C> static yes test_b(typename std::enable_if<
-                                               std::is_same<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::begin)),
-                                               typename C::const_iterator(C::*)() const>::value, void>::type*);
-        template<typename C> static yes test_e(typename std::enable_if<
-                                               std::is_same<decltype(static_cast<typename C::const_iterator (C::*)() const>(&C::end)),
-                                               typename C::const_iterator(C::*)() const>::value, void>::type*);
         template<typename C> static no test_b(...);
         template<typename C> static no test_e(...);
         
