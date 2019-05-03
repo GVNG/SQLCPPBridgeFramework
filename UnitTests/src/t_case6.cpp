@@ -35,7 +35,7 @@ TEST_F(DBFixture, Case6)
 {
     sql_bridge::context cont(storage()["case6"]);
     std::vector<Case6> src6,dst6;
-    for(long long i=0; i<10; ++i)
+    for(long i=0; i<10; ++i)
         src6.push_back(Case6(i));
     cont.save(src6);
     cont.load(dst6);

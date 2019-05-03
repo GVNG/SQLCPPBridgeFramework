@@ -40,13 +40,13 @@ class Parent1
     DECLARE_SQL_ACCESS(Parent1);
 public:
     Parent1(){};
-    Parent1(long v)
+    Parent1(long long v)
         : val_(v)
         {};
     inline bool operator == (Parent1 const& rv) const {return val_==rv.val_;}
 protected:
 private:
-    long val_;
+    long long val_;
 };
 
 class Parent2
@@ -54,13 +54,13 @@ class Parent2
     DECLARE_SQL_ACCESS(Parent2);
 public:
     Parent2(){};
-    Parent2(float v)
+    Parent2(double v)
         : val_(v)
         {};
     inline bool operator == (Parent2 const& rv) const {return val_==rv.val_;}
 protected:
 private:
-    float val_;
+    double val_;
 };
 
 class MemberCase2 : public Parent1
