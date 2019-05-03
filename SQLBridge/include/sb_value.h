@@ -51,6 +51,8 @@ namespace sql_bridge
         inline sql_value(std::string const& tx)
             : type_(e_key_type::String)
             , tValue_(tx)
+            , iValue_(0)
+            , rValue_(0)
             {};
         template<typename T> inline sql_value(T const& v) : sql_value(v,_t_real_adapter<std::is_floating_point<T>::value>()) {}
         template<typename T> inline sql_value(T const& v, _t_real_adapter<false>) : sql_value(v,_t_integral_adapter<is_convertible_to_int<T>::value>()) {}
