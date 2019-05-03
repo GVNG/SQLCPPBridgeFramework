@@ -34,4 +34,9 @@ TEST_F(DBFixture, Traits)
     ASSERT_EQ(sql_bridge::is_kind_of_array<_t_array>::value, true);
     ASSERT_EQ(sql_bridge::is_kind_of_array<_t_vector>::value, false);
     ASSERT_EQ(sql_bridge::is_kind_of_array<std::string>::value, false);
+    
+    ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_vector>::value, true);
+    ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_map>::value, false);
+    ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_set>::value, false);
+    ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_array>::value, false);
 }

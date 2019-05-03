@@ -34,7 +34,6 @@
 
 #include <chrono>
 #include <set>
-#include <unordered_set>
 #include <deque>
 #include <vector>
 #include <array>
@@ -75,13 +74,6 @@ namespace sql_bridge
                                             sizeof(st<T>(0)) == sizeof(yes);
     };
 
-    template<typename T> struct is_kind_of_set
-        : std::integral_constant<bool,  std::is_base_of<std::set<typename T::value_type>, T>::value ||
-                                        std::is_base_of<std::multiset<typename T::value_type>, T>::value ||
-                                        std::is_base_of<std::unordered_set<typename T::value_type>, T>::value>
-    {
-    };
-
     template<typename T> struct has_const_iterator
     {
     private:
@@ -91,7 +83,7 @@ namespace sql_bridge
         template<typename C> static yes test(typename C::const_iterator*);
         template<typename C> static no  test(...);
     public:
-        static constexpr const bool value = sizeof(test<T>(0)) == sizeof(yes);
+        static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
         typedef T type;
     };
     
@@ -104,13 +96,11 @@ namespace sql_bridge
         typedef typename T::const_iterator (T::*mem_fn)() const;
 
         template<typename C> static typename std::enable_if<
-            std::is_same<decltype(static_cast<mem_fn>(&C::begin)),
-            mem_fn>::value,
+            std::is_same<decltype(static_cast<mem_fn>(&C::begin)),mem_fn>::value,
             yes>::type test_b(void const*);
 
         template<typename C> static typename std::enable_if<
-            std::is_same<decltype(static_cast<mem_fn>(&C::end)),
-            mem_fn>::value,
+            std::is_same<decltype(static_cast<mem_fn>(&C::end)),mem_fn>::value,
             yes>::type test_e(void const*);
         
         template<typename C> static no test_b(...);
@@ -122,6 +112,28 @@ namespace sql_bridge
         typedef T type;
     };
     
+    template<typename T> struct has_push_back
+    {
+    private:
+        typedef char                      yes;
+        typedef struct { char array[2]; } no;
+        typedef void (T::*mem_fn)(typename T::const_reference);
+        
+        template<typename C> static typename std::enable_if<
+            std::is_same<decltype(static_cast<mem_fn>(&C::push_back)),mem_fn>::value,
+            yes>::type test(void const*);
+        template<typename C> static no  test(...);
+    public:
+        static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
+        typedef T type;
+    };
+    
+    template<typename T> struct is_ordered_set
+        : std::integral_constant<bool,  std::is_base_of<std::set<typename T::value_type>, T>::value ||
+                                        std::is_base_of<std::multiset<typename T::value_type>, T>::value>
+    {
+    };
+
     template<typename T> struct is_any_container
         : std::integral_constant<bool, has_begin_end<has_const_iterator<T>::value,T>::value>
     {
@@ -139,7 +151,7 @@ namespace sql_bridge
     };
     
     template<bool,typename T> struct check_for_set : std::integral_constant<bool, false>{};
-    template<typename T> struct check_for_set<true,T> : std::integral_constant<bool, is_kind_of_set<T>::value>{};
+    template<typename T> struct check_for_set<true,T> : std::integral_constant<bool, is_ordered_set<T>::value>{};
 
     template<typename T> struct is_set
         : std::integral_constant<bool,  check_for_set<is_any_container<T>::value,T>::value>
@@ -188,14 +200,12 @@ namespace sql_bridge
                                         is_chrono<T>::value>
     {
     };
-    
+
     template<typename T> struct is_back_pushable_container
-        : std::integral_constant<bool,  std::is_base_of<std::vector<typename T::value_type>, T>::value ||
-                                        std::is_base_of<std::deque<typename T::value_type>, T>::value ||
-                                        std::is_base_of<std::list<typename T::value_type>, T>::value>
+        : std::integral_constant<bool,  has_push_back<T>::value>
     {
     };
-    
+
     template<typename T> struct sql_array_size : std::extent<T> {};
     template<typename T, size_t N> struct sql_array_size<std::array<T,N> > : std::tuple_size<std::array<T,N> >
     {
