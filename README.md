@@ -18,7 +18,7 @@ How to use this library
 -------------
 For using the library you need to add the framework "sqlcppbridge" into your 
 project and to include the file sqlcppbridge.h in your sources where it is required. 
-In 'Cases' directory there are several samples of using the library.
+In 'Cases' folder there are several samples of using the library.
 
 Key features:
 -------------
@@ -27,9 +27,9 @@ necessary tables/indexes is supported automatically; if necessary custom
 SQL-scripts for updating tables/indexes are called or a simple deleting
 followed by recreating the tables is made (this is the only place where you
 may need SQL knowledge);
-* Storing of base types (here and below) arithmetic/enum/std::string by
+* storing of base types (here and below) arithmetic/enum/std::string by
 string keys (the so-called KV-storage);
-* Storing iterable containers with the values ​​of all base types in the
+* storing iterable containers with the values ​​of all base types in the
 KV-storage;
 * storing of classes' instances with members of base types in a single
 repository with creation of required indexes and control of objects'
