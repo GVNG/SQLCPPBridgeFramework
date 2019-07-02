@@ -53,7 +53,7 @@ namespace sql_bridge
     private:
         mutable type_stream buf_;
         template<typename TFn> inline typename std::enable_if<std::is_enum<TFn>::value>::type _write(TFn const& src) {buf_ << static_cast<typename std::underlying_type<TFn>::type>(src);}
-        template<typename TFn> inline typename std::enable_if<is_chrono<TFn>::value>::type _write(TFn const& src) {double pr = static_cast<double>(src.time_since_epoch().count()) / TFn::period::den * TFn::period::num; buf_ << pr;}
+        template<typename TFn> inline typename std::enable_if<is_chrono<TFn>::value>::type _write(TFn const& src) {double pr = static_cast<double>(src.time_since_epoch().count()) / TFn::period::den * TFn::period::num; buf_ << std::setprecision(15) << pr;}
         template<typename TFn> inline typename std::enable_if<!std::is_enum<TFn>::value && !is_chrono<TFn>::value>::type _write(TFn const& src) {buf_ << src;}
     };
     

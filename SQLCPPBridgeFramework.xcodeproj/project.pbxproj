@@ -89,6 +89,7 @@
 		937F84A921DA3C8B00DD82F8 /* example23.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931D3CCE2170E3AC00BCD515 /* example23.cpp */; };
 		937F84AA21DA3C8B00DD82F8 /* example24.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931D3CE72175CAFA00BCD515 /* example24.cpp */; };
 		937F854721E615BB00DD82F8 /* t_traits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F854621E615BB00DD82F8 /* t_traits.cpp */; };
+		93AB7F6022CB93AB00D5658C /* t_misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AB7F5F22CB93AB00D5658C /* t_misc.cpp */; };
 		93B071FB20582B0E008D2FB6 /* sb_sqlite_adapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B071FA20582B0E008D2FB6 /* sb_sqlite_adapter.cpp */; };
 		93B0720320591999008D2FB6 /* sb_data_section_descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B0720220591999008D2FB6 /* sb_data_section_descriptor.cpp */; };
 		93BEDCF020A34894004166EB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E60D7B20558090009151ED /* main.cpp */; };
@@ -173,6 +174,7 @@
 		939E0AE520F7651900106D46 /* example21.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example21.cpp; sourceTree = "<group>"; };
 		93A1349020D149E90041EE2E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; usesTabs = 1; };
 		93A1349220D249BD0041EE2E /* make_framework */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = make_framework; sourceTree = SOURCE_ROOT; };
+		93AB7F5F22CB93AB00D5658C /* t_misc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_misc.cpp; sourceTree = "<group>"; };
 		93B071F92058262E008D2FB6 /* sb_sqlite_adapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_sqlite_adapter.h; sourceTree = "<group>"; };
 		93B071FA20582B0E008D2FB6 /* sb_sqlite_adapter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sb_sqlite_adapter.cpp; sourceTree = "<group>"; };
 		93B071FF20590A38008D2FB6 /* sb_context.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_context.h; sourceTree = "<group>"; };
@@ -275,6 +277,7 @@
 			isa = PBXGroup;
 			children = (
 				937F848421DA2B4800DD82F8 /* main.cpp */,
+				93AB7F5F22CB93AB00D5658C /* t_misc.cpp */,
 				937F854621E615BB00DD82F8 /* t_traits.cpp */,
 				937F848C21DA328600DD82F8 /* t_kvdb.cpp */,
 				937F84AB21DA3CC000DD82F8 /* t_case1.cpp */,
@@ -557,6 +560,7 @@
 				937F849D21DA3C8B00DD82F8 /* example11.cpp in Sources */,
 				937F849121DA367500DD82F8 /* sb_class_descriptor.cpp in Sources */,
 				937F84A121DA3C8B00DD82F8 /* example15.cpp in Sources */,
+				93AB7F6022CB93AB00D5658C /* t_misc.cpp in Sources */,
 				937F84A521DA3C8B00DD82F8 /* example19.cpp in Sources */,
 				93718CA9227C589E00E22497 /* t_case9.cpp in Sources */,
 				937F84A621DA3C8B00DD82F8 /* example20.cpp in Sources */,
