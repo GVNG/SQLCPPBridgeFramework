@@ -38,9 +38,9 @@
 #include "sb_sqlite_adapter.h"
 #include "sb_data_section_descriptor.h"
 
-#define DEFINE_SQL_DATABASE_EXT(STRAT,NAME,VERSION,CLASSES...)\
-    static sql_bridge::_t_data_section_descriptors_creator<STRAT,CLASSES> const g_db_##NAME##_init(#NAME,VERSION);\
-    template<> void sql_bridge::_t_data_section_descriptor<STRAT,CLASSES>::updater
+#define DEFINE_SQL_DATABASE_EXT(STRAT,NAME,VERSION,...)\
+    static sql_bridge::_t_data_section_descriptors_creator<STRAT,__VA_ARGS__> const g_db_##NAME##_init(#NAME,VERSION);\
+    template<> void sql_bridge::_t_data_section_descriptor<STRAT,__VA_ARGS__>::updater
 
 #define DEFINE_SQL_TABLE_EXT(STRAT,NAME,CLASSNAME)\
     template<> std::string const sql_bridge::_t_class_descriptor<STRAT,CLASSNAME>::table_name_ = #NAME;\
@@ -51,13 +51,13 @@
     template<> sql_bridge::class_descriptors_container const sql_bridge::_t_container_descriptor<STRAT,CLASSNAME>::members_ =\
     sql_bridge::_t_container_descriptor<STRAT,CLASSNAME>::create_members();
 
-#define DECLARE_SQL_ACCESS_EXT(STRAT,CLASSNAME...)\
-    friend class sql_bridge::_t_class_descriptor< STRAT, CLASSNAME >;
+#define DECLARE_SQL_ACCESS_EXT(STRAT,...)\
+    friend class sql_bridge::_t_class_descriptor< STRAT,__VA_ARGS__ >;
 
 // defines for the default strategy (sqlite)
 
-#define DEFINE_SQL_DATABASE(NAME,VERSION,CLASSES...)\
-    DEFINE_SQL_DATABASE_EXT(sql_bridge::sqlite_adapter,NAME,VERSION,CLASSES)
+#define DEFINE_SQL_DATABASE(NAME,VERSION,...)\
+    DEFINE_SQL_DATABASE_EXT(sql_bridge::sqlite_adapter,NAME,VERSION,__VA_ARGS__)
 
 #define DEFINE_SQL_TABLE(NAME,CLASSNAME)\
     DEFINE_SQL_TABLE_EXT(sql_bridge::sqlite_adapter,NAME,CLASSNAME)
@@ -65,7 +65,7 @@
 #define DEFINE_SQL_TRIVIAL_TABLE(NAME,CLASSNAME)\
     DEFINE_SQL_TRIVIAL_TABLE_EXT(sql_bridge::sqlite_adapter,NAME,CLASSNAME)
 
-#define DECLARE_SQL_ACCESS(CLASSNAME...)\
-    DECLARE_SQL_ACCESS_EXT(sql_bridge::sqlite_adapter,CLASSNAME)
+#define DECLARE_SQL_ACCESS(...)\
+    DECLARE_SQL_ACCESS_EXT(sql_bridge::sqlite_adapter,__VA_ARGS__)
 
 #endif /* sql_cpp_bridge_h */

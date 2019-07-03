@@ -50,7 +50,7 @@ public:
         {}
     inline bool operator == (Case21Ext const& rv) const {return var1_==rv.var1_ && var2_==rv.var2_ && var3_==rv.var3_;}
 private:
-    float var1_;
+    double var1_;
     int var2_;
     std::string var3_;
 };

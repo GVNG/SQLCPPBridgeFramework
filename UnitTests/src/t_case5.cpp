@@ -39,7 +39,7 @@ TEST_F(DBFixture, Case5)
     for(long long i=0; i<100; ++i)
         src5a.push_back(sql_bridge::to_string() << "var: " << i+1);
     for(long long i=0; i<300; ++i)
-        src5b[sql_bridge::to_string() << "key: " << i+1] = i;
+        src5b[sql_bridge::to_string() << "key: " << i+1] = (long)i;
     
     cont.replace(src5a);
     cont.replace(src5b);

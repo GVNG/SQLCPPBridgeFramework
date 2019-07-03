@@ -44,7 +44,7 @@ public:
         {}
     inline bool operator == (Case12Attach const& rv) const {return val_==rv.val_;}
 private:
-    float val_;
+    double val_;
 };
 
 class Case12Member : public Case12Attach

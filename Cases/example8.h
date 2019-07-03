@@ -46,7 +46,7 @@ public:
     Case8() {};
     Case8(int i)
         : item_id_(sql_bridge::to_string() << "Test: " << i)
-        , member_(3,i+5)
+        , member_(3,i+5.0f)
         , time_stamp_(std::chrono::system_clock::now())
     {
         buffer_.fill(i);

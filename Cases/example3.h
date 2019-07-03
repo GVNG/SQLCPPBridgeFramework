@@ -44,7 +44,7 @@ public:
     Case3(){};
     Case3(long i)
         : id_(i)
-        , field1_(i/M_2_PI)
+        , field1_((float)(i/M_2_PI))
         , field2_(i*M_PI)
         , field3_(sql_bridge::to_string() << "blah-blah:" << i)
         , field4_(3,sql_bridge::to_string() << "T:" << i)

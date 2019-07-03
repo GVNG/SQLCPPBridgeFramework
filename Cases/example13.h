@@ -38,7 +38,7 @@ class Case13Element
 {
     DECLARE_SQL_ACCESS(Case13Element);
 public:
-    Case13Element(long i = 0)
+    Case13Element(float i = 0)
         : val_(i+1)
         {};
     inline bool operator == (Case13Element const& rv) const {return val_==rv.val_;}
@@ -54,8 +54,8 @@ class Case13
 public:
     Case13(EBase b=EBase::Normal)
         : base_(b)
-        , elements_(10,Case13Element((long)b))
-        , elements_alt_(5,Case13Element((long)b))
+        , elements_(10,Case13Element((float)b))
+        , elements_alt_(5,Case13Element((float)b))
         {}
     inline bool operator == (Case13 const& rv) const {return base_==rv.base_ && elements_==rv.elements_ && elements_alt_==rv.elements_alt_;}
 private:

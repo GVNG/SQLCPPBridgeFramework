@@ -46,7 +46,7 @@ namespace sql_bridge
     data_section_descriptors_ptr data_section_descriptors::operator[](std::string const& name)
     {
         proc_init_queue();
-        std::lock_guard<std::mutex> lck(access_);
+        std::unique_lock<std::mutex> lck(access_);
         data_section_descriptors_map::const_iterator pos = index_.find(name);
         if (pos==index_.end())
             throw sql_bridge_error(to_string() << "The data section with the name \"" << name << "\" doesn't exist",
@@ -57,7 +57,7 @@ namespace sql_bridge
     void data_section_descriptors::add_data_section(std::string const& name, data_section_descriptors_ptr sect)
     {
         static std::string const rec("Use the different name");
-        std::lock_guard<std::mutex> lck(access_);
+        std::unique_lock<std::mutex> lck(access_);
         data_section_descriptors_map::const_iterator pos = index_.find(name);
         if (pos!=index_.end())
             throw sql_bridge_error(to_string() << "The data section with the name \"" << name << "\" is duplicated", rec);

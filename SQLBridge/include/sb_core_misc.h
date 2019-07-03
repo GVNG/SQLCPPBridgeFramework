@@ -45,6 +45,7 @@
 #include <algorithm>
 #include <condition_variable>
 #include <functional>
+#include <iomanip>
 
 namespace sql_bridge
 {
@@ -92,7 +93,7 @@ namespace sql_bridge
     public:
         mt_event() {};
         mt_event(mt_event const&) = delete;
-        mt_event(mt_event&) = delete;
+        mt_event(mt_event&&) = delete;
         
         inline void fire() {std::unique_lock<std::mutex> lk(mtx_);var_.notify_one();}
         inline void fire_all() {std::unique_lock<std::mutex> lk(mtx_);var_.notify_all();}
@@ -115,14 +116,14 @@ namespace sql_bridge
             {};
         inline operator type() const
         {
-            std::lock_guard<std::mutex> lk(mtx_);
+            std::unique_lock<std::mutex> lk(mtx_);
             return val_;
         }
-        inline type operator = (type const& v){std::lock_guard<std::mutex> lk(mtx_);val_ = v;return val_;}
-        inline type operator ++ () {std::lock_guard<std::mutex> lk(mtx_);return ++val_;}
-        inline type operator ++ (int) {std::lock_guard<std::mutex> lk(mtx_);return val_++;}
-        inline type operator -- () {std::lock_guard<std::mutex> lk(mtx_);return --val_;}
-        inline type operator -- (int) {std::lock_guard<std::mutex> lk(mtx_);return val_--;}
+        inline type operator = (type const& v){std::unique_lock<std::mutex> lk(mtx_);val_ = v;return val_;}
+        inline type operator ++ () {std::unique_lock<std::mutex> lk(mtx_);return ++val_;}
+        inline type operator ++ (int) {std::unique_lock<std::mutex> lk(mtx_);return val_++;}
+        inline type operator -- () {std::unique_lock<std::mutex> lk(mtx_);return --val_;}
+        inline type operator -- (int) {std::unique_lock<std::mutex> lk(mtx_);return val_--;}
 
     private:
         type val_;

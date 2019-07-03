@@ -50,7 +50,7 @@ public:
         {
             std::ostringstream os;
             os << "val_" << k+1;
-            value_.insert({os.str(),i*100});
+            value_.insert({os.str(),i*100.0f});
         }
     }
     inline bool operator < (Case7 const& rv) const {return id_<rv.id_;}

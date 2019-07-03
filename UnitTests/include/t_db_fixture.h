@@ -34,7 +34,9 @@
 
 #include "gtest/gtest.h"
 #include "sqlcppbridge.h"
+#ifndef _WIN32
 #include <ftw.h>
+#endif
 #include <cmath>
 
 static char const* db_path = "./DBTest";
@@ -49,7 +51,7 @@ protected:
 		#ifndef _WIN32
 			mkdir(db_path, 0777);
         #else
-            mkdir(db_path);
+            _mkdir(db_path);
         #endif
         storage_ = std::make_unique<_t_storage>(db_path);
     }
@@ -95,7 +97,7 @@ private:
 			}
 			while(en.next());
         }
-		return rmdir(path);
+		return _rmdir(path);
 	}
 #else
     static int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)

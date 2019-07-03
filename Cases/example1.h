@@ -42,7 +42,7 @@ class Case1Attach
     DECLARE_SQL_ACCESS(Case1Attach);
 public:
     Case1Attach(){};
-    Case1Attach(float av)
+    Case1Attach(double av)
         : attached_value_(av)
         {}
     inline bool operator == (Case1Attach const& rv) const
@@ -50,7 +50,7 @@ public:
         return attached_value_==rv.attached_value_;
     }
 private:
-    float attached_value_;
+    double attached_value_;
 };
 
 class Case1Related

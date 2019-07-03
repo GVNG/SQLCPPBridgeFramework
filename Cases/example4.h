@@ -40,12 +40,12 @@ class Case4Member
     DECLARE_SQL_ACCESS(Case4Member);
 public:
     Case4Member(){};
-    Case4Member(float v)
+    Case4Member(double v)
         : val_(v)
         {}
     inline bool operator == (Case4Member const& rv) const {return val_==rv.val_;}
 private:
-    float val_;
+    double val_;
 };
 
 class Case4

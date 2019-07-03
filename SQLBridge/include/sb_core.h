@@ -53,29 +53,13 @@ namespace sql_bridge
     private:
         mutable type_stream buf_;
         template<typename TFn> inline typename std::enable_if<std::is_enum<TFn>::value>::type _write(TFn const& src) {buf_ << static_cast<typename std::underlying_type<TFn>::type>(src);}
-        template<typename TFn> inline typename std::enable_if<is_chrono<TFn>::value>::type _write(TFn const& src) {double pr = static_cast<double>(src.time_since_epoch().count()) / TFn::period::den * TFn::period::num; buf_ << pr;}
+        template<typename TFn> inline typename std::enable_if<is_chrono<TFn>::value>::type _write(TFn const& src) {double pr = static_cast<double>(src.time_since_epoch().count()) / TFn::period::den * TFn::period::num; buf_ << std::setprecision(15) << pr;}
         template<typename TFn> inline typename std::enable_if<!std::is_enum<TFn>::value && !is_chrono<TFn>::value>::type _write(TFn const& src) {buf_ << src;}
     };
     
     using to_string = _t_to_string<std::string>;
     using to_wstring = _t_to_string<std::wstring>;
 
-#pragma mark - class time_tracker -
-    
-    class time_tracker
-    {
-    public:
-        time_tracker()
-            : stamp_(std::chrono::system_clock::now())
-            {}
-        ~time_tracker()
-        {
-            std::chrono::duration<float> dif(std::chrono::system_clock::now() - stamp_);
-            std::cout << "The delay is " << dif.count() << " sec." << std::endl;
-        };
-    private:
-        std::chrono::system_clock::time_point stamp_;
-    };
 };
 
 #endif /* sb_core_h */

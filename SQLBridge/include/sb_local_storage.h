@@ -168,7 +168,7 @@ namespace sql_bridge
         {
             struct _t_context_creator : context {_t_context_creator(db_tasks_queue_interface_ptr q, data_sections_ptr ds) : context(q,ds) {}};
             {
-                std::lock_guard<std::mutex> lk(data_section_access_);
+                std::unique_lock<std::mutex> lk(data_section_access_);
                 data_sections_map::iterator pos(data_sections_.find(nm));
                 if (pos!=data_sections_.end() && !pos->second.expired())
                 {
@@ -187,7 +187,7 @@ namespace sql_bridge
             ret.get(); // exceptions check
             data_sections_ptr sect(static_cast<create_task*>(task.get())->section());
             {
-                std::lock_guard<std::mutex> lk(data_section_access_);
+                std::unique_lock<std::mutex> lk(data_section_access_);
                 data_sections_map::iterator pos(data_sections_.find(nm));
                 section_keepers_.erase(nm);
                 if (pos!=data_sections_.end() && !pos->second.expired())
@@ -222,7 +222,7 @@ namespace sql_bridge
             ready_--;
             while(!shutdown_.wait_for(std::chrono::seconds(10)))
             {
-                std::lock_guard<std::mutex> lk(data_section_access_);
+                std::unique_lock<std::mutex> lk(data_section_access_);
                 for(typename sections_cache::iterator pos = section_keepers_.begin(); pos!=section_keepers_.end();)
                 {
                     if (pos->second.is_expired())
