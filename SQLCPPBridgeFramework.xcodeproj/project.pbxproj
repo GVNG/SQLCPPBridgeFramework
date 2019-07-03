@@ -175,6 +175,7 @@
 		93A1349020D149E90041EE2E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; usesTabs = 1; };
 		93A1349220D249BD0041EE2E /* make_framework */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = make_framework; sourceTree = SOURCE_ROOT; };
 		93AB7F5F22CB93AB00D5658C /* t_misc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_misc.cpp; sourceTree = "<group>"; };
+		93AB7F6122CC809100D5658C /* time_tracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = time_tracker.h; sourceTree = "<group>"; };
 		93B071F92058262E008D2FB6 /* sb_sqlite_adapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_sqlite_adapter.h; sourceTree = "<group>"; };
 		93B071FA20582B0E008D2FB6 /* sb_sqlite_adapter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sb_sqlite_adapter.cpp; sourceTree = "<group>"; };
 		93B071FF20590A38008D2FB6 /* sb_context.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_context.h; sourceTree = "<group>"; };
@@ -402,6 +403,7 @@
 				93A1349220D249BD0041EE2E /* make_framework */,
 				93A1349020D149E90041EE2E /* Makefile */,
 				93E60D7B20558090009151ED /* main.cpp */,
+				93AB7F6122CC809100D5658C /* time_tracker.h */,
 			);
 			path = Support;
 			sourceTree = "<group>";

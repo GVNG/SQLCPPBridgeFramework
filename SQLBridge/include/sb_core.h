@@ -60,22 +60,6 @@ namespace sql_bridge
     using to_string = _t_to_string<std::string>;
     using to_wstring = _t_to_string<std::wstring>;
 
-#pragma mark - class time_tracker -
-    
-    class time_tracker
-    {
-    public:
-        time_tracker()
-            : stamp_(std::chrono::system_clock::now())
-            {}
-        ~time_tracker()
-        {
-            std::chrono::duration<float> dif(std::chrono::system_clock::now() - stamp_);
-            std::cout << "The delay is " << dif.count() << " sec." << std::endl;
-        };
-    private:
-        std::chrono::system_clock::time_point stamp_;
-    };
 };
 
 #endif /* sb_core_h */

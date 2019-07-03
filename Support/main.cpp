@@ -31,6 +31,7 @@
 #include <iostream>
 #include <sys/stat.h>
 #include "sqlcppbridge.h"
+#include "time_tracker.h"
 
 #include "example1.h"
 #include "example2.h"
@@ -59,7 +60,7 @@
 
 int main(int argc, char** argv)
 {
-    sql_bridge::time_tracker tracker;
+    time_tracker tracker;
     try
     {
         mkdir("./DB", 0777);
@@ -68,7 +69,7 @@ int main(int argc, char** argv)
 #if 1
         {
             std::cout << "Case KVDB ";
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             // test kvdb
             double src_rl(M_PI),dst_rl;
             std::string src_str("aaa"),dst_str;
@@ -122,7 +123,7 @@ int main(int argc, char** argv)
         }
         
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case1"]);
             std::cout << "Case 1 ";
             std::map<int,Case1> src1,dst1;
@@ -140,7 +141,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case2"]);
             std::cout << "Case 2 ";
 
@@ -157,7 +158,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case3"]);
             std::cout << "Case 3 ";
 
@@ -180,7 +181,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case4"]);
             std::cout << "Case 4 ";
             std::vector<Case4> src4,dst4;
@@ -193,7 +194,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case5"]);
             std::cout << "Case 5 ";
             Case5a src5a, dst5a;
@@ -215,7 +216,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case6"]);
             std::cout << "Case 6 ";
             std::vector<Case6> src6,dst6;
@@ -228,7 +229,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case7"]);
             std::cout << "Case 7 ";
             std::vector<Case7> src7,dst7;
@@ -245,7 +246,7 @@ int main(int argc, char** argv)
         }
         
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case8"]);
             std::cout << "Case 8 ";
             std::set<Case8> src8,dst8;
@@ -258,7 +259,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case9"]);
             std::cout << "Case 9 ";
             Case9 src9,dst9;
@@ -271,7 +272,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case10"]);
             std::cout << "Case 10 ";
             Case10 src10,dst10;
@@ -284,7 +285,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage.context_with_alt_file("case11", [](std::string const& src)->std::string
             {
                 return sql_bridge::to_string() << "test_" << src;
@@ -298,7 +299,7 @@ int main(int argc, char** argv)
         }
         
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case12"]);
             std::cout << "Case 12 ";
             Case12 src12(10),dst12;
@@ -309,7 +310,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case13"]);
             std::cout << "Case 13 ";
             cont.save(Case13(EBase::Normal));
@@ -322,7 +323,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case14"]);
             std::cout << "Case 14 ";
             std::vector<Case14> src14,dst14;
@@ -338,7 +339,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case15"]);
             std::cout << "Case 15 ";
 
@@ -356,7 +357,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case16"]);
             std::cout << "Case 16 ";
 
@@ -370,7 +371,7 @@ int main(int argc, char** argv)
         }
         
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case17"]);
             std::cout << "Case 17 ";
             _TLongToCase17Map src17,dst17;
@@ -383,7 +384,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case18"]);
             std::cout << "Case 18 ";
             Case18 src18(10),dst18;
@@ -394,7 +395,7 @@ int main(int argc, char** argv)
         }
         
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case19"]);
             std::cout << "Case 19 ";
             Case19Map src19
@@ -412,7 +413,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case20"]);
             std::cout << "Case 20 ";
             Case20Container src20,dst20;
@@ -425,7 +426,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case21"]);
             std::cout << "Case 21 ";
             std::vector<Case21> src21,dst21;
@@ -438,7 +439,7 @@ int main(int argc, char** argv)
         }
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case22"]);
             std::cout << "Case 22 ";
             Case22Container src =
@@ -457,7 +458,7 @@ int main(int argc, char** argv)
         }
         
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case23"]);
             std::cout << "Case 23 ";
             Case23Container src,dst;
@@ -480,7 +481,7 @@ int main(int argc, char** argv)
 #endif
 
         {
-            sql_bridge::time_tracker trk;
+            time_tracker trk;
             sql_bridge::context cont(storage["case24"]);
             std::cout << "Case 24 ";
             Case24Container src,dst;
