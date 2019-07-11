@@ -61,7 +61,7 @@ namespace sql_bridge
         _t_init_queue init_queue_;
     };
 
-    template<typename TStrategy, typename... T> class _t_data_section_descriptor
+    template<typename TStrategy, typename TNamesSelector, typename... T> class _t_data_section_descriptor
         : public data_section_descriptor
     {
     public:
@@ -194,9 +194,9 @@ namespace sql_bridge
         }
     };
     
-    template<typename TStrategy, typename ...T> struct _t_data_section_descriptors_creator
+    template<typename TStrategy, typename TNamesSelector, typename ...T> struct _t_data_section_descriptors_creator
     {
-        typedef _t_data_section_descriptor<TStrategy,T...> type;
+        typedef _t_data_section_descriptor<TStrategy,TNamesSelector,T...> type;
         _t_data_section_descriptors_creator(std::string const& name, size_t ver)
         {
             std::string locname(name);

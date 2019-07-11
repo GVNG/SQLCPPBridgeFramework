@@ -44,7 +44,7 @@ public:
     Case24(long i = 0)
         : lower_(i)
         , upper_(100-i)
-    {}
+        {}
     inline bool operator == (Case24 const& rv) const {return lower_==rv.lower_ && upper_==rv.upper_;}
     long lower_;
     long upper_;

@@ -478,7 +478,6 @@ int main(int argc, char** argv)
             assert(chk==dst);
             std::cout << "is ok. ";
         }
-#endif
 
         {
             time_tracker trk;
@@ -499,6 +498,7 @@ int main(int argc, char** argv)
             assert(chk==dst);
             std::cout << "is ok. ";
         }
+#endif
 
     }
     catch (std::exception& ex)

@@ -39,8 +39,9 @@
 #include "sb_data_section_descriptor.h"
 
 #define DEFINE_SQL_DATABASE_EXT(STRAT,NAME,VERSION,...)\
-    static sql_bridge::_t_data_section_descriptors_creator<STRAT,__VA_ARGS__> const g_db_##NAME##_init(#NAME,VERSION);\
-    template<> void sql_bridge::_t_data_section_descriptor<STRAT,__VA_ARGS__>::updater
+    struct __t_sect_name_##NAME##_selector{};\
+    static sql_bridge::_t_data_section_descriptors_creator<STRAT,__t_sect_name_##NAME##_selector,__VA_ARGS__> const g_db_##NAME##_init(#NAME,VERSION);\
+    template<> void sql_bridge::_t_data_section_descriptor<STRAT,__t_sect_name_##NAME##_selector,__VA_ARGS__>::updater
 
 #define DEFINE_SQL_TABLE_EXT(STRAT,NAME,CLASSNAME)\
     template<> std::string const sql_bridge::_t_class_descriptor<STRAT,CLASSNAME>::table_name_ = #NAME;\
