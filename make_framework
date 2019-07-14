@@ -45,19 +45,19 @@ make -C ./UnitTests || exit 1
 
 export DEVPATH=${CROSS_TOP_IOS}/SDKs/${CROSS_SDK_IOS}
 export TOS="ios"
-export ARCH="arm64e"
-make clean
-make || exit 2
 export ARCH="armv7"
 make clean
-make || exit 3
+make || exit 2
 export ARCH="armv7s"
 make clean
-make || exit 4
+make || exit 3
 export ARCH="armv7k"
 make clean
-make || exit 5
+make || exit 3
 export ARCH="arm64"
+make clean
+make || exit 5
+export ARCH="arm64e"
 make clean
 make || exit 6
 export ARCH="arm64_32"
@@ -88,10 +88,10 @@ export DEVPATH=${CROSS_TOP_OSX}/SDKs/${CROSS_SDK_OSX}
 export TOS="osx"
 export ARCH="x86_64"
 make clean
-make || exit 9
+make || exit 10
 export ARCH="i386"
 make clean
-make || exit 10
+make || exit 11
 unset DEVPATH
 unset ARCH
 unset TOS
