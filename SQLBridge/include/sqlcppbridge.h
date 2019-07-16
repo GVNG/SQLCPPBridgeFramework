@@ -52,8 +52,11 @@
     template<> sql_bridge::class_descriptors_container const sql_bridge::_t_container_descriptor<STRAT,CLASSNAME>::members_ =\
     sql_bridge::_t_container_descriptor<STRAT,CLASSNAME>::create_members();
 
-#define DECLARE_SQL_ACCESS_EXT(STRAT,...)\
-    friend class sql_bridge::_t_class_descriptor< STRAT,__VA_ARGS__ >;
+#define DECLARE_SQL_ACCESS_EXT(STRAT,CLASSNAME)\
+    friend class sql_bridge::_t_class_descriptor< STRAT,CLASSNAME >;
+
+#define DECLARE_SQL_INHERITANCE_ACCESS_EXT(STRAT,CLASSNAME,CLASSNAME_PARENT)\
+    friend class sql_bridge::_t_inheritance_descriptor< STRAT,CLASSNAME,CLASSNAME_PARENT >;
 
 // defines for the default strategy (sqlite)
 
@@ -66,7 +69,10 @@
 #define DEFINE_SQL_TRIVIAL_TABLE(NAME,CLASSNAME)\
     DEFINE_SQL_TRIVIAL_TABLE_EXT(sql_bridge::sqlite_adapter,NAME,CLASSNAME)
 
-#define DECLARE_SQL_ACCESS(...)\
-    DECLARE_SQL_ACCESS_EXT(sql_bridge::sqlite_adapter,__VA_ARGS__)
+#define DECLARE_SQL_ACCESS(CLASSNAME)\
+    DECLARE_SQL_ACCESS_EXT(sql_bridge::sqlite_adapter,CLASSNAME)
+
+#define DECLARE_SQL_INHERITANCE_ACCESS(CLASSNAME,CLASSNAME_PARENT)\
+    DECLARE_SQL_INHERITANCE_ACCESS_EXT(sql_bridge::sqlite_adapter,CLASSNAME,CLASSNAME_PARENT)
 
 #endif /* sql_cpp_bridge_h */

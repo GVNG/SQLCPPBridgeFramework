@@ -57,6 +57,7 @@
 #include "example22.h"
 #include "example23.h"
 #include "example24.h"
+#include "example25.h"
 
 int main(int argc, char** argv)
 {
@@ -499,7 +500,19 @@ int main(int argc, char** argv)
             std::cout << "is ok. ";
         }
 #endif
-
+        {
+            time_tracker trk;
+            sql_bridge::context cont(storage["case25"]);
+            std::cout << "Case 25 ";
+            Case25Container src,dst;
+            for(int i=0; i<100; ++i)
+                src.push_back(i);
+            cont.save(src);
+            cont.load(dst);
+            assert(src==dst);
+            std::cout << "is ok. ";
+        }
+        
     }
     catch (std::exception& ex)
     {

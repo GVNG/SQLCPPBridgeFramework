@@ -93,8 +93,11 @@
 		93B071FB20582B0E008D2FB6 /* sb_sqlite_adapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B071FA20582B0E008D2FB6 /* sb_sqlite_adapter.cpp */; };
 		93B0720320591999008D2FB6 /* sb_data_section_descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B0720220591999008D2FB6 /* sb_data_section_descriptor.cpp */; };
 		93BEDCF020A34894004166EB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E60D7B20558090009151ED /* main.cpp */; };
+		93E1DD1C22DBC01B00FE4948 /* example25.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E1DD1A22DBC01B00FE4948 /* example25.cpp */; };
+		93E1DD1D22DBC2FD00FE4948 /* example25.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E1DD1A22DBC01B00FE4948 /* example25.cpp */; };
 		93E60DBB205589C4009151ED /* sb_tasks_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E60DB9205589C4009151ED /* sb_tasks_queue.cpp */; };
 		93E60DC120558D16009151ED /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 93E60DC020558D16009151ED /* libsqlite3.tbd */; };
+		93EA944B22DDB48D0034663D /* t_case25.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EA944A22DDB48D0034663D /* t_case25.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -216,6 +219,8 @@
 		93CD862E20CA9B9B005D37A7 /* example17.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = example17.h; sourceTree = "<group>"; };
 		93D3B1C520C4481000EEFC49 /* example12.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = example12.h; sourceTree = "<group>"; };
 		93D3B1C620C4481000EEFC49 /* example12.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = example12.cpp; sourceTree = "<group>"; };
+		93E1DD1922DBB84800FE4948 /* example25.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example25.h; sourceTree = "<group>"; };
+		93E1DD1A22DBC01B00FE4948 /* example25.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example25.cpp; sourceTree = "<group>"; };
 		93E60D6C20557F7A009151ED /* SQLCPPBridgeFramework */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SQLCPPBridgeFramework; sourceTree = BUILT_PRODUCTS_DIR; };
 		93E60D7B20558090009151ED /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		93E60DB12055816E009151ED /* sqlcppbridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sqlcppbridge.h; sourceTree = "<group>"; };
@@ -227,6 +232,7 @@
 		93E60DB9205589C4009151ED /* sb_tasks_queue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sb_tasks_queue.cpp; sourceTree = "<group>"; };
 		93E60DBC20558B41009151ED /* sb_kv_storage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_kv_storage.h; sourceTree = "<group>"; };
 		93E60DC020558D16009151ED /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
+		93EA944A22DDB48D0034663D /* t_case25.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case25.cpp; sourceTree = "<group>"; };
 		93F4421520DE25F200CC0B83 /* example18.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example18.h; sourceTree = "<group>"; };
 		93F4421620DE260800CC0B83 /* example18.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example18.cpp; sourceTree = "<group>"; };
 		93F4424F20E4C20200CC0B83 /* example19.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example19.h; sourceTree = "<group>"; };
@@ -305,6 +311,7 @@
 				937F84D621DA565200DD82F8 /* t_case22.cpp */,
 				937F84D821DA565D00DD82F8 /* t_case23.cpp */,
 				937F84DA21DA566700DD82F8 /* t_case24.cpp */,
+				93EA944A22DDB48D0034663D /* t_case25.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -366,6 +373,7 @@
 				931E1F0121455031009F9953 /* example22.h */,
 				931D3CCD2170E38900BCD515 /* example23.h */,
 				931D3CE62175CA4F00BCD515 /* example24.h */,
+				93E1DD1922DBB84800FE4948 /* example25.h */,
 				93B072042059359C008D2FB6 /* example1.cpp */,
 				93BEDCBB209E0B2F004166EB /* example2.cpp */,
 				93BEDCC320A06CB5004166EB /* example3.cpp */,
@@ -390,6 +398,7 @@
 				931E1F0221455043009F9953 /* example22.cpp */,
 				931D3CCE2170E3AC00BCD515 /* example23.cpp */,
 				931D3CE72175CAFA00BCD515 /* example24.cpp */,
+				93E1DD1A22DBC01B00FE4948 /* example25.cpp */,
 			);
 			path = Cases;
 			sourceTree = "<group>";
@@ -545,6 +554,7 @@
 				93718CB1227C589E00E22497 /* t_case17.cpp in Sources */,
 				93718CB8227C589E00E22497 /* t_case24.cpp in Sources */,
 				93718CAA227C589E00E22497 /* t_case10.cpp in Sources */,
+				93E1DD1C22DBC01B00FE4948 /* example25.cpp in Sources */,
 				937F849921DA3C8B00DD82F8 /* example7.cpp in Sources */,
 				937F84A421DA3C8B00DD82F8 /* example18.cpp in Sources */,
 				937F849621DA3C8B00DD82F8 /* example4.cpp in Sources */,
@@ -552,6 +562,7 @@
 				937F84A821DA3C8B00DD82F8 /* example22.cpp in Sources */,
 				93718CA5227C589E00E22497 /* t_case5.cpp in Sources */,
 				93718CAF227C589E00E22497 /* t_case15.cpp in Sources */,
+				93EA944B22DDB48D0034663D /* t_case25.cpp in Sources */,
 				937F849721DA3C8B00DD82F8 /* example5.cpp in Sources */,
 				937F84A921DA3C8B00DD82F8 /* example23.cpp in Sources */,
 				937F848F21DA367500DD82F8 /* sb_tasks_queue.cpp in Sources */,
@@ -602,6 +613,7 @@
 				931D3CE82175CAFA00BCD515 /* example24.cpp in Sources */,
 				931D3CF82175D0E600BCD515 /* example16.cpp in Sources */,
 				931D3CEF2175D0E600BCD515 /* example7.cpp in Sources */,
+				93E1DD1D22DBC2FD00FE4948 /* example25.cpp in Sources */,
 				931D3CFA2175D0E600BCD515 /* example18.cpp in Sources */,
 				931D3CEC2175D0E600BCD515 /* example4.cpp in Sources */,
 				931D3CF42175D0E600BCD515 /* example12.cpp in Sources */,
