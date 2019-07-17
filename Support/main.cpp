@@ -58,6 +58,7 @@
 #include "example23.h"
 #include "example24.h"
 #include "example25.h"
+#include "example26.h"
 
 int main(int argc, char** argv)
 {
@@ -499,7 +500,7 @@ int main(int argc, char** argv)
             assert(chk==dst);
             std::cout << "is ok. ";
         }
-#endif
+        
         {
             time_tracker trk;
             sql_bridge::context cont(storage["case25"]);
@@ -512,7 +513,19 @@ int main(int argc, char** argv)
             assert(src==dst);
             std::cout << "is ok. ";
         }
-        
+#endif
+        {
+            time_tracker trk;
+            sql_bridge::context cont(storage["case26"]);
+            std::cout << "Case 26 ";
+            Case26Container src,dst;
+            for(int i=0; i<100; ++i)
+                src.push_back(i);
+            cont.save(src);
+            cont.load(dst);
+            assert(src==dst);
+            std::cout << "is ok. ";
+        }
     }
     catch (std::exception& ex)
     {
