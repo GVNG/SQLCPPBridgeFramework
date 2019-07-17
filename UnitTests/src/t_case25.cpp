@@ -1,9 +1,9 @@
 //
-//  example24.h
-//  SQLCPPBridgeFramework
+//  t_case25.cpp
+//  Tests
 //
-//  Created by Roman Makhnenko on 16/10/2018.
-//  Copyright © 2018 DataArt.
+//  Created by Roman Makhnenko on 16/07/2019.
+//  Copyright © 2019 DataArt.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -28,26 +28,16 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
-#ifndef example24_h
-#define example24_h
+#include "t_db_fixture.h"
+#include "example25.h"
 
-#include "sqlcppbridge.h"
-
-class Case24;
-typedef std::vector<Case24> Case24Container;
-
-class Case24
+TEST_F(DBFixture, Case25)
 {
-    DECLARE_SQL_ACCESS(Case24);
-public:
-    Case24(long i = 0)
-        : lower_(i)
-        , upper_(100-i)
-        {}
-    inline bool operator == (Case24 const& rv) const {return lower_==rv.lower_ && upper_==rv.upper_;}
-    long lower_;
-    long upper_;
-};
-
-#endif /* example24_h */
+    sql_bridge::context cont(storage()["case25"]);
+    Case25Container src,dst;
+    for(int i=0; i<100; ++i)
+        src.push_back(i);
+    cont.save(src);
+    cont.load(dst);
+    ASSERT_EQ(src,dst);
+}

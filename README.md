@@ -44,8 +44,8 @@ depth limitations of such nesting at all.
 
 Restrictions:
 -------------
-* At the current moment inheritance of iterable containers of basic types
-is not supported;
+* At the current moment the public inheritance of iterable containers is not 
+supported;
 * Containers stack, queue (obviously non-iterable) and forward_list 
 are not supported either.
 
@@ -54,10 +54,11 @@ Build:
 You can use the script:
 ./make_framework
 to create ./build/sqlcppbridge.framework
-which includes armv7, armv7s, arm64 and x86_64 architectures to use in the 
-whole set of iOS-devices and iOS-simulators
+which includes armv7, armv7s, armv7k, arm64, arm64e, arm64_32 and x86_64 
+architectures to use in the whole set of iOS-devices and iOS-simulators
 
-...or you can simple run 'make' utility to create the static library for the default environment
+...or you can simple run 'make' utility to create the static library for the default 
+environment
 
 Install:
 -------------

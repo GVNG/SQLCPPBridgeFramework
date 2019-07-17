@@ -61,24 +61,25 @@ namespace sql_bridge
     private:
         // methods
 #pragma mark - bind
-        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value>::type _bind_comp(TParent const& el, data_update_context& cont, sql_value const& extkey) {};
-        template<typename TFn> inline typename std::enable_if<is_map<TFn>::value>::type _bind_comp(TParent const& el, data_update_context& cont, sql_value const& extkey) {};
-        template<typename TFn> inline typename std::enable_if<!is_container<TFn>::value && !is_map<TFn>::value>::type _bind_comp(TParent const& el, data_update_context& cont, sql_value const& extkey)
+        template<typename TFn> inline void _bind_comp(TParent const& el, data_update_context& cont, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
             data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,std::string()));
             ncnt->bind_comp(&el, extkey);
         };
 #pragma mark - read
-        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value>::type _read_comp(TParent& dst, data_update_context& cont, sql_value const& extkey) {};
-        template<typename TFn> inline typename std::enable_if<is_map<TFn>::value>::type _read_comp(TParent& dst, data_update_context& cont, sql_value const& extkey) {};
-        template<typename TFn> inline typename std::enable_if<!is_container<TFn>::value && !is_map<TFn>::value>::type _read_comp(TParent& dst, data_update_context& cont, sql_value const& extkey)
+        template<typename TFn> inline void _read_comp(TParent& dst, data_update_context& cont, sql_value const& extkey)
         {
             size_t elemt = typeid(TParent).hash_code();
             data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,std::string()));
             if(ncnt->is_ok())
                 ncnt->read_comp(&dst, extkey);
         };
+
+#pragma mark - clear container
+        
+        template<typename TFn> inline typename std::enable_if<is_kind_of_array<TFn>::value>::type _clear(TFn& el) {}
+        template<typename TFn> inline typename std::enable_if<!is_kind_of_array<TFn>::value>::type _clear(TFn& el) {el.clear();}
 
         // data
         class_descriptors_ptr description_;

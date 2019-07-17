@@ -1,9 +1,9 @@
 //
-//  example24.h
+//  example26.h
 //  SQLCPPBridgeFramework
 //
-//  Created by Roman Makhnenko on 16/10/2018.
-//  Copyright © 2018 DataArt.
+//  Created by Roman Makhnenko on 16/07/2019.
+//  Copyright © 2019 DataArt.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -29,25 +29,57 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
-#ifndef example24_h
-#define example24_h
+#ifndef example26_h
+#define example26_h
 
 #include "sqlcppbridge.h"
+#include <cmath>
 
-class Case24;
-typedef std::vector<Case24> Case24Container;
+class Case26;
+class Case26Ext;
+typedef std::vector<Case26Ext> _TCase26ExtContainer;
+typedef std::vector<Case26> Case26Container;
 
-class Case24
+class Case26Ext
 {
-    DECLARE_SQL_ACCESS(Case24);
+    DECLARE_SQL_ACCESS(Case26Ext);
 public:
-    Case24(long i = 0)
-        : lower_(i)
-        , upper_(100-i)
-        {}
-    inline bool operator == (Case24 const& rv) const {return lower_==rv.lower_ && upper_==rv.upper_;}
-    long lower_;
-    long upper_;
+    Case26Ext()
+        : first_(0)
+        , second_(0)
+        {};
+    Case26Ext(int k)
+        : first_(std::sin(M_PI+k))
+        , second_(std::cos(M_E*k))
+        {};
+    inline bool operator == (Case26Ext const& rv) const {return first_==rv.first_ && second_==rv.second_;}
+private:
+    double first_;
+    double second_;
 };
 
-#endif /* example24_h */
+class Case26
+    : private _TCase26ExtContainer
+{
+    DECLARE_SQL_ACCESS(Case26);
+    DECLARE_SQL_INHERITANCE_ACCESS(Case26,_TCase26ExtContainer);
+public:
+    Case26()
+        : key_(0)
+        {}
+    Case26(int k)
+        : key_(k)
+    {
+        for(int i=0; i<10; ++i)
+            _TCase26ExtContainer::push_back(Case26Ext(i));
+    }
+    inline bool operator == (Case26 const& rv) const
+    {
+        return  key_==rv.key_ &&
+                static_cast<_TCase26ExtContainer const&>(*this)==rv;
+    }
+private:
+    int key_;
+};
+
+#endif /* example26_h */

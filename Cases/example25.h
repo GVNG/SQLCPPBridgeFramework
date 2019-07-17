@@ -1,9 +1,9 @@
 //
-//  example24.h
+//  example25.h
 //  SQLCPPBridgeFramework
 //
-//  Created by Roman Makhnenko on 16/10/2018.
-//  Copyright © 2018 DataArt.
+//  Created by Roman Makhnenko on 14/07/2019.
+//  Copyright © 2019 DataArt.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -29,25 +29,44 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
-#ifndef example24_h
-#define example24_h
+#ifndef example25_h
+#define example25_h
 
 #include "sqlcppbridge.h"
 
-class Case24;
-typedef std::vector<Case24> Case24Container;
+class Case25;
+typedef std::set<std::string> _TCase25Strings;
+typedef std::map<int,int> _TCase25Map;
+typedef std::vector<Case25> Case25Container;
 
-class Case24
+class Case25
+    : protected _TCase25Strings
+    , private _TCase25Map
 {
-    DECLARE_SQL_ACCESS(Case24);
+    DECLARE_SQL_ACCESS(Case25);
+    DECLARE_SQL_INHERITANCE_ACCESS(Case25,_TCase25Strings);
+    DECLARE_SQL_INHERITANCE_ACCESS(Case25,_TCase25Map);
 public:
-    Case24(long i = 0)
-        : lower_(i)
-        , upper_(100-i)
+    Case25()
+        : key_(0)
         {}
-    inline bool operator == (Case24 const& rv) const {return lower_==rv.lower_ && upper_==rv.upper_;}
-    long lower_;
-    long upper_;
+    Case25(int k)
+        : key_(k)
+    {
+        for(int i=0; i<10; ++i)
+            _TCase25Strings::insert(sql_bridge::to_string() << "test_" << i << "_" << k);
+        for(int i=0; i<100; ++i)
+            _TCase25Map::insert({i,k*i});
+    }
+    inline bool operator == (Case25 const& rv) const
+    {
+        return  key_==rv.key_ &&
+                static_cast<_TCase25Strings const&>(*this)==rv &&
+                static_cast<_TCase25Map const&>(*this)==rv;
+    }
+private:
+    int key_;
 };
 
-#endif /* example24_h */
+
+#endif /* example25_h */

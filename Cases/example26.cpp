@@ -1,9 +1,9 @@
 //
-//  example24.h
+//  example26.cpp
 //  SQLCPPBridgeFramework
 //
-//  Created by Roman Makhnenko on 16/10/2018.
-//  Copyright © 2018 DataArt.
+//  Created by Roman Makhnenko on 16/07/2019.
+//  Copyright © 2019 DataArt.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -28,26 +28,28 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
-#ifndef example24_h
-#define example24_h
+#include "example26.h"
 
-#include "sqlcppbridge.h"
-
-class Case24;
-typedef std::vector<Case24> Case24Container;
-
-class Case24
+DEFINE_SQL_TABLE(main, Case26)
 {
-    DECLARE_SQL_ACCESS(Case24);
-public:
-    Case24(long i = 0)
-        : lower_(i)
-        , upper_(100-i)
-        {}
-    inline bool operator == (Case24 const& rv) const {return lower_==rv.lower_ && upper_==rv.upper_;}
-    long lower_;
-    long upper_;
+    bind("KEY",     &Case26::key_,         e_db_index_type::Unique),
 };
 
-#endif /* example24_h */
+DEFINE_SQL_TABLE(ext, Case26Ext)
+{
+    bind("FS",      &Case26Ext::first_),
+    bind("SC",      &Case26Ext::second_),
+};
+
+DEFINE_SQL_TRIVIAL_TABLE(container, _TCase26ExtContainer);
+
+DEFINE_SQL_DATABASE(case26, 1, Case26, _TCase26ExtContainer, Case26Ext)::upgrade_structure(size_t from, size_t to)
+{
+    // ------------------------------------------------------------------------------------
+    // you can place here the upgrade script from the 'from' to the 'to' version
+    // something like below, or whatever SQL statements you want
+    //
+    //if (from<=2 && to>2)
+    //    execute("CREATE INDEX IF NOT EXISTS BLAH_BLAH_INDEX ON MY_TABLE (BLAH_BLAH_ID)");
+    // ------------------------------------------------------------------------------------
+};
