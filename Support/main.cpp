@@ -59,6 +59,7 @@
 #include "example24.h"
 #include "example25.h"
 #include "example26.h"
+#include "example27.h"
 
 int main(int argc, char** argv)
 {
@@ -68,7 +69,7 @@ int main(int argc, char** argv)
         mkdir("./DB", 0777);
         sql_bridge::local_storage<sql_bridge::sqlite_adapter> storage("./DB");
         
-#if 1
+#if 0
         {
             std::cout << "Case KVDB ";
             time_tracker trk;
@@ -513,7 +514,7 @@ int main(int argc, char** argv)
             assert(src==dst);
             std::cout << "is ok. ";
         }
-#endif
+
         {
             time_tracker trk;
             sql_bridge::context cont(storage["case26"]);
@@ -524,6 +525,19 @@ int main(int argc, char** argv)
             cont.save(src);
             cont.load(dst);
             assert(src==dst);
+            std::cout << "is ok. ";
+        }
+#endif
+        {
+            time_tracker trk;
+            sql_bridge::context cont(storage["case27"]);
+            std::cout << "Case 27 ";
+//            Case26Container src,dst;
+//            for(int i=0; i<100; ++i)
+//                src.push_back(i);
+//            cont.save(src);
+//            cont.load(dst);
+//            assert(src==dst);
             std::cout << "is ok. ";
         }
     }

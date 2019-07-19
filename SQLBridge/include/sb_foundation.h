@@ -63,7 +63,7 @@ namespace sql_bridge
         virtual ~data_section_descriptor() {};
         virtual void update(std::string const& fname, size_t from, size_t to) const = 0;
         virtual void create_tables(std::string const& fname) const = 0;
-        void prepare_relations(class_links_container&,std::string const&) const;
+        void prepare_relations(class_links_container&,std::string const&,std::string const&) const;
         void dump_statements(class_links_container const&) const;
         void apply_links(class_links_container const&);
 
@@ -85,7 +85,7 @@ namespace sql_bridge
         }
     protected:
         // methods
-        member_for_index_ref lookup_for_key_mode(class_link&,std::string const&) const;
+        member_for_index_ref lookup_for_key_mode(class_link&,std::string const&,std::string const&,size_t_set) const;
         void dump_statements(class_link const&,std::string const&) const;
         void get_create_statements(class_link const&,string_container&) const;
         // members
