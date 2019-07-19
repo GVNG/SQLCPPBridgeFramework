@@ -1,8 +1,8 @@
 //
-//  example25.h
+//  example27.cpp
 //  SQLCPPBridgeFramework
 //
-//  Created by Roman Makhnenko on 14/07/2019.
+//  Created by Roman Makhnenko on 19/07/2019.
 //  Copyright © 2019 DataArt.
 //  All rights reserved.
 //
@@ -28,45 +28,21 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
-#ifndef example25_h
-#define example25_h
+#include "example27.h"
 
-#include "sqlcppbridge.h"
-
-class Case25;
-typedef std::set<std::string> _TCase25Strings;
-typedef std::map<int,int> _TCase25Map;
-typedef std::vector<Case25> Case25Container;
-
-class Case25
-    : protected _TCase25Strings
-    , private _TCase25Map
+DEFINE_SQL_TABLE(main, Case27)
 {
-    DECLARE_SQL_ACCESS(Case25);
-    DECLARE_SQL_INHERITANCE_ACCESS(Case25,_TCase25Strings);
-    DECLARE_SQL_INHERITANCE_ACCESS(Case25,_TCase25Map);
-public:
-    Case25()
-        : key_(0)
-        {}
-    Case25(int k)
-        : key_(k)
-    {
-        for(int i=0; i<10; ++i)
-            _TCase25Strings::insert(sql_bridge::to_string() << "test_" << i << "_" << k);
-        for(int i=0; i<100; ++i)
-            _TCase25Map::insert({i,k*i});
-    }
-    inline bool operator == (Case25 const& rv) const
-    {
-        return  key_==rv.key_ &&
-                static_cast<_TCase25Strings const&>(*this)==static_cast<_TCase25Strings const&>(rv) &&
-                static_cast<_TCase25Map const&>(*this)==static_cast<_TCase25Map const&>(rv);
-    }
-private:
-    int key_;
+    bind("CHL",     &Case27::child_),
+    bind("VAL",     &Case27::value_),
 };
 
-
-#endif /* example25_h */
+DEFINE_SQL_DATABASE(case27, 1, Case27)::upgrade_structure(size_t from, size_t to)
+{
+    // ------------------------------------------------------------------------------------
+    // you can place here the upgrade script from the 'from' to the 'to' version
+    // something like below, or whatever SQL statements you want
+    //
+    //if (from<=2 && to>2)
+    //    execute("CREATE INDEX IF NOT EXISTS BLAH_BLAH_INDEX ON MY_TABLE (BLAH_BLAH_ID)");
+    // ------------------------------------------------------------------------------------
+};

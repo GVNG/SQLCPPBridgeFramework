@@ -75,7 +75,7 @@ namespace sql_bridge
     
 #pragma mark - descriptor
     
-    void data_section_descriptor::prepare_relations(class_links_container& dst,std::string const& def_internal_type) const
+    void data_section_descriptor::prepare_relations(class_links_container& dst,std::string const& def_internal_type, std::string const& def_recursive_type) const
     {
         for(class_descriptors_map::const_iterator src = classes_map_.begin(); src!=classes_map_.end(); ++src)
         {
@@ -90,10 +90,10 @@ namespace sql_bridge
                 dst.push_back(class_link(src->second->type_id(),src->second->table_name(),""));
         }
         for(auto& dp : dst)
-            dp.update_for_key_mode(lookup_for_key_mode(dp,def_internal_type));
+            dp.update_for_key_mode(lookup_for_key_mode(dp,def_internal_type,def_recursive_type,size_t_set()));
     }
 
-    member_for_index_ref data_section_descriptor::lookup_for_key_mode(class_link& dp, std::string const& def_internal_type) const
+    member_for_index_ref data_section_descriptor::lookup_for_key_mode(class_link& dp, std::string const& def_internal_type, std::string const& def_recursive_type, size_t_set tids_in_proc) const
     {
         class_descriptors_map::const_iterator cur = classes_map_.find(dp.source_id());
         if (cur==classes_map_.end())
@@ -135,9 +135,12 @@ namespace sql_bridge
             class_descriptors_pair pref = mb->prefix_description();
             if (cbp.second!=nullptr)
             {
-                dp.add_target(class_link(cbp.first, to_string() << dp.table_name() << "_" << mb->field_name() << "_" << cbp.second->table_name(),mb->field_name()));
-                if (pref.second)
-                    dp.target().back().add_prefix_field(fields_definition{pref.second->field_name(),pref.second->sql_type(),false,false});
+                if (tids_in_proc.find(cbp.first)==tids_in_proc.end())
+                {
+                    dp.add_target(class_link(cbp.first, to_string() << dp.table_name() << "_" << mb->field_name() << "_" << cbp.second->table_name(),mb->field_name()));
+                    if (pref.second)
+                        dp.target().back().add_prefix_field(fields_definition{pref.second->field_name(),pref.second->sql_type(),false,false});
+                }
             }
             else
             if (!cbp.second && cbp.first)
@@ -158,11 +161,21 @@ namespace sql_bridge
             dp.add_field({ret.name(),def_internal_type,true,false});
             chld_index_ref = fields_definition{to_string() << dp.table_name() << "_" << ret.name(),def_internal_type,false,true};
         }
+        tids_in_proc.insert(dp.source_id());
         for(auto& chl : dp.target())
         {
             if (chld_index_ref.type_.empty())
                 throw sql_bridge_error(g_internal_error_text,g_architecture_error_text);
-            chl.update_for_key_mode(lookup_for_key_mode(chl,def_internal_type));
+            if (tids_in_proc.find(chl.source_id())!=tids_in_proc.end())
+            {
+//                throw sql_bridge_error("Recursive dependencies don't support yet","You should wait the next releases or simplificate your object model.");
+                
+//                ret = member_for_index_ref(e_db_key_mode::None,to_string() << "sqlcpp_recursive_field");
+//                dp.add_field({ret.name(),def_recursive_type,false,true});
+//                chld_index_ref = fields_definition{to_string() << dp.table_name() << "_" << ret.name(),def_recursive_type,false,true};
+//                return ret;
+            }
+            chl.update_for_key_mode(lookup_for_key_mode(chl,def_internal_type,def_recursive_type,tids_in_proc));
             chl.add_field(chld_index_ref);
         }
         return ret;

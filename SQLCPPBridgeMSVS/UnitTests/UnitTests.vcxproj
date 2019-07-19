@@ -36,6 +36,9 @@
     <ClCompile Include="..\..\Cases\example22.cpp" />
     <ClCompile Include="..\..\Cases\example23.cpp" />
     <ClCompile Include="..\..\Cases\example24.cpp" />
+    <ClCompile Include="..\..\Cases\example25.cpp" />
+    <ClCompile Include="..\..\Cases\example26.cpp" />
+    <ClCompile Include="..\..\Cases\example27.cpp" />
     <ClCompile Include="..\..\Cases\example3.cpp" />
     <ClCompile Include="..\..\Cases\example4.cpp" />
     <ClCompile Include="..\..\Cases\example5.cpp" />
@@ -61,6 +64,8 @@
     <ClCompile Include="..\..\UnitTests\src\t_case22.cpp" />
     <ClCompile Include="..\..\UnitTests\src\t_case23.cpp" />
     <ClCompile Include="..\..\UnitTests\src\t_case24.cpp" />
+    <ClCompile Include="..\..\UnitTests\src\t_case25.cpp" />
+    <ClCompile Include="..\..\UnitTests\src\t_case26.cpp" />
     <ClCompile Include="..\..\UnitTests\src\t_case3.cpp" />
     <ClCompile Include="..\..\UnitTests\src\t_case4.cpp" />
     <ClCompile Include="..\..\UnitTests\src\t_case5.cpp" />
@@ -72,6 +77,54 @@
     <ClCompile Include="..\..\UnitTests\src\t_traits.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Cases\example1.h" />
+    <ClInclude Include="..\..\Cases\example10.h" />
+    <ClInclude Include="..\..\Cases\example11.h" />
+    <ClInclude Include="..\..\Cases\example12.h" />
+    <ClInclude Include="..\..\Cases\example13.h" />
+    <ClInclude Include="..\..\Cases\example14.h" />
+    <ClInclude Include="..\..\Cases\example15.h" />
+    <ClInclude Include="..\..\Cases\example16.h" />
+    <ClInclude Include="..\..\Cases\example17.h" />
+    <ClInclude Include="..\..\Cases\example18.h" />
+    <ClInclude Include="..\..\Cases\example19.h" />
+    <ClInclude Include="..\..\Cases\example2.h" />
+    <ClInclude Include="..\..\Cases\example20.h" />
+    <ClInclude Include="..\..\Cases\example21.h" />
+    <ClInclude Include="..\..\Cases\example22.h" />
+    <ClInclude Include="..\..\Cases\example23.h" />
+    <ClInclude Include="..\..\Cases\example24.h" />
+    <ClInclude Include="..\..\Cases\example25.h" />
+    <ClInclude Include="..\..\Cases\example26.h" />
+    <ClInclude Include="..\..\Cases\example27.h" />
+    <ClInclude Include="..\..\Cases\example3.h" />
+    <ClInclude Include="..\..\Cases\example4.h" />
+    <ClInclude Include="..\..\Cases\example5.h" />
+    <ClInclude Include="..\..\Cases\example6.h" />
+    <ClInclude Include="..\..\Cases\example7.h" />
+    <ClInclude Include="..\..\Cases\example8.h" />
+    <ClInclude Include="..\..\Cases\example9.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_class_descriptor.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_container_descriptor.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_context.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_core.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_core_misc.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_data_section.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_data_section_descriptor.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_exceptions.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_foundation.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_inheritance_descriptor.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_kv_storage.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_links.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_local_storage.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_members_descriptor.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_sqlite_adapter.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_stm_builder.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_tasks_queue.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_traits.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_trivial_members_descriptor.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sb_value.h" />
+    <ClInclude Include="..\..\SQLBridge\include\sqlcppbridge.h" />
     <ClInclude Include="..\..\UnitTests\include\t_db_fixture.h" />
   </ItemGroup>
   <ItemGroup>

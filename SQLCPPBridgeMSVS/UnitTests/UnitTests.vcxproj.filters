@@ -16,6 +16,9 @@
     <Filter Include="Source Files\Cases">
       <UniqueIdentifier>{b9ab9253-611e-4de3-803d-247f085015da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Cases">
+      <UniqueIdentifier>{82d5860e-2aa9-4cdf-99dc-546162edb828}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\UnitTests\src\main.cpp">
@@ -171,10 +174,169 @@
     <ClCompile Include="..\..\Cases\example24.cpp">
       <Filter>Source Files\Cases</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\UnitTests\src\t_case25.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\UnitTests\src\t_case26.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Cases\example25.cpp">
+      <Filter>Source Files\Cases</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Cases\example26.cpp">
+      <Filter>Source Files\Cases</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Cases\example27.cpp">
+      <Filter>Source Files\Cases</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\UnitTests\include\t_db_fixture.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_class_descriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_container_descriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_context.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_core_misc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_data_section.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_data_section_descriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_exceptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_foundation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_inheritance_descriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_kv_storage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_links.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_local_storage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_members_descriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_sqlite_adapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_stm_builder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_tasks_queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_traits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_trivial_members_descriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sb_value.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SQLBridge\include\sqlcppbridge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example1.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example2.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example3.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example4.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example5.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example6.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example7.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example8.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example9.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example10.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example11.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example12.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example13.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example14.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example15.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example16.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example17.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example18.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example19.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example20.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example21.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example22.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example23.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example24.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example25.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example26.h">
+      <Filter>Header Files\Cases</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cases\example27.h">
+      <Filter>Header Files\Cases</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

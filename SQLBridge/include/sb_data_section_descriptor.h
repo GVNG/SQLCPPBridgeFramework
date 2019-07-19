@@ -73,7 +73,11 @@ namespace sql_bridge
             _init<T...>(*ret);
             _check_inheritance<T...>(*ret);
             class_links_container rel;
-            ret->prepare_relations(rel,TStrategy::template sql_types<long long>::template type_name<long long>());
+            typedef typename TStrategy::template sql_types<long long> long_sql;
+            typedef typename TStrategy::template sql_types<std::string> string_sql;
+            ret->prepare_relations(rel,
+                                   long_sql::template type_name<long long>(),
+                                   string_sql::template type_name<std::string>());
             TStrategy::create_statements(rel);
             ret->dump_statements(rel);
             ret->apply_links(rel);

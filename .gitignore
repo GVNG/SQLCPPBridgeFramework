@@ -7,3 +7,8 @@ SQLCPPBridgeFramework.xcodeproj/xcuserdata
 SQLCPPBridgeFramework.xcodeproj/project.xcworkspace/xcuserdata
 out
 .vs/
+*.tlog
+*.idb
+SQLCPPBridgeMSVS/Debug/
+SQLCPPBridgeMSVS/SQLiteLib/Debug/
+SQLCPPBridgeMSVS/UnitTests/Debug/

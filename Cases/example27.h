@@ -1,8 +1,8 @@
 //
-//  example25.h
+//  example27.h
 //  SQLCPPBridgeFramework
 //
-//  Created by Roman Makhnenko on 14/07/2019.
+//  Created by Roman Makhnenko on 19/07/2019.
 //  Copyright © 2019 DataArt.
 //  All rights reserved.
 //
@@ -29,44 +29,25 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
-#ifndef example25_h
-#define example25_h
+#ifndef example27_h
+#define example27_h
 
 #include "sqlcppbridge.h"
 
-class Case25;
-typedef std::set<std::string> _TCase25Strings;
-typedef std::map<int,int> _TCase25Map;
-typedef std::vector<Case25> Case25Container;
+class Case27;
+typedef std::vector<Case27> Case27Container;
 
-class Case25
-    : protected _TCase25Strings
-    , private _TCase25Map
+class Case27
 {
-    DECLARE_SQL_ACCESS(Case25);
-    DECLARE_SQL_INHERITANCE_ACCESS(Case25,_TCase25Strings);
-    DECLARE_SQL_INHERITANCE_ACCESS(Case25,_TCase25Map);
+    DECLARE_SQL_ACCESS(Case27);
 public:
-    Case25()
-        : key_(0)
+    Case27()
+        : value_(0)
         {}
-    Case25(int k)
-        : key_(k)
-    {
-        for(int i=0; i<10; ++i)
-            _TCase25Strings::insert(sql_bridge::to_string() << "test_" << i << "_" << k);
-        for(int i=0; i<100; ++i)
-            _TCase25Map::insert({i,k*i});
-    }
-    inline bool operator == (Case25 const& rv) const
-    {
-        return  key_==rv.key_ &&
-                static_cast<_TCase25Strings const&>(*this)==static_cast<_TCase25Strings const&>(rv) &&
-                static_cast<_TCase25Map const&>(*this)==static_cast<_TCase25Map const&>(rv);
-    }
+protected:
 private:
-    int key_;
+    Case27Container child_;
+    long value_;
 };
 
-
-#endif /* example25_h */
+#endif /* example27_h */
