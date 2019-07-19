@@ -161,20 +161,20 @@ namespace sql_bridge
             dp.add_field({ret.name(),def_internal_type,true,false});
             chld_index_ref = fields_definition{to_string() << dp.table_name() << "_" << ret.name(),def_internal_type,false,true};
         }
-        if (tids_in_proc.find(dp.source_id())!=tids_in_proc.end())
-        {
-            throw sql_bridge_error("Recursive dependencies don't support yet","You should wait the next releases or simplificate your object model.");
-
-//            ret = member_for_index_ref(e_db_key_mode::None,to_string() << "sqlcpp_recursive_field");
-//            dp.add_field({ret.name(),def_recursive_type,false,true});
-//            chld_index_ref = fields_definition{to_string() << dp.table_name() << "_" << ret.name(),def_recursive_type,false,true};
-//            return ret;
-        }
         tids_in_proc.insert(dp.source_id());
         for(auto& chl : dp.target())
         {
             if (chld_index_ref.type_.empty())
                 throw sql_bridge_error(g_internal_error_text,g_architecture_error_text);
+            if (tids_in_proc.find(chl.source_id())!=tids_in_proc.end())
+            {
+//                throw sql_bridge_error("Recursive dependencies don't support yet","You should wait the next releases or simplificate your object model.");
+                
+//                ret = member_for_index_ref(e_db_key_mode::None,to_string() << "sqlcpp_recursive_field");
+//                dp.add_field({ret.name(),def_recursive_type,false,true});
+//                chld_index_ref = fields_definition{to_string() << dp.table_name() << "_" << ret.name(),def_recursive_type,false,true};
+//                return ret;
+            }
             chl.update_for_key_mode(lookup_for_key_mode(chl,def_internal_type,def_recursive_type,tids_in_proc));
             chl.add_field(chld_index_ref);
         }
