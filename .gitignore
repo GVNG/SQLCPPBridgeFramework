@@ -9,3 +9,6 @@ out
 .vs/
 *.tlog
 *.idb
+SQLCPPBridgeMSVS/Debug/
+SQLCPPBridgeMSVS/SQLiteLib/Debug/
+SQLCPPBridgeMSVS/UnitTests/Debug/
