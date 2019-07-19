@@ -7,3 +7,5 @@ SQLCPPBridgeFramework.xcodeproj/xcuserdata
 SQLCPPBridgeFramework.xcodeproj/project.xcworkspace/xcuserdata
 out
 .vs/
+*.tlog
+*.idb

@@ -36,6 +36,9 @@
     <ClCompile Include="..\..\Cases\example22.cpp" />
     <ClCompile Include="..\..\Cases\example23.cpp" />
     <ClCompile Include="..\..\Cases\example24.cpp" />
+    <ClCompile Include="..\..\Cases\example25.cpp" />
+    <ClCompile Include="..\..\Cases\example26.cpp" />
+    <ClCompile Include="..\..\Cases\example27.cpp" />
     <ClCompile Include="..\..\Cases\example3.cpp" />
     <ClCompile Include="..\..\Cases\example4.cpp" />
     <ClCompile Include="..\..\Cases\example5.cpp" />
@@ -61,6 +64,8 @@
     <ClCompile Include="..\..\UnitTests\src\t_case22.cpp" />
     <ClCompile Include="..\..\UnitTests\src\t_case23.cpp" />
     <ClCompile Include="..\..\UnitTests\src\t_case24.cpp" />
+    <ClCompile Include="..\..\UnitTests\src\t_case25.cpp" />
+    <ClCompile Include="..\..\UnitTests\src\t_case26.cpp" />
     <ClCompile Include="..\..\UnitTests\src\t_case3.cpp" />
     <ClCompile Include="..\..\UnitTests\src\t_case4.cpp" />
     <ClCompile Include="..\..\UnitTests\src\t_case5.cpp" />

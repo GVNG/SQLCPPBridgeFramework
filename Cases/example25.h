@@ -61,8 +61,8 @@ public:
     inline bool operator == (Case25 const& rv) const
     {
         return  key_==rv.key_ &&
-                static_cast<_TCase25Strings const&>(*this)==rv &&
-                static_cast<_TCase25Map const&>(*this)==rv;
+                static_cast<_TCase25Strings const&>(*this)==static_cast<_TCase25Strings const&>(rv) &&
+                static_cast<_TCase25Map const&>(*this)==static_cast<_TCase25Map const&>(rv);
     }
 private:
     int key_;
