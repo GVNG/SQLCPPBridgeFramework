@@ -163,10 +163,12 @@ namespace sql_bridge
         }
         if (tids_in_proc.find(dp.source_id())!=tids_in_proc.end())
         {
-            ret = member_for_index_ref(e_db_key_mode::None,to_string() << "sqlcpp_recursive_field");
-            dp.add_field({ret.name(),def_recursive_type,false,true});
+            throw sql_bridge_error("Recursive dependencies don't support yet","You should wait the next releases or simplificate your object model.");
+
+//            ret = member_for_index_ref(e_db_key_mode::None,to_string() << "sqlcpp_recursive_field");
+//            dp.add_field({ret.name(),def_recursive_type,false,true});
 //            chld_index_ref = fields_definition{to_string() << dp.table_name() << "_" << ret.name(),def_recursive_type,false,true};
-            return ret;
+//            return ret;
         }
         tids_in_proc.insert(dp.source_id());
         for(auto& chl : dp.target())
