@@ -54,6 +54,9 @@ make || exit 3
 export ARCH="armv7k"
 make clean
 make || exit 4
+export ARCH="arm64_32"
+make clean
+make || exit 5
 export ARCH="arm64"
 make clean
 make || exit 7
@@ -77,6 +80,7 @@ lipo -arch armv7 "out/$FRAMEWORK_NAME-ios-armv7.a" \
      -arch armv7k "out/$FRAMEWORK_NAME-ios-armv7k.a" \
 	 -arch arm64 "out/$FRAMEWORK_NAME-ios-arm64.a" \
      -arch arm64e "out/$FRAMEWORK_NAME-ios-arm64e.a" \
+     -arch arm64_32 "out/$FRAMEWORK_NAME-ios-arm64_32.a" \
 	 -arch x86_64 "out/$FRAMEWORK_NAME-ios-x86_64.a" \
 	 -create -output "$FRAMEWORK/$FRAMEWORK_NAME"
 
