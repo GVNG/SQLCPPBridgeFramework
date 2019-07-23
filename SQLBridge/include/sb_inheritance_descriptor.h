@@ -76,11 +76,6 @@ namespace sql_bridge
                 ncnt->read_comp(&dst, extkey);
         };
 
-#pragma mark - clear container
-        
-        template<typename TFn> inline typename std::enable_if<is_kind_of_array<TFn>::value>::type _clear(TFn& el) {}
-        template<typename TFn> inline typename std::enable_if<!is_kind_of_array<TFn>::value>::type _clear(TFn& el) {el.clear();}
-
         // data
         class_descriptors_ptr description_;
     };
