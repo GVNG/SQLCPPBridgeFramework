@@ -42,6 +42,7 @@ public:
         : val_(i+1)
         {};
     inline bool operator == (Case13Element const& rv) const {return val_==rv.val_;}
+    inline bool operator < (Case13Element const& rv) const {return val_<rv.val_;}
 private:
     float val_;
 };
@@ -52,16 +53,26 @@ class Case13
 {
     DECLARE_SQL_ACCESS(Case13);
 public:
-    Case13(EBase b=EBase::Normal)
+    Case13()
+        : base_(EBase::Normal)
+        {}
+    Case13(EBase b)
         : base_(b)
         , elements_(10,Case13Element((float)b))
-        , elements_alt_(5,Case13Element((float)b))
-        {}
-    inline bool operator == (Case13 const& rv) const {return base_==rv.base_ && elements_==rv.elements_ && elements_alt_==rv.elements_alt_;}
+    {
+        for(int i=0; i<5; ++i)
+            elements_alt_.insert(Case13Element((float)b));
+    }
+    inline bool operator == (Case13 const& rv) const
+    {
+        return  base_==rv.base_ &&
+                elements_==rv.elements_ &&
+                elements_alt_==rv.elements_alt_;
+    }
 private:
     EBase base_;
     std::vector<Case13Element> elements_;
-    std::vector<Case13Element> elements_alt_;
+    std::set<Case13Element> elements_alt_;
 };
 
 

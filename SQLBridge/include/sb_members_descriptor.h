@@ -253,7 +253,7 @@ namespace sql_bridge
                 m_type var;
                 ncnt->read(key);
                 ncnt->read_comp(&var, extkey);
-                (dst.*member_).insert({key.value<k_type>(),var});
+                (dst.*member_).insert({key.value<k_type>(),std::move(var)});
             }
         }
 
@@ -269,7 +269,7 @@ namespace sql_bridge
             {
                 type var;
                 ncnt->read_comp(&var, extkey);
-                (dst.*member_).push_back(var);
+                _containers_insert(dst.*member_, std::move(var));
             }
         }
 
@@ -277,6 +277,11 @@ namespace sql_bridge
         
         template<typename TFn> inline typename std::enable_if<is_kind_of_array<TFn>::value>::type _clear(TFn& el) {}
         template<typename TFn> inline typename std::enable_if<!is_kind_of_array<TFn>::value>::type _clear(TFn& el) {el.clear();}
+
+#pragma mark - containers inserter
+        
+        template<typename TFn, typename TArg> inline typename std::enable_if<is_back_pushable_container<TFn>::value>::type _containers_insert(TFn& ct, TArg&& ar) {ct.push_back(std::move(ar));}
+        template<typename TFn, typename TArg> inline typename std::enable_if<!is_back_pushable_container<TFn>::value>::type _containers_insert(TFn& ct, TArg&& ar) {ct.insert(ct.end(),std::move(ar));}
 
         TMb T::*member_;
         class_descriptors_ptr description_;
