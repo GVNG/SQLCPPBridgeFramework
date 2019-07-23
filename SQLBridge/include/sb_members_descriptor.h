@@ -263,7 +263,7 @@ namespace sql_bridge
         {
             typedef typename TFn::value_type type;
             size_t elemt = typeid(type).hash_code();
-            (dst.*member_).clear();
+            _clear(dst.*member_);
             data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name()));
             while(ncnt->is_ok())
             {
