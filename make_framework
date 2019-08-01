@@ -53,20 +53,23 @@ make clean
 make || exit 3
 export ARCH="armv7k"
 make clean
-make || exit 3
-export ARCH="arm64"
-make clean
-make || exit 5
-export ARCH="arm64e"
-make clean
-make || exit 6
+make || exit 4
 export ARCH="arm64_32"
 make clean
+make || exit 5
+export ARCH="arm64"
+make clean
 make || exit 7
+export ARCH="arm64e"
+make clean
+make || exit 8
 export DEVPATH=${CROSS_TOP_SIM}/SDKs/${CROSS_SDK_SIM}
 export ARCH="x86_64"
 make clean
-make || exit 8
+make || exit 9
+export ARCH="i386"
+make clean
+make || exit 10
 
 FRAMEWORK_NAME="sqlcppbridge"
 FRAMEWORK="./build/iOS/${FRAMEWORK_NAME}.framework"
@@ -79,19 +82,20 @@ lipo -arch armv7 "out/$FRAMEWORK_NAME-ios-armv7.a" \
 	 -arch armv7s "out/$FRAMEWORK_NAME-ios-armv7s.a" \
      -arch armv7k "out/$FRAMEWORK_NAME-ios-armv7k.a" \
 	 -arch arm64 "out/$FRAMEWORK_NAME-ios-arm64.a" \
-     -arch arm64_32 "out/$FRAMEWORK_NAME-ios-arm64_32.a" \
      -arch arm64e "out/$FRAMEWORK_NAME-ios-arm64e.a" \
+     -arch arm64_32 "out/$FRAMEWORK_NAME-ios-arm64_32.a" \
 	 -arch x86_64 "out/$FRAMEWORK_NAME-ios-x86_64.a" \
+     -arch i386 "out/$FRAMEWORK_NAME-ios-i386.a" \
 	 -create -output "$FRAMEWORK/$FRAMEWORK_NAME"
 
 export DEVPATH=${CROSS_TOP_OSX}/SDKs/${CROSS_SDK_OSX}
 export TOS="osx"
 export ARCH="x86_64"
 make clean
-make || exit 10
+make || exit 15
 export ARCH="i386"
 make clean
-make || exit 11
+make || exit 16
 unset DEVPATH
 unset ARCH
 unset TOS

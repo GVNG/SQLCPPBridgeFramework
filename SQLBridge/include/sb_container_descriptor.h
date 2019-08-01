@@ -160,14 +160,22 @@ namespace sql_bridge
         template<typename TFn> inline typename std::enable_if<is_kind_of_array<TFn>::value>::type _read_comp(TFn& dst,data_update_context& cont,sql_value const& extkey)
         {
             typedef typename TFn::value_type type;
+            typedef typename TFn::iterator iterator;
             sql_value val((type()));
-            for(auto& n : dst)
+            iterator pos = dst.begin();
+            while(cont.is_ok())
             {
-                if (!cont.is_ok()) break;
+                if (pos==dst.end())
+                    throw sql_bridge_error(to_string() << "The table: \"" << cont.table_name() << "\" contains more elements than provided container",
+                                           g_expand_static_recommendation);
                 cont.read(val);
                 cont.next();
-                n = val.value<type>();
+                *pos = val.value<type>();
+                pos++;
             }
+            if (pos!=dst.end())
+                throw sql_bridge_error(to_string() << "The table: \"" << cont.table_name() << "\" contains less elements than provided static container.",
+                                       g_replace_static_recommendation);
         }
 
         template<typename TFn, typename TVal> inline typename std::enable_if<is_back_pushable_container<TFn>::value>::type add_to_container(TFn& dst, TVal&& v) const {dst.push_back(std::move(v));}

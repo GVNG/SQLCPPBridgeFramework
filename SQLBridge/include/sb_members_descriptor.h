@@ -253,23 +253,47 @@ namespace sql_bridge
                 m_type var;
                 ncnt->read(key);
                 ncnt->read_comp(&var, extkey);
-                (dst.*member_).insert({key.value<k_type>(),var});
+                (dst.*member_).insert({key.value<k_type>(),std::move(var)});
             }
         }
 
         template<typename TFn> inline typename std::enable_if<is_container<TFn>::value &&
+                                                              is_kind_of_array<TFn>::value &&
+                                                              !is_trivial_container<TFn>::value &&
+                                                              !is_container_of_containers<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
+        {
+            typedef typename TFn::value_type type;
+            typedef typename TFn::iterator iterator;
+            size_t elemt = typeid(type).hash_code();
+            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name()));
+            iterator pos = (dst.*member_).begin();
+            while(ncnt->is_ok())
+            {
+                if (pos==(dst.*member_).end())
+                    throw sql_bridge_error(to_string() << "The table: \"" << ncnt->table_name() << "\" contains more elements than provided container",
+                                           g_expand_static_recommendation);
+                ncnt->read_comp(*pos, extkey);
+                pos++;
+            }
+            if (pos!=(dst.*member_).end())
+                throw sql_bridge_error(to_string() << "The table: \"" << ncnt->table_name() << "\" contains less elements than provided static container.",
+                                       g_replace_static_recommendation);
+        }
+        
+        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value &&
+                                                              !is_kind_of_array<TFn>::value &&
                                                               !is_trivial_container<TFn>::value &&
                                                               !is_container_of_containers<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             typedef typename TFn::value_type type;
             size_t elemt = typeid(type).hash_code();
-            (dst.*member_).clear();
+            _clear(dst.*member_);
             data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name()));
             while(ncnt->is_ok())
             {
                 type var;
                 ncnt->read_comp(&var, extkey);
-                (dst.*member_).push_back(var);
+                add_to_container(dst.*member_, std::move(var));
             }
         }
 
@@ -277,6 +301,11 @@ namespace sql_bridge
         
         template<typename TFn> inline typename std::enable_if<is_kind_of_array<TFn>::value>::type _clear(TFn& el) {}
         template<typename TFn> inline typename std::enable_if<!is_kind_of_array<TFn>::value>::type _clear(TFn& el) {el.clear();}
+
+#pragma mark - containers inserter
+        
+        template<typename TFn, typename TArg> inline typename std::enable_if<is_back_pushable_container<TFn>::value>::type add_to_container(TFn& ct, TArg&& ar) {ct.push_back(std::move(ar));}
+        template<typename TFn, typename TArg> inline typename std::enable_if<!is_back_pushable_container<TFn>::value>::type add_to_container(TFn& ct, TArg&& ar) {ct.insert(ct.end(),std::move(ar));}
 
         TMb T::*member_;
         class_descriptors_ptr description_;
