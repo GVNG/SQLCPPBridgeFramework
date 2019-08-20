@@ -62,6 +62,7 @@ namespace sql_bridge
         void read(void* dst,data_update_context& cont) override {_read<T>(*static_cast<T*>(dst),cont);}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {_read_comp<T>(*static_cast<T*>(dst),cont,extkey);}
         bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
+        bool is_target_map() const override {return is_map<T>::value;}
 
         template<typename TFn> static class_descriptors_ptr create_description() {return _create_description_pub<TFn>();}
         template<typename TFn> static class_descriptors_ptr create_inheritance(class_descriptors_ptr desc)
@@ -85,7 +86,7 @@ namespace sql_bridge
         template<typename TFn> inline static typename std::enable_if<is_sql_acceptable<TFn>::value,class_descriptors_ptr>::type _create_description_pub() {return class_descriptors_ptr();}
         template<typename TFn> inline static typename std::enable_if<is_container<TFn>::value || is_map<TFn>::value,class_descriptors_ptr>::type _create_description() {return _create_containers_description<TFn>();}
         template<typename TFn> inline static typename std::enable_if<!is_trivial_container<TFn>::value && !is_trivial_map<TFn>::value && !is_container_of_containers<TFn>::value,class_descriptors_ptr>::type _create_containers_description() {return _create_nt_containers_description<TFn>();}
-        template<typename TFn> inline static typename std::enable_if<is_container<TFn>::value || is_map<TFn>::value,class_descriptors_ptr>::type _create_description_pub()
+        template<typename TFn> inline static typename std::enable_if<is_container<TFn>::value || is_any_map<TFn>::value,class_descriptors_ptr>::type _create_description_pub()
         {
             typedef _t_container_descriptor<TStrategy,TFn> type;
             return std::make_shared<type>();
@@ -113,7 +114,7 @@ namespace sql_bridge
             typedef _t_class_descriptor<TStrategy, typename TFn::value_type> type;
             return std::make_shared<type>();
         }
-        template<typename TFn> inline static typename std::enable_if<is_map<TFn>::value &&
+        template<typename TFn> inline static typename std::enable_if<is_any_map<TFn>::value &&
                                                                      !is_container_of_containers<TFn>::value, class_descriptors_ptr>::type _create_nt_containers_description()
         {
             typedef typename TFn::key_type key;

@@ -532,12 +532,16 @@ int main(int argc, char** argv)
             time_tracker trk;
             sql_bridge::context cont(storage["case27"]);
             std::cout << "Case 27 ";
-//            Case26Container src,dst;
-//            for(int i=0; i<100; ++i)
-//                src.push_back(i);
-//            cont.save(src);
-//            cont.load(dst);
-//            assert(src==dst);
+            Case27Container src,dst;
+            for(int i=0; i<100; ++i)
+                src.insert({i,Case27(i+100)});
+            cont.save(src);
+            cont.remove<Case27Container>(5);
+            cont.remove<Case27Container>(17);
+            src.erase(5);
+            src.erase(17);
+            cont.load(dst);
+            assert(src==dst);
             std::cout << "is ok. ";
         }
     }

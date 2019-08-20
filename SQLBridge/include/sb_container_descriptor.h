@@ -64,6 +64,7 @@ namespace sql_bridge
         void read(void* dst,data_update_context& cont) override {read_comp(dst,cont,sql_value());}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {_read_comp<T>(*static_cast<T*>(dst),cont,extkey);};
         bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
+        bool is_target_map() const override {return is_map<T>::value;}
 
         inline static class_descriptors_container create_members() {return _create_members<T>();}
     private:
@@ -81,7 +82,7 @@ namespace sql_bridge
             class_descriptors_container ret = {std::make_shared<type>(g_value_field_name),};
             return ret;
         }
-        template<typename TFn> inline static typename std::enable_if<is_map<TFn>::value && !is_trivial_map<TFn>::value,class_descriptors_container>::type _create_members()
+        template<typename TFn> inline static typename std::enable_if<is_any_map<TFn>::value && !is_trivial_map<TFn>::value,class_descriptors_container>::type _create_members()
         {
             typedef _t_trivial_member_descriptor<TStrategy, typename TFn::key_type> k_type;
             typedef _t_link_member_descriptor<TStrategy, typename TFn::mapped_type> m_type;
@@ -96,10 +97,16 @@ namespace sql_bridge
         {
             typedef _t_trivial_member_descriptor<TStrategy, typename TFn::key_type> k_type;
             typedef _t_trivial_member_descriptor<TStrategy, typename TFn::mapped_type> m_type;
-            class_descriptors_container ret = {std::make_shared<k_type>(g_key_field_name),std::make_shared<m_type>(g_value_field_name),};
+            class_descriptors_container ret =
+            {
+                std::make_shared<k_type>(g_key_field_name,e_db_index_type::Basic),
+                std::make_shared<m_type>(g_value_field_name),
+            };
             return ret;
         }
+        
 #pragma mark - bind
+        
         template<typename TFn> inline typename std::enable_if<is_container<TFn>::value && !is_trivial_container<TFn>::value>::type _bind_comp(TFn const& src,data_update_context& cont,sql_value const& extkey)
         {
             size_t tid = typeid(typename TFn::value_type).hash_code();
@@ -126,7 +133,7 @@ namespace sql_bridge
                 cont.next();
             }
         }
-        template<typename TFn> inline typename std::enable_if<is_map<TFn>::value && !is_trivial_map<TFn>::value>::type _bind_comp(TFn const& src,data_update_context& cont,sql_value const& extkey)
+        template<typename TFn> inline typename std::enable_if<is_any_map<TFn>::value && !is_trivial_map<TFn>::value>::type _bind_comp(TFn const& src,data_update_context& cont,sql_value const& extkey)
         {
             size_t tid = typeid(typename TFn::mapped_type).hash_code();
             std::string const& refname(cont.forward_ref());

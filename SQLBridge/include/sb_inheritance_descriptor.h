@@ -51,6 +51,7 @@ namespace sql_bridge
         void read(void* dst,data_update_context& cont) override {}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {_read_comp<TParent>(*static_cast<TChild*>(dst),cont,extkey);}
         bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
+        bool is_target_map() const override {return is_map<TChild>::value;}
 
     protected:
         _t_inheritance_descriptor(class_descriptors_ptr desc)

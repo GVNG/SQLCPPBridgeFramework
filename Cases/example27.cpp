@@ -30,13 +30,14 @@
 
 #include "example27.h"
 
-DEFINE_SQL_TABLE(main, Case27)
+DEFINE_SQL_TABLE(elm, Case27)
 {
-    bind("CHL",     &Case27::child_),
     bind("VAL",     &Case27::value_),
 };
 
-DEFINE_SQL_DATABASE(case27, 1, Case27)::upgrade_structure(size_t from, size_t to)
+DEFINE_SQL_TRIVIAL_TABLE(mn, Case27Container);
+
+DEFINE_SQL_DATABASE(case27, 1, Case27Container,Case27)::upgrade_structure(size_t from, size_t to)
 {
     // ------------------------------------------------------------------------------------
     // you can place here the upgrade script from the 'from' to the 'to' version

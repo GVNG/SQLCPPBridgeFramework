@@ -152,7 +152,22 @@ namespace sql_bridge
             data_sections_ptr section_;
             _t_base data_;
         };
-        
+
+        template<typename T> class remove_by_key_task : public db_task
+        {
+            typedef typename std::decay<T>::type _t_base;
+            typedef typename _t_base::key_type _t_key;
+        public:
+            remove_by_key_task(_t_key const& val, data_sections_ptr section)
+                : section_(section)
+                , value_(val)
+                {};
+            inline void run_task() override {section_->remove_by_key<T>(value_);}
+        private:
+            data_sections_ptr section_;
+            _t_key const value_;
+        };
+
         template<typename T> class remove_if_task : public db_task
         {
             typedef typename std::decay<T>::type _t_base;
@@ -196,6 +211,8 @@ namespace sql_bridge
         template<typename T> inline context& remove(T const& src) {_remove<T>(src);return *this;}
         template<typename T> inline context& remove(T& src) {_remove<T>(src);return *this;}
         template<typename T> inline context& remove(T&& src) {_remove_m<T>(std::move(src));return *this;}
+
+        template<typename T> inline typename std::enable_if<is_map<T>::value,context&>::type remove(typename T::key_type const& val) {_remove_by_key<T>(val);return *this;}
         template<typename T> inline context& remove_if(std::string const& flt = "") {typedef typename types_selector<T>::type type;_remove_if<type>(build_suffix(flt));return *this;}
 
         template<typename T> inline context& replace(T const& src) {_replace<T>(src);return *this;}
@@ -346,7 +363,12 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<remove_if_task<T> >(flt,data_));
         }
-
+        template<typename T> inline typename std::enable_if<is_map<T>::value>::type _remove_by_key(typename T::key_type const& val) const
+        {
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr) qp->add( std::make_shared<remove_by_key_task<T> >(val,data_));
+        }
+        
 #pragma mark - replace
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _replace(T const&) const
         {

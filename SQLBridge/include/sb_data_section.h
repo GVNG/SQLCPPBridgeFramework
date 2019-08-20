@@ -48,6 +48,7 @@ namespace sql_bridge
         template<typename T> inline void load(T& dst, std::string const& flt) {_load<T>(dst,flt);};
         template<typename T> inline void remove(T const& src) {_remove<T>(src);}
         template<typename T> inline void remove_if(std::string const& src) {_remove_if<T>(src);}
+        template<typename T> inline typename std::enable_if<is_any_map<T>::value>::type remove_by_key(typename T::key_type const& src) {_remove_by_key<T>(src);}
         template<typename T> inline void replace(T const& src) {_replace<T>(src);}
         template<typename T, typename TMem> inline std::string field_name(TMem const T::*mem_offs) const
         {
@@ -86,8 +87,10 @@ namespace sql_bridge
 
         data_section_descriptors_ptr descriptor_;
     private:
+        
 #pragma mark - save
-        template<typename T> inline typename std::enable_if<!is_container<T>::value && !is_map<T>::value>::type _save(T const& src)
+        
+        template<typename T> inline typename std::enable_if<!is_container<T>::value && !is_any_map<T>::value>::type _save(T const& src)
         {
             size_t tid = typeid(T).hash_code();
             data_update_context_ptr cont(create_context(tid));
@@ -120,7 +123,7 @@ namespace sql_bridge
                     cont->bind_comp(&el,sql_value());
             }
         }
-        template<typename T> inline typename std::enable_if<is_map<T>::value &&
+        template<typename T> inline typename std::enable_if<is_any_map<T>::value &&
                                                             !is_trivial_map<T>::value &&
                                                             !is_container_of_containers<T>::value>::type _save(T const& src)
         {
@@ -128,6 +131,9 @@ namespace sql_bridge
             {
                 size_t tid(typeid(T).hash_code());
                 data_update_context_ptr cont(create_context(tid));
+                if (is_map<T>::value)
+                    for(auto const& el : src)
+                        cont->remove_by_key(sql_value(el.first));
                 cont->bind_comp(&src,sql_value());
             }
             else
@@ -139,8 +145,10 @@ namespace sql_bridge
                     cont->bind_comp(&el.second,sql_value());
             }
         }
+        
 #pragma mark - replace
-        template<typename T> inline typename std::enable_if<!is_container<T>::value && !is_map<T>::value>::type _replace(T const& src)
+        
+        template<typename T> inline typename std::enable_if<!is_container<T>::value && !is_any_map<T>::value>::type _replace(T const& src)
         {
             size_t tid = typeid(T).hash_code();
             data_update_context_ptr cont(create_context(tid));
@@ -177,7 +185,7 @@ namespace sql_bridge
                     cont->bind_comp(&el,sql_value());
             }
         }
-        template<typename T> inline typename std::enable_if<is_map<T>::value &&
+        template<typename T> inline typename std::enable_if<is_any_map<T>::value &&
                                                             !is_trivial_map<T>::value &&
                                                             !is_container_of_containers<T>::value>::type _replace(T const& src)
         {
@@ -198,8 +206,10 @@ namespace sql_bridge
                     cont->bind_comp(&el.second,sql_value());
             }
         }
+        
 #pragma mark - load
-        template<typename T> inline typename std::enable_if<!is_container<T>::value && !is_map<T>::value>::type _load(T& dst, std::string const& flt)
+        
+        template<typename T> inline typename std::enable_if<!is_container<T>::value && !is_any_map<T>::value>::type _load(T& dst, std::string const& flt)
         {
             size_t tid = typeid(T).hash_code();
             data_update_context_ptr cont(create_reader(tid, flt));
@@ -237,7 +247,7 @@ namespace sql_bridge
                 }
             }
         }
-        template<typename T> inline typename std::enable_if<is_map<T>::value &&
+        template<typename T> inline typename std::enable_if<is_any_map<T>::value &&
                                                             !is_trivial_map<T>::value &&
                                                             !is_container_of_containers<T>::value>::type _load(T& dst, std::string const& flt)
         {
@@ -272,12 +282,15 @@ namespace sql_bridge
         template<typename TFn, typename TVal> inline typename std::enable_if<!is_back_pushable_container<TFn>::value>::type add_to_container(TFn& dst,TVal&& v) const {dst.insert(dst.end(),std::move(v));}
 
 #pragma mark - remove
-        template<typename T> inline typename std::enable_if<!is_container<T>::value && !is_map<T>::value>::type _remove(T const& src)
+        
+        template<typename T> inline typename std::enable_if<!is_container<T>::value &&
+                                                            !is_any_map<T>::value>::type _remove(T const& src)
         {
             size_t tid = typeid(T).hash_code();
             data_update_context_ptr cont(create_context(tid));
             cont->remove_if_possible(&src);
         }
+        
         template<typename T> inline typename std::enable_if<is_container<T>::value &&
                                                             !is_trivial_container<T>::value &&
                                                             !is_container_of_containers<T>::value>::type _remove(T const& src)
@@ -287,9 +300,20 @@ namespace sql_bridge
             for(auto const& el : src)
                 cont->remove_if_possible(&el);
         }
+
+#pragma mark - remove_by_key
+        
+        template<typename T> inline typename std::enable_if<is_any_map<T>::value>::type _remove_by_key(typename T::key_type const& val)
+        {
+            size_t tid = typeid(T).hash_code();
+            data_update_context_ptr cont(create_context(tid));
+            cont->remove_by_key(sql_value(val));
+        }
         
 #pragma mark - remove_if
-        template<typename T> inline typename std::enable_if<!is_container<T>::value && !is_map<T>::value>::type _remove_if(std::string const& flt)
+        
+        template<typename T> inline typename std::enable_if<!is_container<T>::value &&
+                                                            !is_any_map<T>::value>::type _remove_if(std::string const& flt)
         {
             size_t tid = typeid(T).hash_code();
             data_update_context_ptr cont(create_context(tid,flt));
@@ -335,8 +359,9 @@ namespace sql_bridge
         }
 
         void add(sql_value const& var) {}
-        void remove_if_possible(void const* dat) {}
+        void remove_if_possible(void const*) {}
         void remove_all() {}
+        void remove_by_key(sql_value const&) {}
         bool is_ok() {return reader_.is_valid();}
         void read(sql_value& dst)
         {
@@ -443,7 +468,14 @@ namespace sql_bridge
             remover_.bind(mid);
             remover_.next();
         }
-        
+
+        void remove_by_key(sql_value const& mid)
+        {
+            if (remover_.empty()|| remove_all_used_) return;
+            remover_.bind(mid);
+            remover_.next();
+        }
+
         void remove_all()
         {
             remove_all_used_ = true;

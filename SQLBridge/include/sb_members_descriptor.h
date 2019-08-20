@@ -59,6 +59,7 @@ namespace sql_bridge
             T const* chk = static_cast<T const*>(base);
             return &(chk->*member_)==memptr;
         }
+        bool is_target_map() const override {return is_map<TMb>::value;}
 
     protected:
 #pragma mark - constructor
