@@ -168,6 +168,7 @@ namespace sql_bridge
         virtual sql_value id_for_members(void const*) const = 0;
         virtual data_update_context_ptr context_for_member(size_t,sql_value const&, std::string const&) = 0;
         virtual void remove_if_possible(void const*) = 0;
+        virtual void remove_by_key(sql_value const&) = 0;
         virtual void remove_all() = 0;
         
     protected:

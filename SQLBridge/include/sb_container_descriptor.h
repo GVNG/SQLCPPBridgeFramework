@@ -105,7 +105,9 @@ namespace sql_bridge
             };
             return ret;
         }
+        
 #pragma mark - bind
+        
         template<typename TFn> inline typename std::enable_if<is_container<TFn>::value && !is_trivial_container<TFn>::value>::type _bind_comp(TFn const& src,data_update_context& cont,sql_value const& extkey)
         {
             size_t tid = typeid(typename TFn::value_type).hash_code();

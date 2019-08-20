@@ -128,6 +128,8 @@ namespace sql_bridge
             {
                 size_t tid(typeid(T).hash_code());
                 data_update_context_ptr cont(create_context(tid));
+                for(auto const& el : src)
+                    cont->remove_by_key(sql_value(el.first));
                 cont->bind_comp(&src,sql_value());
             }
             else
@@ -335,8 +337,9 @@ namespace sql_bridge
         }
 
         void add(sql_value const& var) {}
-        void remove_if_possible(void const* dat) {}
+        void remove_if_possible(void const*) {}
         void remove_all() {}
+        void remove_by_key(sql_value const&) {}
         bool is_ok() {return reader_.is_valid();}
         void read(sql_value& dst)
         {
@@ -443,7 +446,14 @@ namespace sql_bridge
             remover_.bind(mid);
             remover_.next();
         }
-        
+
+        void remove_by_key(sql_value const& mid)
+        {
+            if (remover_.empty()|| remove_all_used_) return;
+            remover_.bind(mid);
+            remover_.next();
+        }
+
         void remove_all()
         {
             remove_all_used_ = true;
