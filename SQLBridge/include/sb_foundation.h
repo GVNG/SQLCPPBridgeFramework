@@ -110,7 +110,6 @@ namespace sql_bridge
         virtual void read(void*,data_update_context&) = 0;
         virtual void read_comp(void*,data_update_context&,sql_value const&) = 0;
         virtual bool is_this_mem_ptr(void const*,void const*) const = 0;
-        virtual bool is_trivial() const = 0;
         virtual bool is_target_map() const = 0;
 
         inline size_t type_id() const {return type_id_;}
