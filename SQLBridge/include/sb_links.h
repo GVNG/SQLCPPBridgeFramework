@@ -68,9 +68,11 @@ namespace sql_bridge
             : source_id_(src)
             , table_name_(tabname)
             , ref_field_name_(ref_fld_name)
+            , use_trivial_key_for_remove_(false)
             {};
         
         inline bool empty() const {return source_id_==0;}
+        inline bool is_trivial_key() const {return use_trivial_key_for_remove_;}
         inline size_t source_id() const {return source_id_;}
         inline std::string const& ref_field_name() const {return ref_field_name_;}
         inline member_for_index_ref const& index_ref() const {return index_ref_;}
@@ -94,6 +96,7 @@ namespace sql_bridge
         inline void add_index_to_create(index_to_field_pair const& ip) {should_create_indexes_.push_back(ip);}
         inline void add_field(fields_definition const& fl) {fields_.push_back(fl);}
         inline void add_prefix_field(fields_definition const& fl) {prefix_fields_.push_back(fl);}
+        inline void switch_to_trivial_key() {use_trivial_key_for_remove_=true;}
     protected:
     private:
         size_t source_id_;
@@ -103,6 +106,7 @@ namespace sql_bridge
         class_links_container target_;
         index_to_field_pairs_container should_create_indexes_;
         fields_definitions_container prefix_fields_,fields_;
+        bool use_trivial_key_for_remove_;
         // statements
         statements_set statements_;
     };

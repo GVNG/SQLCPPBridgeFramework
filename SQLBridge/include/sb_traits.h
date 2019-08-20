@@ -122,12 +122,28 @@ namespace sql_bridge
         template<typename C> static typename std::enable_if<
             std::is_same<decltype(static_cast<mem_fn>(&C::push_back)),mem_fn>::value,
             yes>::type test(void const*);
-        template<typename C> static no  test(...);
+        template<typename C> static no test(...);
     public:
         static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
         typedef T type;
     };
-    
+
+    template<typename T> struct has_at
+    {
+    private:
+        typedef char                      yes;
+        typedef struct { char array[2]; } no;
+        typedef typename T::mapped_type& (T::*mem_fn)(typename T::key_type const&);
+        
+        template<typename C> static typename std::enable_if<
+            std::is_same<decltype(static_cast<mem_fn>(&C::at)),mem_fn>::value,
+            yes>::type test(void const*);
+        template<typename C> static no test(...);
+    public:
+        static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
+        typedef T type;
+    };
+
     template<typename T> struct is_ordered_set
         : std::integral_constant<bool,  std::is_base_of<std::set<typename T::value_type>, T>::value ||
                                         std::is_base_of<std::multiset<typename T::value_type>, T>::value>
@@ -143,13 +159,30 @@ namespace sql_bridge
         : std::integral_constant<bool, is_kind_of_pair<T>::value>
     {
     };
-    
+
+    template<bool,typename T> struct check_for_multimap : std::integral_constant<bool, false>{};
+    template<typename T> struct check_for_multimap<true,T> : std::integral_constant<bool, !has_at<T>::value>{};
+
     template<typename T> struct is_map
         : std::integral_constant<bool,  is_any_container<T>::value &&
-                                        is_key_mapped<T>::value>
+                                        is_key_mapped<T>::value &&
+                                        !check_for_multimap<is_key_mapped<T>::value,T>::value>
+    {
+    };
+
+    template<typename T> struct is_multimap
+        : std::integral_constant<bool,  is_any_container<T>::value &&
+                                        is_key_mapped<T>::value &&
+                                        check_for_multimap<is_key_mapped<T>::value,T>::value>
     {
     };
     
+    template<typename T> struct is_any_map
+        : std::integral_constant<bool, is_map<T>::value || is_multimap<T>::value>
+    {
+    };
+
+
     template<bool,typename T> struct check_for_set : std::integral_constant<bool, false>{};
     template<typename T> struct check_for_set<true,T> : std::integral_constant<bool, is_ordered_set<T>::value>{};
 
@@ -161,7 +194,7 @@ namespace sql_bridge
     template<typename T> struct is_container
         : std::integral_constant<bool,  is_any_container<T>::value &&
                                         !std::is_base_of<std::string,T>::value &&
-                                        !is_map<T>::value>
+                                        !is_any_map<T>::value>
     {
     };
     
@@ -247,7 +280,7 @@ namespace sql_bridge
     
     template<typename T> struct types_selector
     {
-        typedef typename std::conditional<map_type_check<is_map<T>::value,T>::value, typename map_type_check<is_map<T>::value,T>::type, T>::type T1;
+        typedef typename std::conditional<map_type_check<is_any_map<T>::value,T>::value, typename map_type_check<is_any_map<T>::value,T>::type, T>::type T1;
         typedef typename std::conditional<container_type_check<is_container<T>::value,T>::value, typename container_type_check<is_container<T>::value, T>::type, T1>::type T2;
         typedef T2 type;
         static_assert(!std::is_same<type, void>::value,"No acceptable type selected");
@@ -260,7 +293,7 @@ namespace sql_bridge
     template<typename T> struct containers_type_check_for_trivial<true,T> : std::integral_constant<bool, is_sql_acceptable<typename T::value_type>::value> {};
     
     template<typename T> struct is_trivial_map
-        : std::integral_constant<bool,  map_type_check_for_trivial<is_map<T>::value,T>::value>
+        : std::integral_constant<bool,  map_type_check_for_trivial<is_any_map<T>::value,T>::value>
     {
     };
 

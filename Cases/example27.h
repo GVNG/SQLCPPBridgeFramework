@@ -35,7 +35,7 @@
 #include "sqlcppbridge.h"
 
 class Case27;
-typedef std::vector<Case27> Case27Container;
+typedef std::map<int,Case27> Case27Container;
 
 class Case27
 {
@@ -44,9 +44,12 @@ public:
     Case27()
         : value_(0)
         {}
+    Case27(long v)
+        : value_(v)
+        {}
+    inline bool operator == (Case27 const& rv) const {return value_==rv.value_;}
 protected:
 private:
-    Case27Container child_;
     long value_;
 };
 

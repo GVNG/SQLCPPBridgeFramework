@@ -157,6 +157,8 @@ namespace sql_bridge
         }
         if (ret.empty() && !dp.target().empty())
         {
+            if (cur->second->is_target_map())
+                dp.switch_to_trivial_key();
             ret = member_for_index_ref(e_db_key_mode::ExternalPrimaryKey,to_string() << "sqlcpp_internal_field");
             dp.add_field({ret.name(),def_internal_type,true,false});
             chld_index_ref = fields_definition{to_string() << dp.table_name() << "_" << ret.name(),def_internal_type,false,true};

@@ -55,6 +55,8 @@ namespace sql_bridge
         void read(void*,data_update_context&) override {}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {};
         bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
+        bool is_trivial() const override {return is_trivial_map<T>::value || is_trivial_container<T>::value;}
+        bool is_target_map() const override {return is_map<T>::value;}
     private:
     };
     
@@ -77,6 +79,8 @@ namespace sql_bridge
         void read(void*,data_update_context&) override {}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {};
         bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
+        bool is_trivial() const override {return is_trivial_map<T>::value || is_trivial_container<T>::value;}
+        bool is_target_map() const override {return is_any_map<T>::value;}
 
     private:
 #pragma mark - sql types

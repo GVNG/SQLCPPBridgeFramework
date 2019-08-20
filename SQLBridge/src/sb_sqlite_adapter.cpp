@@ -380,7 +380,10 @@ namespace sql_bridge
         if (!dp.index_ref().empty() && relfrom.empty())
         {
             to_string delsts;
-            delsts << "DELETE FROM " << dp.table_name() << " WHERE " << dp.index_ref().name() << "=?";
+            if (dp.is_trivial_key())
+                delsts << "DELETE FROM " << dp.table_name() << " WHERE " << dp.fields().front().name_ << "=?";
+            else
+                delsts << "DELETE FROM " << dp.table_name() << " WHERE " << dp.index_ref().name() << "=?";
             dp.update_for_remove_statement(delsts);
         }
         if (relfrom.empty())
