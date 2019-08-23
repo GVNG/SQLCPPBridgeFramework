@@ -181,7 +181,7 @@
 		939E0AE420F7650200106D46 /* example21.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example21.h; sourceTree = "<group>"; };
 		939E0AE520F7651900106D46 /* example21.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example21.cpp; sourceTree = "<group>"; };
 		93A1349020D149E90041EE2E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; usesTabs = 1; };
-		93A1349220D249BD0041EE2E /* make_framework */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = make_framework; sourceTree = SOURCE_ROOT; };
+		93A1349220D249BD0041EE2E /* make_framework */ = {isa = PBXFileReference; explicitFileType = text.script.sh; fileEncoding = 4; path = make_framework; sourceTree = SOURCE_ROOT; };
 		93A54A2E22DF444F00AB4C09 /* t_case26.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case26.cpp; sourceTree = "<group>"; };
 		93A54A3022E1939000AB4C09 /* example27.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example27.h; sourceTree = "<group>"; };
 		93A54A3122E1E5DC00AB4C09 /* example27.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example27.cpp; sourceTree = "<group>"; };
