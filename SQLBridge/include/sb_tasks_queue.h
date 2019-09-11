@@ -81,7 +81,7 @@ namespace sql_bridge
             {}
         void add(db_task_ptr tsk)
         {
-            std::unique_lock<std::mutex> lck(access_);
+            std::lock_guard<std::mutex> lck(access_);
             if (tsk->out_of_band() && !tasks_queue_.empty())
             {
                 db_tasks_queue::iterator pos = std::find_if(tasks_queue_.begin(),
@@ -101,7 +101,7 @@ namespace sql_bridge
             {
                 db_task_ptr task;
                 {
-                    std::unique_lock<std::mutex> lck(access_);
+                    std::lock_guard<std::mutex> lck(access_);
                     if (!tasks_queue_.empty())
                     {
                         task = tasks_queue_.front();
