@@ -556,9 +556,12 @@ int main(int argc, char** argv)
             src.fill(20);
             chk.push_back(src);
             cont.save(src);
-            std::vector<Case28> dst;
+            std::vector<Case28> dst,dst2;
             cont.load(dst);
+            cont.save(dst[1]);
+            cont.load(dst2);
             assert(chk==dst);
+            assert(chk==dst2);
             std::cout << "is ok. ";
         }
 #endif
