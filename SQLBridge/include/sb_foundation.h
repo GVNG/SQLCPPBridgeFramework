@@ -125,7 +125,13 @@ namespace sql_bridge
                 throw sql_bridge_error(g_internal_error_text,g_architecture_error_text);
             depends_ = cl;
         }
-        inline void update_for_inheritances(class_descriptors_ptr cl) {inheritances_.push_back(cl);}
+        inline void update_for_inheritances(class_descriptors_ptr cl)
+        {
+            if (std::find_if(inheritances_.begin(),
+                             inheritances_.end(),
+                             [cl](class_descriptors_ptr const& p){return p->type_id()==cl->type_id();})==inheritances_.end())
+                                inheritances_.push_back(cl);
+        }
         
     protected:
         class_descriptor(size_t tp)
