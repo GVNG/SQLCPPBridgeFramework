@@ -79,7 +79,7 @@ namespace sql_bridge
             : key_value_storage<TStrategy>(fn)
             , shutdown_(false)
             {}
-        void add(db_task_ptr tsk)
+        void add(db_task_ptr tsk) override
         {
             std::lock_guard<std::mutex> lck(access_);
             if (tsk->out_of_band() && !tasks_queue_.empty())

@@ -456,7 +456,7 @@ namespace sql_bridge
         
         sql_value id_for_members(void const* dat) const
         {
-            if (member_for_id_)
+            if (member_for_id_ && !use_last_id_)
                 return member_for_id_->expand(dat);
             return use_last_id_?sql_value(last_insert_id_):sql_value();
         }

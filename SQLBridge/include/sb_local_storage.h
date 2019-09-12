@@ -140,7 +140,7 @@ namespace sql_bridge
             , proc_flush_thread_(std::bind(std::mem_fn(&local_storage::proc_flush),this))
         
         {
-            while (ready_) std::this_thread::yield();
+            do {std::this_thread::yield();} while(ready_);
         }
         ~local_storage()
         {
@@ -161,7 +161,6 @@ namespace sql_bridge
             return static_cast<load_task<T>*>(task.get())->data();
         }
         inline std::string load(std::string const& key) const {return load(key,std::string());}
-        
         inline context operator[](std::string const& nm) {return context_with_alt_file(nm,nullptr);}
 
         context context_with_alt_file(std::string const& nm, fn_change_file_name fn)
