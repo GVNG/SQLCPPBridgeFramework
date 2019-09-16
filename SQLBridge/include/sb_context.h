@@ -123,7 +123,12 @@ namespace sql_bridge
                 if (fn_failed_)
                     fn_failed_(err);
                 else
+                {
+                    _t_base def;
+                    if (fn_success_)
+                        fn_success_(std::move(def));
                     std::cerr << err.what() << std::endl;
+                }
             }
             inline _t_base&& data() {return std::move(data_);}
         private:
