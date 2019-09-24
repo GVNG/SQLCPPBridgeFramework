@@ -70,7 +70,10 @@ INC := -I $(INCDIR)
 ifdef ARCH
 	CFLAGS += -arch $(ARCH)
 	ifeq ($(TOS),ios)
-		CFLAGS += -mios-version-min=7.0
+		CFLAGS += -mios-version-min=8.0
+	endif
+	ifeq ($(TOS),wos)
+		CFLAGS += -mwatchos-version-min=5.0
 	endif
 	ifeq ($(TOS),osx)
 		CFLAGS += -mmacosx-version-min=10.7
