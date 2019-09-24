@@ -37,24 +37,29 @@ CROSS_SDK_IOS="iPhoneOS.sdk"
 CROSS_TOP_OSX="`xcode-select --print-path`/Platforms/MacOSX.platform/Developer"
 CROSS_SDK_OSX="MacOSX.sdk"
 
+CROSS_TOP_WOS="`xcode-select --print-path`/Platforms/WatchOS.platform/Developer"
+CROSS_SDK_WOS="WatchOS.sdk"
+
 # unit-tests first
 # ---------------------
 make -C ./UnitTests clean
 make -C ./UnitTests || exit 1
 # ---------------------
 
+export DEVPATH=${CROSS_TOP_WOS}/SDKs/${CROSS_SDK_WOS}
+export TOS="wos"
+export ARCH="armv7k"
+make clean
+make || exit 2
+export ARCH="arm64_32"
+make clean
+make || exit 3
 export DEVPATH=${CROSS_TOP_IOS}/SDKs/${CROSS_SDK_IOS}
 export TOS="ios"
 export ARCH="armv7"
 make clean
-make || exit 2
-export ARCH="armv7s"
-make clean
-make || exit 3
-export ARCH="armv7k"
-make clean
 make || exit 4
-export ARCH="arm64_32"
+export ARCH="armv7s"
 make clean
 make || exit 5
 export ARCH="arm64"
@@ -80,12 +85,12 @@ cp -R "SQLBridge/include/." "$FRAMEWORK/Headers"
 
 lipo -arch armv7 "out/$FRAMEWORK_NAME-ios-armv7.a" \
 	 -arch armv7s "out/$FRAMEWORK_NAME-ios-armv7s.a" \
-     -arch armv7k "out/$FRAMEWORK_NAME-ios-armv7k.a" \
 	 -arch arm64 "out/$FRAMEWORK_NAME-ios-arm64.a" \
      -arch arm64e "out/$FRAMEWORK_NAME-ios-arm64e.a" \
-     -arch arm64_32 "out/$FRAMEWORK_NAME-ios-arm64_32.a" \
 	 -arch x86_64 "out/$FRAMEWORK_NAME-ios-x86_64.a" \
      -arch i386 "out/$FRAMEWORK_NAME-ios-i386.a" \
+     -arch armv7k "out/$FRAMEWORK_NAME-wos-armv7k.a" \
+     -arch arm64_32 "out/$FRAMEWORK_NAME-wos-arm64_32.a" \
 	 -create -output "$FRAMEWORK/$FRAMEWORK_NAME"
 
 export DEVPATH=${CROSS_TOP_OSX}/SDKs/${CROSS_SDK_OSX}
