@@ -351,20 +351,21 @@ namespace sql_bridge
             }
         }
         
-        bool next(void const*)
+        bool next(void const*) override
         {
             if (use_ext_primary_key_)
                 reader_.read_value(last_key_);
             return reader_.next();
         }
 
-        void add(sql_value const& var) {}
-        void remove_if_possible(void const*) {}
-        void remove_all() {}
-        void remove_by_key(sql_value const&) {}
-        bool is_ok() {return reader_.is_valid();}
-        void check_for_update_ability(void const*) {}
-        void read(sql_value& dst)
+        void add(sql_value const& var) override {}
+        void remove_if_possible(void const*) override {}
+        void remove_all() override {}
+        void remove_by_key(sql_value const&) override {}
+        bool is_ok() override {return reader_.is_valid();}
+        void check_for_update_ability(void const*) override {}
+        
+        void read(sql_value& dst) override
         {
             switch (dst.type_)
             {
@@ -382,14 +383,14 @@ namespace sql_bridge
             }
         }
         
-        sql_value id_for_members(void const* dat) const
+        sql_value id_for_members(void const* dat) const override
         {
             if (use_ext_primary_key_)
                 return sql_value(last_key_);
             return member_for_id_?member_for_id_->expand(dat):sql_value();
         }
 
-        data_update_context_ptr context_for_member(size_t etid, sql_value const& extkey, std::string const& ref)
+        data_update_context_ptr context_for_member(size_t etid, sql_value const& extkey, std::string const& ref) override
         {
             for(auto const& tl : link_.target())
                 if (tl.source_id()==etid && ref==tl.ref_field_name())
@@ -438,23 +439,23 @@ namespace sql_bridge
             }
         }
         
-        bool is_ok() {return true;}
-        void add(sql_value const& var)
+        bool is_ok() override {return true;}
+        void add(sql_value const& var) override
         {
             if (update_mode_)
                 updater_.bind(var);
             else
                 inserter_.bind(var);
         }
-        void read(sql_value&) {}
-        data_update_context_ptr context_for_member(size_t etid, sql_value const&, std::string const& ref)
+        void read(sql_value&) override {}
+        data_update_context_ptr context_for_member(size_t etid, sql_value const&, std::string const& ref) override
         {
             for(auto const& tl : link_.target())
                 if (tl.source_id()==etid && ref==tl.ref_field_name())
                     return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::no_transactions_lock>(file_,(*hierarhy_)[etid],tl,hierarhy_,""));
             throw sql_bridge_error(to_string() << "Table: " << table_name() <<". " << g_internal_error_text, g_architecture_error_text);
         }
-        bool next(void const* dat)
+        bool next(void const* dat) override
         {
             if (update_mode_)
             {
@@ -473,7 +474,7 @@ namespace sql_bridge
             }
         }
         
-        sql_value id_for_members(void const* dat) const
+        sql_value id_for_members(void const* dat) const override
         {
             if (update_mode_)
                 return member_for_id_->expand(dat);
@@ -482,7 +483,7 @@ namespace sql_bridge
             return use_last_id_?sql_value(last_insert_id_):sql_value();
         }
         
-        void check_for_update_ability(void const* dat)
+        void check_for_update_ability(void const* dat) override
         {
             update_mode_ = false;
             if (updater_.empty() || !use_last_id_ || !member_for_id_) return;
@@ -491,7 +492,7 @@ namespace sql_bridge
             update_mode_ = val.value<int64_t>()!=0;
         }
         
-        void remove_if_possible(void const* dat)
+        void remove_if_possible(void const* dat) override
         {
             if (update_mode_) return;
             if (remover_.empty() || !member_for_id_ || remove_all_used_) return;
@@ -500,14 +501,14 @@ namespace sql_bridge
             remover_.next();
         }
 
-        void remove_by_key(sql_value const& mid)
+        void remove_by_key(sql_value const& mid) override
         {
             if (remover_.empty()|| remove_all_used_) return;
             remover_.bind(mid);
             remover_.next();
         }
 
-        void remove_all()
+        void remove_all() override
         {
             remove_all_used_ = true;
             if (remover_for_all_.empty()) return;
