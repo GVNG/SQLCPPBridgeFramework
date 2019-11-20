@@ -168,13 +168,14 @@ namespace sql_bridge
 
         virtual bool is_ok() = 0;
         virtual void add(sql_value const&) = 0;
-        virtual bool next() = 0;
+        virtual bool next(void const*) = 0;
         virtual void read(sql_value&) = 0;
         virtual sql_value id_for_members(void const*) const = 0;
         virtual data_update_context_ptr context_for_member(size_t,sql_value const&, std::string const&) = 0;
         virtual void remove_if_possible(void const*) = 0;
         virtual void remove_by_key(sql_value const&) = 0;
         virtual void remove_all() = 0;
+        virtual void check_for_update_ability(void const*) = 0;
         
     protected:
         data_update_context(class_descriptors_ptr desc, class_link const& lnk)

@@ -38,6 +38,7 @@ DEFINE_SQL_TABLE(extr, Case28Extra)
 DEFINE_SQL_TABLE(main, Case28)
 {
     bind("ID",      &Case28::db_id_,        e_db_index_type::PrimaryKey),
+    bind("EXT",     &Case28::extra_),
     bind("MEM",     &Case28::members_),
 };
 

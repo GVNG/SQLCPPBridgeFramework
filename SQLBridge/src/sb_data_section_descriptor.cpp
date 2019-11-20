@@ -200,7 +200,9 @@ namespace sql_bridge
         {
             if (cn.second->depends().empty()) continue;
             dst.push_back(cn.second->depends().statements().create_);
-            dst.push_back(cn.second->depends().statements().trigger_);
+            std::copy(cn.second->depends().statements().trigger_.begin(),
+                      cn.second->depends().statements().trigger_.end(),
+                      std::back_inserter(dst));
             std::copy(cn.second->depends().statements().indexes_.begin(),
                       cn.second->depends().statements().indexes_.end(),
                       std::back_inserter(dst));
@@ -213,7 +215,9 @@ namespace sql_bridge
     void data_section_descriptor::get_create_statements(class_link const& lnk, string_container &dst) const
     {
         dst.push_back(lnk.statements().create_);
-        dst.push_back(lnk.statements().trigger_);
+        std::copy(lnk.statements().trigger_.begin(),
+                  lnk.statements().trigger_.end(),
+                  std::back_inserter(dst));
         std::copy(lnk.statements().indexes_.begin(),
                   lnk.statements().indexes_.end(),
                   std::back_inserter(dst));
@@ -245,9 +249,11 @@ namespace sql_bridge
         std::cerr << pref << "       init: " << stm.create_ << std::endl;
         for(auto const& idx : stm.indexes_)
             std::cerr << pref << "      index: " << idx << std::endl;
-        if (!stm.trigger_.empty())
-            std::cerr << pref << "    trigger: " << stm.trigger_ << std::endl;
+        for(auto const& idx : stm.trigger_)
+            std::cerr << pref << "    trigger: " << idx << std::endl;
         std::cerr << pref << "     insert: " << stm.insert_ << std::endl;
+        if (!stm.update_.empty())
+            std::cerr << pref << "     update: " << stm.update_ << std::endl;
         if (!stm.remove_.empty())
             std::cerr << pref << "     remove: " << stm.remove_ << std::endl;
         if (!stm.remove_all_.empty())

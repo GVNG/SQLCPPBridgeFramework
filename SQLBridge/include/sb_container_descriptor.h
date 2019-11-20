@@ -115,7 +115,7 @@ namespace sql_bridge
             {
                 if (!extkey.empty())
                     cont.add(extkey);
-                cont.next();
+                cont.next(&v);
                 sql_value extid = cont.id_for_members(&v);
                 if (extid.empty())
                     throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the forward link", "You should configure any type of index at least at one field in the definition of table");
@@ -130,7 +130,7 @@ namespace sql_bridge
                 cont.add(sql_value(v));
                 if (!extkey.empty())
                     cont.add(extkey);
-                cont.next();
+                cont.next(&v);
             }
         }
         template<typename TFn> inline typename std::enable_if<is_any_map<TFn>::value && !is_trivial_map<TFn>::value>::type _bind_comp(TFn const& src,data_update_context& cont,sql_value const& extkey)
@@ -142,7 +142,7 @@ namespace sql_bridge
                 cont.add(sql_value(v.first));
                 if (!extkey.empty())
                     cont.add(extkey);
-                cont.next();
+                cont.next(&v);
                 sql_value extid = cont.id_for_members(&v);
                 if (extid.empty())
                     throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
@@ -158,7 +158,7 @@ namespace sql_bridge
                 cont.add(sql_value(v.second));
                 if (!extkey.empty())
                     cont.add(extkey);
-                cont.next();
+                cont.next(&v);
             }
         }
         
@@ -176,7 +176,7 @@ namespace sql_bridge
                     throw sql_bridge_error(to_string() << "The table: \"" << cont.table_name() << "\" contains more elements than provided container",
                                            g_expand_static_recommendation);
                 cont.read(val);
-                cont.next();
+                cont.next(nullptr);
                 *pos = val.value<type>();
                 pos++;
             }
@@ -195,7 +195,7 @@ namespace sql_bridge
             std::string const& refname(cont.forward_ref());
             while(cont.is_ok())
             {
-                cont.next();
+                cont.next(nullptr);
                 sql_value extid = cont.id_for_members(&dst);
                 data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname));
                 type v;
@@ -212,7 +212,7 @@ namespace sql_bridge
             while(cont.is_ok())
             {
                 cont.read(val);
-                cont.next();
+                cont.next(nullptr);
                 add_to_container(dst,val.value<type>());
             }
         }
@@ -227,7 +227,7 @@ namespace sql_bridge
             while(cont.is_ok())
             {
                 cont.read(key);
-                cont.next();
+                cont.next(nullptr);
                 sql_value extid = cont.id_for_members(&dst);
                 if (extid.empty())
                     throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
@@ -247,7 +247,7 @@ namespace sql_bridge
             {
                 cont.read(key);
                 cont.read(val);
-                cont.next();
+                cont.next(nullptr);
                 dst.insert(typename TFn::value_type(key.value<k_type>(),val.value<m_type>()));
             }
         }

@@ -44,8 +44,8 @@ TEST_F(DBFixture, Case28)
     cont.save(src);
     std::vector<Case28> dst,dst2;
     cont.load(dst);
+    dst[1].extra_++;
     cont.save(dst[1]);
     cont.load(dst2);
-    ASSERT_EQ(chk,dst);
-    ASSERT_EQ(chk,dst2);
+    ASSERT_EQ(dst,dst2);
 }

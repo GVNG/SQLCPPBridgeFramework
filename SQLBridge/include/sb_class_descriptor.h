@@ -127,13 +127,14 @@ namespace sql_bridge
         template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _bind_comp(TFn const&,data_update_context&,sql_value const&) {}
         template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _bind_comp(TFn const& el,data_update_context& cont,sql_value const& extkey)
         {
+            cont.check_for_update_ability(&el);
             cont.remove_if_possible(&el);
             for(auto const& md : cont.members())
                 if (md->index_type()!=e_db_index_type::PrimaryKey)
                     md->bind(&el, cont);
             if (!extkey.empty())
                 cont.add(extkey);
-            cont.next();
+            cont.next(&el);
             sql_value uid = cont.id_for_members(&el);
             if (uid.empty()) return;
             for(auto const& inh : cont.inheritances())
@@ -150,7 +151,7 @@ namespace sql_bridge
         {
             for(auto const& md : cont.members())
                 md->read(&dst, cont);
-            cont.next();
+            cont.next(nullptr);
             sql_value uid = cont.id_for_members(&dst);
             if (!uid.empty())
             {

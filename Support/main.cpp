@@ -558,10 +558,10 @@ int main(int argc, char** argv)
             cont.save(src);
             std::vector<Case28> dst,dst2;
             cont.load(dst);
+            dst[1].extra_++;
             cont.save(dst[1]);
             cont.load(dst2);
-            assert(chk==dst);
-            assert(chk==dst2);
+            assert(dst==dst2);
             std::cout << "is ok. ";
         }
 #endif
