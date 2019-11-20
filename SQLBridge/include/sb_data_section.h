@@ -351,19 +351,21 @@ namespace sql_bridge
             }
         }
         
-        bool next()
+        bool next(void const*) override
         {
             if (use_ext_primary_key_)
                 reader_.read_value(last_key_);
             return reader_.next();
         }
 
-        void add(sql_value const& var) {}
-        void remove_if_possible(void const*) {}
-        void remove_all() {}
-        void remove_by_key(sql_value const&) {}
-        bool is_ok() {return reader_.is_valid();}
-        void read(sql_value& dst)
+        void add(sql_value const& var) override {}
+        void remove_if_possible(void const*) override {}
+        void remove_all() override {}
+        void remove_by_key(sql_value const&) override {}
+        bool is_ok() override {return reader_.is_valid();}
+        void check_for_update_ability(void const*) override {}
+        
+        void read(sql_value& dst) override
         {
             switch (dst.type_)
             {
@@ -381,14 +383,14 @@ namespace sql_bridge
             }
         }
         
-        sql_value id_for_members(void const* dat) const
+        sql_value id_for_members(void const* dat) const override
         {
             if (use_ext_primary_key_)
                 return sql_value(last_key_);
             return member_for_id_?member_for_id_->expand(dat):sql_value();
         }
 
-        data_update_context_ptr context_for_member(size_t etid, sql_value const& extkey, std::string const& ref)
+        data_update_context_ptr context_for_member(size_t etid, sql_value const& extkey, std::string const& ref) override
         {
             for(auto const& tl : link_.target())
                 if (tl.source_id()==etid && ref==tl.ref_field_name())
@@ -417,9 +419,11 @@ namespace sql_bridge
             , inserter_(fl,link_.statements().insert_)
             , remover_(fl,link_.statements().remove_)
             , remover_for_all_(fl,link_.statements().remove_all_.empty()?std::string():(to_string() << link_.statements().remove_all_ << " " << flt))
+            , updater_(fl,link_.statements().update_)
             , hierarhy_(hr)
             , last_insert_id_(0)
             , use_last_id_(false)
+            , update_mode_(false)
         {
             if (link_.index_ref().type()==e_db_key_mode::ExternalPrimaryKey ||
                 link_.index_ref().type()==e_db_key_mode::PrimaryKey)
@@ -435,48 +439,76 @@ namespace sql_bridge
             }
         }
         
-        bool is_ok() {return true;}
-        void add(sql_value const& var) {inserter_.bind(var);}
-        void read(sql_value&) {}
-        data_update_context_ptr context_for_member(size_t etid, sql_value const&, std::string const& ref)
+        bool is_ok() override {return true;}
+        void add(sql_value const& var) override
+        {
+            if (update_mode_)
+                updater_.bind(var);
+            else
+                inserter_.bind(var);
+        }
+        void read(sql_value&) override {}
+        data_update_context_ptr context_for_member(size_t etid, sql_value const&, std::string const& ref) override
         {
             for(auto const& tl : link_.target())
                 if (tl.source_id()==etid && ref==tl.ref_field_name())
                     return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::no_transactions_lock>(file_,(*hierarhy_)[etid],tl,hierarhy_,""));
             throw sql_bridge_error(to_string() << "Table: " << table_name() <<". " << g_internal_error_text, g_architecture_error_text);
         }
-        bool next()
+        bool next(void const* dat) override
         {
-            inserter_.mark_as_dirty();
-            bool ret = inserter_.next();
-            if (use_last_id_)
-                last_insert_id_ = file_.last_insert_id();
-            return ret;
+            if (update_mode_)
+            {
+                sql_value key = member_for_id_->expand(dat);
+                updater_.bind(key);
+                updater_.mark_as_dirty();
+                return updater_.next();
+            }
+            else
+            {
+                inserter_.mark_as_dirty();
+                bool ret = inserter_.next();
+                if (use_last_id_)
+                    last_insert_id_ = file_.last_insert_id();
+                return ret;
+            }
         }
         
-        sql_value id_for_members(void const* dat) const
+        sql_value id_for_members(void const* dat) const override
         {
+            if (update_mode_)
+                return member_for_id_->expand(dat);
             if (member_for_id_ && !use_last_id_)
                 return member_for_id_->expand(dat);
             return use_last_id_?sql_value(last_insert_id_):sql_value();
         }
         
-        void remove_if_possible(void const* dat)
+        void check_for_update_ability(void const* dat) override
         {
+            update_mode_ = false;
+            if (updater_.empty() || !use_last_id_ || !member_for_id_) return;
+            sql_value val = member_for_id_->expand(dat);
+            if (val.empty()) return;
+            update_mode_ = val.value<int64_t>()!=0;
+        }
+        
+        void remove_if_possible(void const* dat) override
+        {
+            if (update_mode_) return;
             if (remover_.empty() || !member_for_id_ || remove_all_used_) return;
             sql_value mid = member_for_id_->expand(dat);
             remover_.bind(mid);
             remover_.next();
         }
 
-        void remove_by_key(sql_value const& mid)
+        void remove_by_key(sql_value const& mid) override
         {
             if (remover_.empty()|| remove_all_used_) return;
             remover_.bind(mid);
             remover_.next();
         }
 
-        void remove_all()
+        void remove_all() override
         {
             remove_all_used_ = true;
             if (remover_for_all_.empty()) return;
@@ -489,10 +521,11 @@ namespace sql_bridge
         typename TStrategy::sql_updater inserter_;
         typename TStrategy::sql_updater remover_;
         typename TStrategy::sql_updater remover_for_all_;
+        typename TStrategy::sql_updater updater_;
         data_section_descriptors_ptr hierarhy_;
         int64_t last_insert_id_;
         class_descriptors_ptr member_for_id_;
-        bool use_last_id_;
+        bool use_last_id_,update_mode_;
     };
 
     template<typename TStrategy> class _t_data_section

@@ -53,8 +53,9 @@ namespace sql_bridge
     {
         std::string create_;
         string_container indexes_;
-        std::string trigger_;
+        string_container trigger_;
         std::string insert_;
+        std::string update_;
         std::string remove_;
         std::string remove_all_;
         std::string select_;
@@ -87,11 +88,12 @@ namespace sql_bridge
         inline void update_for_key_mode(member_for_index_ref const& r) {index_ref_ = r;}
         inline void update_for_create_statement(std::string const& stm) {statements_.create_ = stm;}
         inline void update_for_index_statement(std::string const& stm) {statements_.indexes_.push_back(stm);}
-        inline void update_for_trigger_statement(std::string const& stm) {statements_.trigger_ = stm;}
+        inline void update_for_trigger_statement(std::string const& stm) {statements_.trigger_.push_back(stm);}
         inline void update_for_insert_statement(std::string const& stm) {statements_.insert_ = stm;}
         inline void update_for_remove_statement(std::string const& stm) {statements_.remove_ = stm;}
         inline void update_for_remove_all_statement(std::string const& stm) {statements_.remove_all_ = stm;}
         inline void update_for_select_statement(std::string const& stm, std::string const& app) {statements_.select_ = stm; statements_.select_app_=app;}
+        inline void update_for_update_statement(std::string const& stm) {statements_.update_ = stm;}
         inline void add_target(class_link const& cl) {target_.push_back(cl);}
         inline void add_index_to_create(index_to_field_pair const& ip) {should_create_indexes_.push_back(ip);}
         inline void add_field(fields_definition const& fl) {fields_.push_back(fl);}

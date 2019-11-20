@@ -340,16 +340,22 @@ namespace sql_bridge
         
         if (!dp.target().empty())
         {
-            to_string trsts;
+            to_string trsts,uptr;
             trsts << "CREATE TRIGGER IF NOT EXISTS tr_" << dp.table_name();
             trsts << " BEFORE DELETE ON " << dp.table_name() << " BEGIN ";
+            uptr << "CREATE TRIGGER IF NOT EXISTS trup_" << dp.table_name();
+            uptr << " BEFORE UPDATE ON " << dp.table_name() << " BEGIN ";
             for(auto const& tr : dp.target())
             {
                 trsts << "DELETE FROM " << tr.table_name() << " WHERE " << dp.table_name() << "_" << dp.index_ref().name();
                 trsts << "=old." << dp.index_ref().name() << ";";
+                uptr << "DELETE FROM " << tr.table_name() << " WHERE " << dp.table_name() << "_" << dp.index_ref().name();
+                uptr << "=old." << dp.index_ref().name() << ";";
             }
             trsts << "END";
+            uptr << "END";
             dp.update_for_trigger_statement(trsts);
+            dp.update_for_trigger_statement(uptr);
         }
 
         to_string insts,qsts;
@@ -377,6 +383,26 @@ namespace sql_bridge
         }
         dp.update_for_insert_statement(insts);
 
+        if (!dp.index_ref().empty() && relfrom.empty())
+        {
+            to_string updsts;
+            updsts << "UPDATE " << dp.table_name() << " SET ";
+            for(auto const& fn : dp.prefix_fields())
+                if (!fn.autoincremented_)
+                    updsts << fn.name_ << "=?,";
+            for(auto const& fn : dp.fields())
+                if (!fn.autoincremented_)
+                    updsts << fn.name_ << "=?,";
+                else
+                    updsts << fn.name_ << "=" << fn.name_ << ",";
+            updsts.remove_from_tail(1);
+            if (dp.is_trivial_key())
+                updsts << " WHERE " << dp.fields().front().name_ << "=?";
+            else
+                updsts << " WHERE " << dp.index_ref().name() << "=?";
+            dp.update_for_update_statement(updsts);
+        }
+        
         if (!dp.index_ref().empty() && relfrom.empty())
         {
             to_string delsts;

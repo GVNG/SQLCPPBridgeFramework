@@ -51,16 +51,19 @@ class Case28
 public:
     Case28()
         : db_id_(0)
+        , extra_(0)
         {}
     void fill(size_t num)
     {
+        extra_ = num;
         members_.clear();
         members_.reserve(num);
         for(size_t i=0; i!=num; ++i)
             members_.push_back(Case28Extra((long)i+1));
     }
-    inline bool operator == (Case28 const& rv) const {return members_==rv.members_;}
+    inline bool operator == (Case28 const& rv) const {return members_==rv.members_ && db_id_==rv.db_id_ && extra_==rv.extra_;}
     int64_t db_id_;
+    size_t extra_;
 private:
     std::vector<Case28Extra> members_;
 };
