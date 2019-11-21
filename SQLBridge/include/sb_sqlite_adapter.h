@@ -136,7 +136,7 @@ namespace sql_bridge
                 src.txt_statement_.clear();
             }
             ~sql_inserter_kv();
-            void next();
+            bool next();
             inline sql_inserter_kv& bind_key(std::string const& key) {need_step_=true;sqlite3_bind_text(state_, 1, key.c_str(), (int)key.size(), SQLITE_STATIC);return *this;}
             template<typename T> inline void bind_value(T const& val) {bind_value(val,fld_num_);}
             template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value>::type bind_value(T const& val, int fld) {need_step_=true;sqlite3_bind_double(state_, fld, val);}
