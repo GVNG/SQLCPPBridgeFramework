@@ -486,7 +486,7 @@ namespace sql_bridge
         void check_for_update_ability(void const* dat) override
         {
             update_mode_ = false;
-            if (updater_.empty() || !use_last_id_ || !member_for_id_) return;
+            if (updater_.empty() || !use_last_id_ || !member_for_id_ || remove_all_used_) return;
             sql_value val = member_for_id_->expand(dat);
             if (val.empty()) return;
             update_mode_ = val.value<int64_t>()!=0;
