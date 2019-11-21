@@ -158,14 +158,14 @@ namespace sql_bridge
             throw sql_error(g_err_cantupdate,txt_statement_,db.err_code());
     }
     
-    void sqlite_adapter::sql_inserter_kv::next()
+    bool sqlite_adapter::sql_inserter_kv::next()
     {
-        if (!state_ || !need_step_) return;
+        if (!state_ || !need_step_) return false;
         int code(SQLITE_OK);
         need_step_ = false;
         if ((code=sqlite3_step(state_))!=SQLITE_DONE)
             throw sql_error(g_err_cantupdate,txt_statement_,code);
-        sqlite3_reset(state_);
+        return sqlite3_reset(state_)==SQLITE_OK;
     }
     
     sqlite_adapter::sql_inserter_kv::~sql_inserter_kv()
