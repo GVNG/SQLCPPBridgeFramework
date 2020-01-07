@@ -19,6 +19,9 @@ TEST_F(DBFixture, Traits)
     struct _t_set_priv_inheritance : private _t_set {};
     struct _t_vector_inheritance : _t_vector {};
     struct _t_vector_priv_inheritance : private _t_vector {};
+    typedef sql_bridge::optional_value<int> _t_optional_int;
+    typedef sql_bridge::optional_value<_t_vector> _t_optional_vector;
+
 
     ASSERT_EQ(sql_bridge::is_map<_t_map>::value, true);
     ASSERT_EQ(sql_bridge::is_map<_t_pair>::value, false);
@@ -39,4 +42,10 @@ TEST_F(DBFixture, Traits)
     ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_map>::value, false);
     ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_set>::value, false);
     ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_array>::value, false);
+    
+    ASSERT_EQ(sql_bridge::is_optional<_t_optional_int>::value, true);
+    ASSERT_EQ(sql_bridge::is_optional<_t_vector>::value, false);
+    ASSERT_EQ(sql_bridge::is_optional<_t_pair>::value, false);
+    ASSERT_EQ(sql_bridge::is_optional<_t_optional_vector>::value, false);
+    ASSERT_EQ(sql_bridge::is_kind_of_optional<_t_optional_vector>::value, true);
 }

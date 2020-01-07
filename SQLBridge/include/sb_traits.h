@@ -143,6 +143,22 @@ namespace sql_bridge
         static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
         typedef T type;
     };
+    
+    template<typename T> struct is_optional_bare
+    {
+    private:
+        typedef char                      yes;
+        typedef struct { char array[2]; } no;
+        
+        template<typename C> static yes ft(typename C::value_type*);
+        template<typename C> static yes st(typename C::type_optional_flag*);
+        template<typename C> static no  ft(...);
+        template<typename C> static no  st(...);
+    public:
+        static constexpr bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
+                                      sizeof(st<T>(0)) == sizeof(yes);
+        typedef T type;
+    };
 
     template<typename T> struct is_ordered_set
         : std::integral_constant<bool,  std::is_base_of<std::set<typename T::value_type>, T>::value ||
@@ -226,11 +242,30 @@ namespace sql_bridge
     {
     };
     
+    template<bool,typename T> struct is_sql_optional : std::integral_constant<bool, false>{};
+    template<typename T> struct is_sql_optional<true,T> : std::integral_constant<bool,  is_convertible_to_int<typename T::value_type>::value ||
+                                                                                        is_convertible_to_float<typename T::value_type>::value ||
+                                                                                        is_convertible_to_text<typename T::value_type>::value ||
+                                                                                        is_chrono<typename T::value_type>::value>
+    {
+    };
+
+    template<typename T> struct is_optional
+        : is_sql_optional<is_optional_bare<T>::value,T>
+    {
+    };
+
+    template<typename T> struct is_kind_of_optional
+        : std::integral_constant<bool,  is_optional_bare<T>::value>
+    {
+    };
+
     template<typename T> struct is_sql_acceptable
         : std::integral_constant<bool,  is_convertible_to_int<T>::value ||
                                         is_convertible_to_float<T>::value ||
                                         is_convertible_to_text<T>::value ||
-                                        is_chrono<T>::value>
+                                        is_chrono<T>::value ||
+                                        is_optional<T>::value>
     {
     };
 
