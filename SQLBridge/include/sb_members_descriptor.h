@@ -107,7 +107,7 @@ namespace sql_bridge
             return ret;
         }
 
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value ||
+        template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value ||
                                                               is_container_of_containers<TFn>::value ||
                                                               is_trivial_map<TFn>::value ||
                                                               is_trivial_container<TFn>::value, class_descriptors_container const&>::type _members() const
@@ -128,7 +128,7 @@ namespace sql_bridge
             static const class_descriptors_container ret(_join_desc());
             return ret;
         }
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value &&
+        template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value &&
                                                               !is_container<TFn>::value &&
                                                               !is_map<TFn>::value, class_descriptors_container const&>::type _members() const
         {
