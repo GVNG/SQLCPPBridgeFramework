@@ -82,8 +82,8 @@ namespace sql_bridge
             return ret;
         }
 
-        template<typename TFn> inline static typename std::enable_if<is_sql_acceptable<TFn>::value,class_descriptors_ptr>::type _create_description() {return class_descriptors_ptr();}
-        template<typename TFn> inline static typename std::enable_if<is_sql_acceptable<TFn>::value,class_descriptors_ptr>::type _create_description_pub() {return class_descriptors_ptr();}
+        template<typename TFn> inline static typename std::enable_if<is_optional_or_trivial<TFn>::value,class_descriptors_ptr>::type _create_description() {return class_descriptors_ptr();}
+        template<typename TFn> inline static typename std::enable_if<is_optional_or_trivial<TFn>::value,class_descriptors_ptr>::type _create_description_pub() {return class_descriptors_ptr();}
         template<typename TFn> inline static typename std::enable_if<is_container<TFn>::value || is_map<TFn>::value,class_descriptors_ptr>::type _create_description() {return _create_containers_description<TFn>();}
         template<typename TFn> inline static typename std::enable_if<!is_trivial_container<TFn>::value && !is_trivial_map<TFn>::value && !is_container_of_containers<TFn>::value,class_descriptors_ptr>::type _create_containers_description() {return _create_nt_containers_description<TFn>();}
         template<typename TFn> inline static typename std::enable_if<is_container<TFn>::value || is_any_map<TFn>::value,class_descriptors_ptr>::type _create_description_pub()
@@ -91,12 +91,12 @@ namespace sql_bridge
             typedef _t_container_descriptor<TStrategy,TFn> type;
             return std::make_shared<type>();
         }
-        template<typename TFn> inline static typename std::enable_if<!is_sql_acceptable<TFn>::value && !is_container<TFn>::value && !is_map<TFn>::value,class_descriptors_ptr>::type _create_description_pub()
+        template<typename TFn> inline static typename std::enable_if<!is_optional_or_trivial<TFn>::value && !is_container<TFn>::value && !is_map<TFn>::value,class_descriptors_ptr>::type _create_description_pub()
         {
             typedef _t_class_descriptor<TStrategy,TFn> type;
             return std::make_shared<type>();
         }
-        template<typename TFn> inline static typename std::enable_if<!is_sql_acceptable<TFn>::value && !is_container<TFn>::value && !is_map<TFn>::value,class_descriptors_ptr>::type _create_description()
+        template<typename TFn> inline static typename std::enable_if<!is_optional_or_trivial<TFn>::value && !is_container<TFn>::value && !is_map<TFn>::value,class_descriptors_ptr>::type _create_description()
         {
             typedef _t_class_descriptor<TStrategy,TFn> type;
             return std::make_shared<type>();

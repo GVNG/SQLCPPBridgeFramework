@@ -61,6 +61,7 @@
 #include "example26.h"
 #include "example27.h"
 #include "example28.h"
+#include "example29.h"
 
 int main(int argc, char** argv)
 {
@@ -562,6 +563,19 @@ int main(int argc, char** argv)
             cont.save(dst[1]);
             cont.load(dst2);
             assert(dst==dst2);
+            std::cout << "is ok. ";
+        }
+
+        {
+            time_tracker trk;
+            sql_bridge::context cont(storage["case29"]);
+            std::cout << "Case 29 ";
+            Case29Container src,dst;
+            for(int i=0; i<10; ++i)
+                src.push_back(Case29(i));
+            cont.save(src);
+            cont.load(dst);
+            assert(src==dst);
             std::cout << "is ok. ";
         }
 #endif

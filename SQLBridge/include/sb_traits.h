@@ -250,7 +250,7 @@ namespace sql_bridge
     {
     };
 
-    template<bool,typename T> struct is_sql_optional : std::integral_constant<bool, false>{};
+    template<bool,typename T> struct is_sql_optional : std::integral_constant<bool, is_sql_acceptable<T>::value>{};
     template<typename T> struct is_sql_optional<true,T> : std::integral_constant<bool,  is_sql_acceptable<typename T::value_type>::value>
     {
     };

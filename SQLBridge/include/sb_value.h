@@ -37,6 +37,7 @@ namespace sql_bridge
 {
     struct sql_value
     {
+        template<bool> struct _t_optional_adapter{};
         template<bool> struct _t_real_adapter {};
         template<bool> struct _t_integral_adapter {};
         template<bool> struct _t_chrono_adapter {};
@@ -54,7 +55,15 @@ namespace sql_bridge
             , iValue_(0)
             , rValue_(0)
             {};
-        template<typename T> inline sql_value(T const& v) : sql_value(v,_t_real_adapter<std::is_floating_point<T>::value>()) {}
+        inline sql_value(std::string const& tx, _t_real_adapter<false>)
+            : type_(e_key_type::String)
+            , tValue_(tx)
+            , iValue_(0)
+            , rValue_(0)
+            {};
+        template<typename T> inline sql_value(T const& v) : sql_value(v,_t_optional_adapter<is_kind_of_optional<T>::value>()) {}
+        template<typename T> inline sql_value(T const& v, _t_optional_adapter<true>) : sql_value(v.value(),_t_real_adapter<std::is_floating_point<typename T::value_type>::value>()) {if (v.empty()) type_=e_key_type::Empty;};
+        template<typename T> inline sql_value(T const& v, _t_optional_adapter<false>) : sql_value(v,_t_real_adapter<std::is_floating_point<T>::value>()) {};
         template<typename T> inline sql_value(T const& v, _t_real_adapter<false>) : sql_value(v,_t_integral_adapter<is_convertible_to_int<T>::value>()) {}
         template<typename T> inline sql_value(T const& v, _t_integral_adapter<false>) : sql_value(v,_t_chrono_adapter<is_chrono<T>::value>()) {}
         template<typename T> inline sql_value(T const& v, _t_real_adapter<true>)
