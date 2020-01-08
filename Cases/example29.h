@@ -53,7 +53,7 @@ public:
     inline bool operator == (Case29 const& rv) const {return opt_i_==rv.opt_i_ && opt_f_==rv.opt_f_ && opt_t_==rv.opt_t_;}
 private:
     sql_bridge::optional_value<int> opt_i_;
-    sql_bridge::optional_value<float> opt_f_;
+    sql_bridge::optional_value<double> opt_f_;
     sql_bridge::optional_value<std::string> opt_t_;
 };
 
