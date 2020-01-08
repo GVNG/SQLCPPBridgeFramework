@@ -70,7 +70,7 @@ INC := -I $(INCDIR)
 ifdef ARCH
 	CFLAGS += -arch $(ARCH)
 	ifeq ($(TOS),ios)
-		CFLAGS += -mios-version-min=8.0
+		CFLAGS += -mios-version-min=10.0
 	endif
 	ifeq ($(TOS),wos)
 		CFLAGS += -mwatchos-version-min=5.0
@@ -105,13 +105,13 @@ clean:
 	@echo "  Cleaning $(TARGET)..."; $(RM) -r $(OBJECTS) $(TARGET)
 
 install:
-	@echo "Installing ..."
+	@echo "Installing..."
 	@cp $(TARGET) /usr/lib/
 	@mkdir -p /usr/include/$(CNAME_S)
 	@cp $(INCDIR)/* /usr/include/$(CNAME_S)/
 
 uninstall:
-	@echo "Uninstalling ..."
+	@echo "Uninstalling..."
 	@rm /usr/lib/lib$(CNAME_S).a
 	@rm -r /usr/include/$(CNAME_S)/
 
