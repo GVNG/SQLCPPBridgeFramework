@@ -242,30 +242,26 @@ namespace sql_bridge
     {
     };
     
-    template<bool,typename T> struct is_sql_optional : std::integral_constant<bool, false>{};
-    template<typename T> struct is_sql_optional<true,T> : std::integral_constant<bool,  is_convertible_to_int<typename T::value_type>::value ||
-                                                                                        is_convertible_to_float<typename T::value_type>::value ||
-                                                                                        is_convertible_to_text<typename T::value_type>::value ||
-                                                                                        is_chrono<typename T::value_type>::value>
+    template<typename T> struct is_sql_acceptable
+        : std::integral_constant<bool,  is_convertible_to_int<T>::value ||
+                                        is_convertible_to_float<T>::value ||
+                                        is_convertible_to_text<T>::value ||
+                                        is_chrono<T>::value>
     {
     };
 
-    template<typename T> struct is_optional
+    template<bool,typename T> struct is_sql_optional : std::integral_constant<bool, false>{};
+    template<typename T> struct is_sql_optional<true,T> : std::integral_constant<bool,  is_sql_acceptable<typename T::value_type>::value>
+    {
+    };
+
+    template<typename T> struct is_optional_or_trivial
         : is_sql_optional<is_optional_bare<T>::value,T>
     {
     };
 
     template<typename T> struct is_kind_of_optional
         : std::integral_constant<bool,  is_optional_bare<T>::value>
-    {
-    };
-
-    template<typename T> struct is_sql_acceptable
-        : std::integral_constant<bool,  is_convertible_to_int<T>::value ||
-                                        is_convertible_to_float<T>::value ||
-                                        is_convertible_to_text<T>::value ||
-                                        is_chrono<T>::value ||
-                                        is_optional<T>::value>
     {
     };
 

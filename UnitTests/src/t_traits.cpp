@@ -8,7 +8,7 @@
 
 #include "t_db_fixture.h"
 
-TEST_F(DBFixture, Traits)
+TEST(Core, Traits)
 {
     typedef std::map<long,long> _t_map;
     typedef std::pair<bool,bool> _t_pair;
@@ -19,8 +19,6 @@ TEST_F(DBFixture, Traits)
     struct _t_set_priv_inheritance : private _t_set {};
     struct _t_vector_inheritance : _t_vector {};
     struct _t_vector_priv_inheritance : private _t_vector {};
-    typedef sql_bridge::optional_value<int> _t_optional_int;
-    typedef sql_bridge::optional_value<_t_vector> _t_optional_vector;
 
 
     ASSERT_EQ(sql_bridge::is_map<_t_map>::value, true);
@@ -42,10 +40,41 @@ TEST_F(DBFixture, Traits)
     ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_map>::value, false);
     ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_set>::value, false);
     ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_array>::value, false);
+}
+
+TEST(Core,Traits2)
+{
+    typedef std::map<int,int> _tmap;
+    typedef std::multimap<int, int> _tmultimap;
+    typedef std::vector<int> _tvector;
+    typedef std::set<int> _tset;
     
-    ASSERT_EQ(sql_bridge::is_optional<_t_optional_int>::value, true);
-    ASSERT_EQ(sql_bridge::is_optional<_t_vector>::value, false);
-    ASSERT_EQ(sql_bridge::is_optional<_t_pair>::value, false);
-    ASSERT_EQ(sql_bridge::is_optional<_t_optional_vector>::value, false);
+    ASSERT_EQ(sql_bridge::is_map<_tmap>::value,true);
+    ASSERT_EQ(sql_bridge::is_map<_tmultimap>::value,false);
+    ASSERT_EQ(sql_bridge::is_multimap<_tmap>::value,false);
+    ASSERT_EQ(sql_bridge::is_multimap<_tmultimap>::value,true);
+    ASSERT_EQ(sql_bridge::is_any_map<_tmap>::value,true);
+    ASSERT_EQ(sql_bridge::is_any_map<_tmultimap>::value,true);
+    ASSERT_EQ(sql_bridge::is_container<_tmap>::value,false);
+    ASSERT_EQ(sql_bridge::is_container<_tmultimap>::value,false);
+    ASSERT_EQ(sql_bridge::is_container<_tvector>::value,true);
+    ASSERT_EQ(sql_bridge::is_container<std::string>::value,false);
+    ASSERT_EQ(sql_bridge::is_set<_tvector>::value,false);
+    ASSERT_EQ(sql_bridge::is_set<_tset>::value,true);
+    ASSERT_EQ(sql_bridge::is_trivial_map<_tmap>::value,true);
+    ASSERT_EQ(sql_bridge::is_trivial_map<_tmultimap>::value,true);
+}
+
+TEST(Core,TraitsOptional)
+{
+    typedef std::pair<bool,bool> _t_pair;
+    typedef std::vector<float> _t_vector;
+    typedef sql_bridge::optional_value<int> _t_optional_int;
+    typedef sql_bridge::optional_value<_t_vector> _t_optional_vector;
+    
+    ASSERT_EQ(sql_bridge::is_optional_or_trivial<_t_optional_int>::value, true);
+    ASSERT_EQ(sql_bridge::is_optional_or_trivial<_t_vector>::value, false);
+    ASSERT_EQ(sql_bridge::is_optional_or_trivial<_t_pair>::value, false);
+    ASSERT_EQ(sql_bridge::is_optional_or_trivial<_t_optional_vector>::value, false);
     ASSERT_EQ(sql_bridge::is_kind_of_optional<_t_optional_vector>::value, true);
 }
