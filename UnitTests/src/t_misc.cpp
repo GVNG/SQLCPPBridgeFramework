@@ -11,30 +11,29 @@
 TEST(Core,Misc)
 {
     std::chrono::system_clock::time_point ts = std::chrono::system_clock::from_time_t(1554188000);
-
     std::string tt = sql_bridge::to_string() << ts;
     ASSERT_EQ(tt,"1554188000");
 }
 
-TEST(Core,Traits)
+TEST(Core,Optional)
 {
-    typedef std::map<int,int> _tmap;
-    typedef std::multimap<int, int> _tmultimap;
-    typedef std::vector<int> _tvector;
-    typedef std::set<int> _tset;
+    typedef sql_bridge::optional_value<int> _t_opt_int;
+
+    _t_opt_int v1,v2,v3,v4;
+    v3 = 10;
+    v4 = 20;
     
-    ASSERT_EQ(sql_bridge::is_map<_tmap>::value,true);
-    ASSERT_EQ(sql_bridge::is_map<_tmultimap>::value,false);
-    ASSERT_EQ(sql_bridge::is_multimap<_tmap>::value,false);
-    ASSERT_EQ(sql_bridge::is_multimap<_tmultimap>::value,true);
-    ASSERT_EQ(sql_bridge::is_any_map<_tmap>::value,true);
-    ASSERT_EQ(sql_bridge::is_any_map<_tmultimap>::value,true);
-    ASSERT_EQ(sql_bridge::is_container<_tmap>::value,false);
-    ASSERT_EQ(sql_bridge::is_container<_tmultimap>::value,false);
-    ASSERT_EQ(sql_bridge::is_container<_tvector>::value,true);
-    ASSERT_EQ(sql_bridge::is_container<std::string>::value,false);
-    ASSERT_EQ(sql_bridge::is_set<_tvector>::value,false);
-    ASSERT_EQ(sql_bridge::is_set<_tset>::value,true);
-    ASSERT_EQ(sql_bridge::is_trivial_map<_tmap>::value,true);
-    ASSERT_EQ(sql_bridge::is_trivial_map<_tmultimap>::value,true);
+    ASSERT_EQ(v1<v2,false);
+    ASSERT_EQ(v2<v1,false);
+    
+    ASSERT_EQ(v3<v4,true);
+    ASSERT_EQ(v4<v3,false);
+    ASSERT_EQ(v3,10);
+    ASSERT_NE(v1,20);
+
+    ASSERT_EQ(v1<v3,true);
+    ASSERT_EQ(v4<v2,false);
+
+    ASSERT_EQ(v1.empty(),true);
+    ASSERT_EQ(v4.empty(),false);
 }

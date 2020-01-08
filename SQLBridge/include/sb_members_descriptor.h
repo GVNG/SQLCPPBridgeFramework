@@ -137,21 +137,21 @@ namespace sql_bridge
 
 
 #pragma mark - sql types
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value,std::string const&>::type _sql_type() const
+        template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value,std::string const&>::type _sql_type() const
         {
             typedef typename TStrategy::template sql_types<TFn> type;
             return type::template type_name<TFn>();
         };
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value,std::string const&>::type _sql_type() const
+        template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value,std::string const&>::type _sql_type() const
         {
             static std::string const def;
             return def;
         };
 #pragma mark - bind
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _bind_elem(T const& el, data_update_context& dst) {dst.add(sql_value(el.*member_));}
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _bind_elem(T const& el, data_update_context& dst) {}
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _bind_comp_elem(T const& el, data_update_context& dst, sql_value const&) {}
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _bind_comp_elem(T const& el, data_update_context& dst, sql_value const& extkey) {_bind_comp<TMb>(el.*member_,dst,extkey);}
+        template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value>::type _bind_elem(T const& el, data_update_context& dst) {dst.add(sql_value(el.*member_));}
+        template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value>::type _bind_elem(T const& el, data_update_context& dst) {}
+        template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value>::type _bind_comp_elem(T const& el, data_update_context& dst, sql_value const&) {}
+        template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value>::type _bind_comp_elem(T const& el, data_update_context& dst, sql_value const& extkey) {_bind_comp<TMb>(el.*member_,dst,extkey);}
 
         template<typename TFn> inline typename std::enable_if<is_trivial_container<TFn>::value || is_trivial_map<TFn>::value>::type _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
@@ -202,20 +202,30 @@ namespace sql_bridge
         }
 
 #pragma mark - expand
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value,sql_value>::type _expand(T const& el) {return sql_value(el.*member_);}
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value,sql_value>::type _expand(T const& el) {return sql_value();}
+        template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value,sql_value>::type _expand(T const& el) {return sql_value(el.*member_);}
+        template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value,sql_value>::type _expand(T const& el) {return sql_value();}
         
 #pragma mark - read
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _read(T& dst, data_update_context& cont) {}
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const&) {}
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _read(T& dst, data_update_context& cont)
+        template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value>::type _read(T& dst, data_update_context& cont) {}
+        template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const&) {}
+        template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value>::type _read(T& dst, data_update_context& cont) {_read_trivial<TFn>(dst,cont);}
+        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _read_trivial(T& dst, data_update_context& cont)
         {
             sql_value vr(dst.*member_);
             cont.read(vr);
             dst.*member_ = vr.value<TMb>();
         }
+        template<typename TFn> inline typename std::enable_if<is_kind_of_optional<TFn>::value>::type _read_trivial(T& dst, data_update_context& cont)
+        {
+            sql_value vr((dst.*member_).value());
+            cont.read(vr);
+            if (vr.empty())
+                dst.*member_ = TMb();
+            else
+                dst.*member_ = vr.value<typename TMb::value_type>();
+        }
 
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value &&
+        template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value &&
                                                               !is_container<TFn>::value && !is_map<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();

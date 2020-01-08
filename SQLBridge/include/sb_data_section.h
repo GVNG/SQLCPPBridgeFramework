@@ -367,6 +367,9 @@ namespace sql_bridge
         
         void read(sql_value& dst) override
         {
+            if (reader_.is_null())
+                dst = sql_value();
+            else
             switch (dst.type_)
             {
                 case sql_value::e_key_type::Integer:
