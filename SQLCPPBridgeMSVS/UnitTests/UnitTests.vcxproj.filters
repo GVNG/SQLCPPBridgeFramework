@@ -189,6 +189,18 @@
     <ClCompile Include="..\..\Cases\example27.cpp">
       <Filter>Source Files\Cases</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\UnitTests\src\t_case28.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\UnitTests\src\t_case29.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Cases\example28.cpp">
+      <Filter>Source Files\Cases</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Cases\example29.cpp">
+      <Filter>Source Files\Cases</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\UnitTests\include\t_db_fixture.h">
