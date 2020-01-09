@@ -1,0 +1,5 @@
+# contains project info used by CMake
+
+set( project_version 1.0.5 )
+set( project_description "SQLite to C++ bridge written in modern C++" )
+set( project_homepage "https://github.com/GVNG/SQLCPPBridgeFramework" )

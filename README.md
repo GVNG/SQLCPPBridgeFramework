@@ -16,8 +16,8 @@ arising from the use of this software.
 
 How to use this library
 -------------
-For using the library you need to add the framework "sqlcppbridge" into your 
-project and to include the file sqlcppbridge.h in your sources where it is required. 
+For using the library you need to add the framework "sqlcppbridge" into your
+project and to include the file sqlcppbridge.h in your sources where it is required.
 In 'Cases' folder there are several samples of using the library.
 
 Key features:
@@ -44,9 +44,9 @@ depth limitations of such nesting at all.
 
 Restrictions:
 -------------
-* At the current moment the public inheritance of iterable containers is not 
+* At the current moment the public inheritance of iterable containers is not
 supported;
-* Containers stack, queue (obviously non-iterable) and forward_list 
+* Containers stack, queue (obviously non-iterable) and forward_list
 are not supported either.
 
 Build:
@@ -54,14 +54,21 @@ Build:
 You can use the script:
 ./make_framework
 to create ./build/iOS/sqlcppbridge.framework and ./build/MacOS/sqlcppbridge.framework
-which includes armv7, armv7s, armv7k, arm64, arm64e, i386  and x86_64 architectures 
+which includes armv7, armv7s, armv7k, arm64, arm64e, i386  and x86_64 architectures
 to use in the whole set of iOS-devices and
 iOS-simulators
 
-...or you can simple run 'make' utility to create the static library for the default 
+...or you can simple run 'make' utility to create the static library for the default
 environment
+
+You can also build it using CMake:
+
+    mkdir build.cmake && cd build.cmake
+    cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/ios.toolchain.cmake -DPLATFORM=OS
+
+For more details on available PLATFORM options see https://github.com/leetal/ios-cmake#options
 
 Install:
 -------------
-For Linux environment use "sudo make install" to put assembled with 'make' utility 
-static library & headers to system folders 
+For Linux environment use "sudo make install" to put assembled with 'make' utility
+static library & headers to system folders
