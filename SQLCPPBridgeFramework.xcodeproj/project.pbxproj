@@ -101,6 +101,7 @@
 		93AC267B23C5E6B700752FA5 /* example28.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939AC058232A6ECE00575859 /* example28.cpp */; };
 		93AC267C23C5E6B700752FA5 /* example29.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AC264123C5C2CD00752FA5 /* example29.cpp */; };
 		93AC267E23C5E79200752FA5 /* t_case29.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AC267D23C5E79200752FA5 /* t_case29.cpp */; };
+		93AC268023C72C0A00752FA5 /* t_case27.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AC267F23C72C0A00752FA5 /* t_case27.cpp */; };
 		93B071FB20582B0E008D2FB6 /* sb_sqlite_adapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B071FA20582B0E008D2FB6 /* sb_sqlite_adapter.cpp */; };
 		93B0720320591999008D2FB6 /* sb_data_section_descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B0720220591999008D2FB6 /* sb_data_section_descriptor.cpp */; };
 		93BEDCF020A34894004166EB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E60D7B20558090009151ED /* main.cpp */; };
@@ -199,6 +200,7 @@
 		93AC264023C5BE6F00752FA5 /* example29.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example29.h; sourceTree = "<group>"; };
 		93AC264123C5C2CD00752FA5 /* example29.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example29.cpp; sourceTree = "<group>"; };
 		93AC267D23C5E79200752FA5 /* t_case29.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case29.cpp; sourceTree = "<group>"; };
+		93AC267F23C72C0A00752FA5 /* t_case27.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case27.cpp; sourceTree = "<group>"; };
 		93B071F92058262E008D2FB6 /* sb_sqlite_adapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_sqlite_adapter.h; sourceTree = "<group>"; };
 		93B071FA20582B0E008D2FB6 /* sb_sqlite_adapter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sb_sqlite_adapter.cpp; sourceTree = "<group>"; };
 		93B071FF20590A38008D2FB6 /* sb_context.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_context.h; sourceTree = "<group>"; };
@@ -335,6 +337,7 @@
 				937F84DA21DA566700DD82F8 /* t_case24.cpp */,
 				93EA944A22DDB48D0034663D /* t_case25.cpp */,
 				93A54A2E22DF444F00AB4C09 /* t_case26.cpp */,
+				93AC267F23C72C0A00752FA5 /* t_case27.cpp */,
 				939AC076232A7C8700575859 /* t_case28.cpp */,
 				93AC267D23C5E79200752FA5 /* t_case29.cpp */,
 			);
@@ -603,6 +606,7 @@
 				93AC264323C5C2CD00752FA5 /* example29.cpp in Sources */,
 				937F849721DA3C8B00DD82F8 /* example5.cpp in Sources */,
 				937F84A921DA3C8B00DD82F8 /* example23.cpp in Sources */,
+				93AC268023C72C0A00752FA5 /* t_case27.cpp in Sources */,
 				937F848F21DA367500DD82F8 /* sb_tasks_queue.cpp in Sources */,
 				937F849A21DA3C8B00DD82F8 /* example8.cpp in Sources */,
 				93EA944F22DDB9F90034663D /* example26.cpp in Sources */,
