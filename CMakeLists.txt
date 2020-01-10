@@ -46,6 +46,14 @@ else()
   message(STATUS "Building static version...")
 endif()
 
+# generate a framework for the above lib
+set_target_properties( sqlcppbridge PROPERTIES
+  FRAMEWORK TRUE
+  FRAMEWORK_VERSION C
+  VERSION ${project_version}
+  SOVERSION 1.0.0
+  PUBLIC_HEADER "${HEADERS}" )
+
 # installation
 install (TARGETS sqlcppbridge DESTINATION lib)
 install (FILES ${HEADERS} DESTINATION include)
