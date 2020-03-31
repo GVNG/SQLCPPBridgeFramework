@@ -78,3 +78,19 @@ TEST(Core,TraitsOptional)
     ASSERT_EQ(sql_bridge::is_optional_or_trivial<_t_optional_vector>::value, false);
     ASSERT_EQ(sql_bridge::is_kind_of_optional<_t_optional_vector>::value, true);
 }
+
+TEST(Core,TraitsPointers)
+{
+    typedef int* _t_simple_int_pointer;
+    typedef int const* _t_simple_int_const_pointer;
+    typedef std::shared_ptr<int> _t_shared_int_pointer;
+    typedef std::unique_ptr<int> _t_unique_int_pointer;
+    typedef std::weak_ptr<int> _t_weak_int_pointer;
+
+    ASSERT_EQ(sql_bridge::is_pointer<_t_simple_int_pointer>::value, true);
+    ASSERT_EQ(sql_bridge::is_pointer<_t_simple_int_const_pointer>::value, true);
+    ASSERT_EQ(sql_bridge::is_pointer<int>::value, false);
+    ASSERT_EQ(sql_bridge::is_pointer<_t_shared_int_pointer>::value, true);
+    ASSERT_EQ(sql_bridge::is_pointer<_t_unique_int_pointer>::value, true);
+    ASSERT_EQ(sql_bridge::is_pointer<_t_weak_int_pointer>::value, true);
+}

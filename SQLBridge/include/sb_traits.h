@@ -86,7 +86,20 @@ namespace sql_bridge
         static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
         typedef T type;
     };
-    
+
+    template<typename T> struct has_element_type
+    {
+    private:
+        typedef char                      yes;
+        typedef struct { char array[2]; } no;
+        
+        template<typename C> static yes test(typename C::element_type*);
+        template<typename C> static no  test(...);
+    public:
+        static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
+        typedef T type;
+    };
+
     template<bool,typename T> struct has_begin_end : std::integral_constant<bool, false>{};
     template <typename T> struct has_begin_end<true,T>
     {
@@ -239,6 +252,20 @@ namespace sql_bridge
         : std::integral_constant<bool,  std::is_same<T, std::chrono::system_clock::time_point>::value ||
                                         std::is_same<T, std::chrono::high_resolution_clock::time_point>::value ||
                                         std::is_same<T, std::chrono::steady_clock::time_point>::value>
+    {
+    };
+    
+    template<bool,typename T> struct is_smart_pointer : std::integral_constant<bool, false> {};
+    template<typename T> struct is_smart_pointer<true,T>
+        : std::integral_constant<bool,  std::is_same<T,std::shared_ptr<typename T::element_type> >::value ||
+                                        std::is_same<T,std::unique_ptr<typename T::element_type> >::value ||
+                                        std::is_same<T,std::weak_ptr<typename T::element_type> >::value>
+    {
+    };
+    
+    template<typename T> struct is_pointer
+        : std::integral_constant<bool,  std::is_pointer<T>::value ||
+                                        is_smart_pointer<has_element_type<T>::value,T>::value>
     {
     };
     
