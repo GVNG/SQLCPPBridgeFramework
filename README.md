@@ -52,21 +52,50 @@ are not supported either.
 Build:
 -------------
 You can use the script:
-./make_framework
+
+    ./make_framework
+
 to create ./build/iOS/sqlcppbridge.framework and ./build/MacOS/sqlcppbridge.framework
 which includes armv7, armv7s, armv7k, arm64, arm64e, i386  and x86_64 architectures
-to use in the whole set of iOS-devices and
-iOS-simulators
+to use in the whole set of iOS-devices and iOS-simulators.
 
-...or you can simple run 'make' utility to create the static library for the default
-environment
+Alternatively you can simply run 'make' utility to create the static library for the default environment.
 
-You can also build it using CMake:
+You can also build it using CMake (for iOS):
 
     mkdir build.cmake && cd build.cmake
     cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/ios.toolchain.cmake -DPLATFORM=OS
 
 For more details on available PLATFORM options see https://github.com/leetal/ios-cmake#options
+
+Build it as a `static` library for the current platform:
+
+    mkdir build.cmake && cd build.cmake
+    cmake ..
+
+Or a `shared` library for the current platform:
+
+    mkdir build.cmake && cd build.cmake
+    cmake -DBUILD_SHARED=ON ..
+
+By default sqlite3 library is detected and built into the shared library OR specified as a requirement for the static library flavour (see below).
+If you want to avoid including sqlite3 (e.g. you already have sqlite3 in your project) you can do so using the `-DREQUIRE_SQLITE=OFF` option:
+
+    mkdir build.cmake && cd build.cmake
+    cmake -DREQUIRE_SQLITE=OFF ..
+
+**Note** that this is only possible for a static library; The shared library will force linkage against sqlite3 and contain it.
+
+CMake can also be used for easy integration with SQLCppBridge (assuming SQLCppBridge is used as a git submodule or dropped to `lib/SQLCppBridge`):
+
+    add_subdirectory ( "${CMAKE_SOURCE_DIR}/lib/SQLCppBridge" EXCLUDE_FROM_ALL )
+    ...
+    target_link_libraries (
+      myTarget
+        PRIVATE  lib::SQLCppBridge
+        ... )
+
+The above example will automatically link myTarget against SQLCppBridge as well as setup required include directories.
 
 Install:
 -------------
