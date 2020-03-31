@@ -50,7 +50,7 @@ DEFINE_SQL_TABLE(attaches, Case1Attach)
     bind("VAL",         &Case1Attach::attached_value_),
 };
 
-DEFINE_SQL_DATABASE(case1 /*name of section*/, 1 /*current version*/, Case1, Case1Related, Case1Attach)::upgrade_structure(size_t from, size_t to)
+DEFINE_SQL_DATABASE(case1 /*name of context*/, 1 /*current version*/, Case1, Case1Related, Case1Attach)::upgrade_structure(size_t from, size_t to)
 {
     // ------------------------------------------------------------------------------------
     // you can place here the upgrade script from the 'from' to the 'to' version
