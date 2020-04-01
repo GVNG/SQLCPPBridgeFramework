@@ -1,9 +1,9 @@
 //
-//  example28.h
+//  example30.h
 //  SQLCPPBridgeFramework
 //
-//  Created by Roman Makhnenko on 12/09/2019.
-//  Copyright © 2019 DataArt.
+//  Created by Roman Makhnenko on 31/03/2020.
+//  Copyright © 2020 DataArt.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -29,44 +29,53 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
-#ifndef example28_h
-#define example28_h
+#ifndef example30_h
+#define example30_h
 
 #include "sqlcppbridge.h"
+#include <unordered_map>
 
-class Case28Extra
-{
-    DECLARE_SQL_ACCESS(Case28Extra);
-public:
-    Case28Extra(long v = 0)
-        : val_(v)
-        {};
-    inline bool operator == (Case28Extra const& rv) const {return val_==rv.val_;}
-protected:
-    long val_;
-};
+class Case30Extra;
+class Case30;
+typedef std::shared_ptr<Case30Extra> Case30ExtraPtr;
+typedef std::shared_ptr<Case30> Case30Ptr;
+typedef std::vector<Case30ExtraPtr> Case30ExtraContainer;
+typedef std::unordered_map<std::string,Case30Ptr> Case30Map;
 
-class Case28
+class Case30Extra
 {
-    DECLARE_SQL_ACCESS(Case28);
+    DECLARE_SQL_ACCESS(Case30Extra);
 public:
-    Case28()
-        : db_id_(0)
-        , extra_(0)
+    Case30Extra() {}
+    Case30Extra(int i)
+        : info_(sql_bridge::to_string() << "info_" << i)
         {}
-    void fill(size_t num)
-    {
-        extra_ = num;
-        members_.clear();
-        members_.reserve(num);
-        for(size_t i=0; i!=num; ++i)
-            members_.push_back(Case28Extra((long)i+1));
-    }
-    inline bool operator == (Case28 const& rv) const {return members_==rv.members_ && db_id_==rv.db_id_ && extra_==rv.extra_;}
-    int64_t db_id_;
-    size_t extra_;
+    inline std::string const& info() const {return info_;}
+    inline bool operator != (Case30Extra const& rv) const {return info_!=rv.info_;}
 private:
-    std::vector<Case28Extra> members_;
+    std::string info_;
 };
 
-#endif /* example28_h */
+class Case30
+{
+    DECLARE_SQL_ACCESS(Case30);
+public:
+    Case30() {};
+    Case30(int num)
+    {
+        for(int i=0; i!=100; ++i)
+            extra_.push_back(std::make_shared<Case30Extra>(i+num*100));
+    }
+    inline bool operator == (Case30 const& rv) const
+    {
+        if (extra_.size()!=rv.extra_.size()) return false;
+        for(Case30ExtraContainer::size_type i=0; i!=extra_.size(); ++i)
+            if (*extra_[i]!=*rv.extra_[i]) return false;
+        return true;
+    }
+
+private:
+    Case30ExtraContainer extra_;
+};
+
+#endif /* example30_h */

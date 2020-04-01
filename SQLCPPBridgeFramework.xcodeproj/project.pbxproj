@@ -14,7 +14,6 @@
 		93718CA2227C589E00E22497 /* t_case2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84AD21DA3E8400DD82F8 /* t_case2.cpp */; };
 		93718CA3227C589E00E22497 /* t_case3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84AF21DA430D00DD82F8 /* t_case3.cpp */; };
 		93718CA4227C589E00E22497 /* t_case4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84B221DA43C800DD82F8 /* t_case4.cpp */; };
-		93718CA5227C589E00E22497 /* t_case5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84B421DA446E00DD82F8 /* t_case5.cpp */; };
 		93718CA6227C589E00E22497 /* t_case6.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84B621DA52D700DD82F8 /* t_case6.cpp */; };
 		93718CA7227C589E00E22497 /* t_case7.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84B821DA52E400DD82F8 /* t_case7.cpp */; };
 		93718CA8227C589E00E22497 /* t_case8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84BA21DA52F700DD82F8 /* t_case8.cpp */; };
@@ -40,76 +39,80 @@
 		937F849021DA367500DD82F8 /* sb_data_section_descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B0720220591999008D2FB6 /* sb_data_section_descriptor.cpp */; };
 		937F849121DA367500DD82F8 /* sb_class_descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9336AAA1206A26EA00DF00CA /* sb_class_descriptor.cpp */; };
 		937F849221DA369500DD82F8 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 93E60DC020558D16009151ED /* libsqlite3.tbd */; };
-		937F849321DA3C8B00DD82F8 /* example1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B072042059359C008D2FB6 /* example1.cpp */; };
-		937F849421DA3C8B00DD82F8 /* example2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCBB209E0B2F004166EB /* example2.cpp */; };
-		937F849521DA3C8B00DD82F8 /* example3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCC320A06CB5004166EB /* example3.cpp */; };
-		937F849621DA3C8B00DD82F8 /* example4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCC720A0939E004166EB /* example4.cpp */; };
-		937F849721DA3C8B00DD82F8 /* example5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCD320A1A60C004166EB /* example5.cpp */; };
-		937F849821DA3C8B00DD82F8 /* example6.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCDD20A3129E004166EB /* example6.cpp */; };
-		937F849921DA3C8B00DD82F8 /* example7.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCE720A32362004166EB /* example7.cpp */; };
-		937F849A21DA3C8B00DD82F8 /* example8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCF220A34DB1004166EB /* example8.cpp */; };
-		937F849B21DA3C8B00DD82F8 /* example9.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCFC20A42306004166EB /* example9.cpp */; };
-		937F849C21DA3C8B00DD82F8 /* example10.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93857EEA20BBD8C40088B787 /* example10.cpp */; };
-		937F849D21DA3C8B00DD82F8 /* example11.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93857F0020BBDB000088B787 /* example11.cpp */; };
-		937F849E21DA3C8B00DD82F8 /* example12.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93D3B1C620C4481000EEFC49 /* example12.cpp */; };
-		937F849F21DA3C8B00DD82F8 /* example13.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD85FA20CA5A79005D37A7 /* example13.cpp */; };
-		937F84A021DA3C8B00DD82F8 /* example14.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD860920CA5D49005D37A7 /* example14.cpp */; };
-		937F84A121DA3C8B00DD82F8 /* example15.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD861920CA85D2005D37A7 /* example15.cpp */; };
-		937F84A221DA3C8B00DD82F8 /* example16.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD861B20CA8713005D37A7 /* example16.cpp */; };
-		937F84A321DA3C8B00DD82F8 /* example17.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD862D20CA9B9B005D37A7 /* example17.cpp */; };
-		937F84A421DA3C8B00DD82F8 /* example18.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93F4421620DE260800CC0B83 /* example18.cpp */; };
-		937F84A521DA3C8B00DD82F8 /* example19.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93F4425020E4C33800CC0B83 /* example19.cpp */; };
-		937F84A621DA3C8B00DD82F8 /* example20.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93F4427C20EF919800CC0B83 /* example20.cpp */; };
-		937F84A721DA3C8B00DD82F8 /* example21.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939E0AE520F7651900106D46 /* example21.cpp */; };
-		937F84A821DA3C8B00DD82F8 /* example22.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931E1F0221455043009F9953 /* example22.cpp */; };
-		937F84A921DA3C8B00DD82F8 /* example23.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931D3CCE2170E3AC00BCD515 /* example23.cpp */; };
-		937F84AA21DA3C8B00DD82F8 /* example24.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931D3CE72175CAFA00BCD515 /* example24.cpp */; };
 		937F854721E615BB00DD82F8 /* t_traits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F854621E615BB00DD82F8 /* t_traits.cpp */; };
-		939AC05A232A6ECE00575859 /* example28.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939AC058232A6ECE00575859 /* example28.cpp */; };
 		939AC077232A7C8700575859 /* t_case28.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939AC076232A7C8700575859 /* t_case28.cpp */; };
+		939B69C72433858E0013068E /* example1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B072042059359C008D2FB6 /* example1.cpp */; };
+		939B69C82433858E0013068E /* example2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCBB209E0B2F004166EB /* example2.cpp */; };
+		939B69C92433858E0013068E /* example3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCC320A06CB5004166EB /* example3.cpp */; };
+		939B69CA2433858E0013068E /* example4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCC720A0939E004166EB /* example4.cpp */; };
+		939B69CC2433858E0013068E /* example6.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCDD20A3129E004166EB /* example6.cpp */; };
+		939B69CD2433858E0013068E /* example7.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCE720A32362004166EB /* example7.cpp */; };
+		939B69CE2433858E0013068E /* example8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCF220A34DB1004166EB /* example8.cpp */; };
+		939B69CF2433858E0013068E /* example9.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCFC20A42306004166EB /* example9.cpp */; };
+		939B69D02433858E0013068E /* example10.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93857EEA20BBD8C40088B787 /* example10.cpp */; };
+		939B69D12433858E0013068E /* example11.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93857F0020BBDB000088B787 /* example11.cpp */; };
+		939B69D22433858E0013068E /* example12.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93D3B1C620C4481000EEFC49 /* example12.cpp */; };
+		939B69D32433858E0013068E /* example13.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD85FA20CA5A79005D37A7 /* example13.cpp */; };
+		939B69D42433858E0013068E /* example14.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD860920CA5D49005D37A7 /* example14.cpp */; };
+		939B69D52433858E0013068E /* example15.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD861920CA85D2005D37A7 /* example15.cpp */; };
+		939B69D62433858E0013068E /* example16.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD861B20CA8713005D37A7 /* example16.cpp */; };
+		939B69D72433858E0013068E /* example17.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD862D20CA9B9B005D37A7 /* example17.cpp */; };
+		939B69D82433858E0013068E /* example18.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93F4421620DE260800CC0B83 /* example18.cpp */; };
+		939B69D92433858E0013068E /* example19.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93F4425020E4C33800CC0B83 /* example19.cpp */; };
+		939B69DA2433858E0013068E /* example20.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93F4427C20EF919800CC0B83 /* example20.cpp */; };
+		939B69DB2433858E0013068E /* example21.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939E0AE520F7651900106D46 /* example21.cpp */; };
+		939B69DC2433858E0013068E /* example22.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931E1F0221455043009F9953 /* example22.cpp */; };
+		939B69DD2433858E0013068E /* example23.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931D3CCE2170E3AC00BCD515 /* example23.cpp */; };
+		939B69DE2433858E0013068E /* example24.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931D3CE72175CAFA00BCD515 /* example24.cpp */; };
+		939B69DF2433858E0013068E /* example25.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E1DD1A22DBC01B00FE4948 /* example25.cpp */; };
+		939B69E02433858E0013068E /* example26.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EA944D22DDB9F90034663D /* example26.cpp */; };
+		939B69E12433858E0013068E /* example27.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93A54A3122E1E5DC00AB4C09 /* example27.cpp */; };
+		939B69E22433858E0013068E /* example28.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939AC058232A6ECE00575859 /* example28.cpp */; };
+		939B69E32433858E0013068E /* example29.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AC264123C5C2CD00752FA5 /* example29.cpp */; };
+		939B69E424339BEF0013068E /* example30.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939B69C4243383E10013068E /* example30.cpp */; };
+		939B69E52434724F0013068E /* t_case5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84B421DA446E00DD82F8 /* t_case5.cpp */; };
+		939B69E62434725B0013068E /* example5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCD320A1A60C004166EB /* example5.cpp */; };
+		939B69E72434AB420013068E /* example1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B072042059359C008D2FB6 /* example1.cpp */; };
+		939B69E82434AB420013068E /* example2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCBB209E0B2F004166EB /* example2.cpp */; };
+		939B69E92434AB420013068E /* example3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCC320A06CB5004166EB /* example3.cpp */; };
+		939B69EA2434AB420013068E /* example4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCC720A0939E004166EB /* example4.cpp */; };
+		939B69EB2434AB420013068E /* example5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCD320A1A60C004166EB /* example5.cpp */; };
+		939B69EC2434AB420013068E /* example6.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCDD20A3129E004166EB /* example6.cpp */; };
+		939B69ED2434AB420013068E /* example7.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCE720A32362004166EB /* example7.cpp */; };
+		939B69EE2434AB420013068E /* example8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCF220A34DB1004166EB /* example8.cpp */; };
+		939B69EF2434AB420013068E /* example9.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCFC20A42306004166EB /* example9.cpp */; };
+		939B69F02434AB420013068E /* example10.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93857EEA20BBD8C40088B787 /* example10.cpp */; };
+		939B69F12434AB420013068E /* example11.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93857F0020BBDB000088B787 /* example11.cpp */; };
+		939B69F22434AB420013068E /* example12.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93D3B1C620C4481000EEFC49 /* example12.cpp */; };
+		939B69F32434AB420013068E /* example13.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD85FA20CA5A79005D37A7 /* example13.cpp */; };
+		939B69F42434AB420013068E /* example14.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD860920CA5D49005D37A7 /* example14.cpp */; };
+		939B69F52434AB420013068E /* example15.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD861920CA85D2005D37A7 /* example15.cpp */; };
+		939B69F62434AB420013068E /* example16.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD861B20CA8713005D37A7 /* example16.cpp */; };
+		939B69F72434AB420013068E /* example17.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD862D20CA9B9B005D37A7 /* example17.cpp */; };
+		939B69F82434AB420013068E /* example18.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93F4421620DE260800CC0B83 /* example18.cpp */; };
+		939B69F92434AB420013068E /* example19.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93F4425020E4C33800CC0B83 /* example19.cpp */; };
+		939B69FA2434AB420013068E /* example20.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93F4427C20EF919800CC0B83 /* example20.cpp */; };
+		939B69FB2434AB420013068E /* example21.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939E0AE520F7651900106D46 /* example21.cpp */; };
+		939B69FC2434AB420013068E /* example22.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931E1F0221455043009F9953 /* example22.cpp */; };
+		939B69FD2434AB420013068E /* example23.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931D3CCE2170E3AC00BCD515 /* example23.cpp */; };
+		939B69FE2434AB420013068E /* example24.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931D3CE72175CAFA00BCD515 /* example24.cpp */; };
+		939B69FF2434AB420013068E /* example25.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E1DD1A22DBC01B00FE4948 /* example25.cpp */; };
+		939B6A002434AB420013068E /* example26.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EA944D22DDB9F90034663D /* example26.cpp */; };
+		939B6A012434AB420013068E /* example27.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93A54A3122E1E5DC00AB4C09 /* example27.cpp */; };
+		939B6A022434AB420013068E /* example28.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939AC058232A6ECE00575859 /* example28.cpp */; };
+		939B6A032434AB420013068E /* example29.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AC264123C5C2CD00752FA5 /* example29.cpp */; };
+		939B6A042434AB580013068E /* example30.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939B69C4243383E10013068E /* example30.cpp */; };
+		939B6A062434AB880013068E /* t_case30.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939B6A052434AB880013068E /* t_case30.cpp */; };
 		93A54A2F22DF444F00AB4C09 /* t_case26.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93A54A2E22DF444F00AB4C09 /* t_case26.cpp */; };
-		93A54A3322E1E5DC00AB4C09 /* example27.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93A54A3122E1E5DC00AB4C09 /* example27.cpp */; };
 		93AB7F6022CB93AB00D5658C /* t_misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AB7F5F22CB93AB00D5658C /* t_misc.cpp */; };
-		93AC264323C5C2CD00752FA5 /* example29.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AC264123C5C2CD00752FA5 /* example29.cpp */; };
-		93AC266023C5E53F00752FA5 /* example1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B072042059359C008D2FB6 /* example1.cpp */; };
-		93AC266123C5E6B700752FA5 /* example2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCBB209E0B2F004166EB /* example2.cpp */; };
-		93AC266223C5E6B700752FA5 /* example3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCC320A06CB5004166EB /* example3.cpp */; };
-		93AC266323C5E6B700752FA5 /* example4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCC720A0939E004166EB /* example4.cpp */; };
-		93AC266423C5E6B700752FA5 /* example5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCD320A1A60C004166EB /* example5.cpp */; };
-		93AC266523C5E6B700752FA5 /* example6.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCDD20A3129E004166EB /* example6.cpp */; };
-		93AC266623C5E6B700752FA5 /* example7.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCE720A32362004166EB /* example7.cpp */; };
-		93AC266723C5E6B700752FA5 /* example8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCF220A34DB1004166EB /* example8.cpp */; };
-		93AC266823C5E6B700752FA5 /* example9.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCFC20A42306004166EB /* example9.cpp */; };
-		93AC266923C5E6B700752FA5 /* example10.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93857EEA20BBD8C40088B787 /* example10.cpp */; };
-		93AC266A23C5E6B700752FA5 /* example11.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93857F0020BBDB000088B787 /* example11.cpp */; };
-		93AC266B23C5E6B700752FA5 /* example12.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93D3B1C620C4481000EEFC49 /* example12.cpp */; };
-		93AC266C23C5E6B700752FA5 /* example13.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD85FA20CA5A79005D37A7 /* example13.cpp */; };
-		93AC266D23C5E6B700752FA5 /* example14.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD860920CA5D49005D37A7 /* example14.cpp */; };
-		93AC266E23C5E6B700752FA5 /* example15.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD861920CA85D2005D37A7 /* example15.cpp */; };
-		93AC266F23C5E6B700752FA5 /* example16.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD861B20CA8713005D37A7 /* example16.cpp */; };
-		93AC267023C5E6B700752FA5 /* example17.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CD862D20CA9B9B005D37A7 /* example17.cpp */; };
-		93AC267123C5E6B700752FA5 /* example18.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93F4421620DE260800CC0B83 /* example18.cpp */; };
-		93AC267223C5E6B700752FA5 /* example19.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93F4425020E4C33800CC0B83 /* example19.cpp */; };
-		93AC267323C5E6B700752FA5 /* example20.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93F4427C20EF919800CC0B83 /* example20.cpp */; };
-		93AC267423C5E6B700752FA5 /* example21.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939E0AE520F7651900106D46 /* example21.cpp */; };
-		93AC267523C5E6B700752FA5 /* example22.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931E1F0221455043009F9953 /* example22.cpp */; };
-		93AC267623C5E6B700752FA5 /* example23.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931D3CCE2170E3AC00BCD515 /* example23.cpp */; };
-		93AC267723C5E6B700752FA5 /* example24.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931D3CE72175CAFA00BCD515 /* example24.cpp */; };
-		93AC267823C5E6B700752FA5 /* example25.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E1DD1A22DBC01B00FE4948 /* example25.cpp */; };
-		93AC267923C5E6B700752FA5 /* example26.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EA944D22DDB9F90034663D /* example26.cpp */; };
-		93AC267A23C5E6B700752FA5 /* example27.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93A54A3122E1E5DC00AB4C09 /* example27.cpp */; };
-		93AC267B23C5E6B700752FA5 /* example28.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939AC058232A6ECE00575859 /* example28.cpp */; };
-		93AC267C23C5E6B700752FA5 /* example29.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AC264123C5C2CD00752FA5 /* example29.cpp */; };
 		93AC267E23C5E79200752FA5 /* t_case29.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AC267D23C5E79200752FA5 /* t_case29.cpp */; };
 		93AC268023C72C0A00752FA5 /* t_case27.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AC267F23C72C0A00752FA5 /* t_case27.cpp */; };
 		93B071FB20582B0E008D2FB6 /* sb_sqlite_adapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B071FA20582B0E008D2FB6 /* sb_sqlite_adapter.cpp */; };
 		93B0720320591999008D2FB6 /* sb_data_section_descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B0720220591999008D2FB6 /* sb_data_section_descriptor.cpp */; };
 		93BEDCF020A34894004166EB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E60D7B20558090009151ED /* main.cpp */; };
-		93E1DD1C22DBC01B00FE4948 /* example25.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E1DD1A22DBC01B00FE4948 /* example25.cpp */; };
 		93E60DBB205589C4009151ED /* sb_tasks_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E60DB9205589C4009151ED /* sb_tasks_queue.cpp */; };
 		93E60DC120558D16009151ED /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 93E60DC020558D16009151ED /* libsqlite3.tbd */; };
 		93EA944B22DDB48D0034663D /* t_case25.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EA944A22DDB48D0034663D /* t_case25.cpp */; };
-		93EA944F22DDB9F90034663D /* example26.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EA944D22DDB9F90034663D /* example26.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -188,6 +191,9 @@
 		939AC057232A6EB500575859 /* example28.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example28.h; sourceTree = "<group>"; };
 		939AC058232A6ECE00575859 /* example28.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example28.cpp; sourceTree = "<group>"; };
 		939AC076232A7C8700575859 /* t_case28.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case28.cpp; sourceTree = "<group>"; };
+		939B6997243370980013068E /* example30.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example30.h; sourceTree = "<group>"; };
+		939B69C4243383E10013068E /* example30.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example30.cpp; sourceTree = "<group>"; };
+		939B6A052434AB880013068E /* t_case30.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case30.cpp; sourceTree = "<group>"; };
 		939E0AE420F7650200106D46 /* example21.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example21.h; sourceTree = "<group>"; };
 		939E0AE520F7651900106D46 /* example21.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example21.cpp; sourceTree = "<group>"; };
 		93A1349020D149E90041EE2E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; usesTabs = 1; };
@@ -340,6 +346,7 @@
 				93AC267F23C72C0A00752FA5 /* t_case27.cpp */,
 				939AC076232A7C8700575859 /* t_case28.cpp */,
 				93AC267D23C5E79200752FA5 /* t_case29.cpp */,
+				939B6A052434AB880013068E /* t_case30.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -406,6 +413,7 @@
 				93A54A3022E1939000AB4C09 /* example27.h */,
 				939AC057232A6EB500575859 /* example28.h */,
 				93AC264023C5BE6F00752FA5 /* example29.h */,
+				939B6997243370980013068E /* example30.h */,
 				93B072042059359C008D2FB6 /* example1.cpp */,
 				93BEDCBB209E0B2F004166EB /* example2.cpp */,
 				93BEDCC320A06CB5004166EB /* example3.cpp */,
@@ -435,6 +443,7 @@
 				93A54A3122E1E5DC00AB4C09 /* example27.cpp */,
 				939AC058232A6ECE00575859 /* example28.cpp */,
 				93AC264123C5C2CD00752FA5 /* example29.cpp */,
+				939B69C4243383E10013068E /* example30.cpp */,
 			);
 			path = Cases;
 			sourceTree = "<group>";
@@ -583,67 +592,69 @@
 			files = (
 				93718CB0227C589E00E22497 /* t_case16.cpp in Sources */,
 				939AC077232A7C8700575859 /* t_case28.cpp in Sources */,
+				939B69E62434725B0013068E /* example5.cpp in Sources */,
 				93718CB7227C589E00E22497 /* t_case23.cpp in Sources */,
-				937F84AA21DA3C8B00DD82F8 /* example24.cpp in Sources */,
+				939B69DF2433858E0013068E /* example25.cpp in Sources */,
+				939B69DD2433858E0013068E /* example23.cpp in Sources */,
 				93718CB3227C589E00E22497 /* t_case19.cpp in Sources */,
 				937F848521DA2B4800DD82F8 /* main.cpp in Sources */,
-				937F84A221DA3C8B00DD82F8 /* example16.cpp in Sources */,
 				93AC267E23C5E79200752FA5 /* t_case29.cpp in Sources */,
 				93718CB1227C589E00E22497 /* t_case17.cpp in Sources */,
+				939B69CE2433858E0013068E /* example8.cpp in Sources */,
 				93718CB8227C589E00E22497 /* t_case24.cpp in Sources */,
+				939B69C72433858E0013068E /* example1.cpp in Sources */,
+				939B69C92433858E0013068E /* example3.cpp in Sources */,
+				939B69D42433858E0013068E /* example14.cpp in Sources */,
+				939B69E12433858E0013068E /* example27.cpp in Sources */,
 				93718CAA227C589E00E22497 /* t_case10.cpp in Sources */,
-				93E1DD1C22DBC01B00FE4948 /* example25.cpp in Sources */,
-				937F849921DA3C8B00DD82F8 /* example7.cpp in Sources */,
-				937F84A421DA3C8B00DD82F8 /* example18.cpp in Sources */,
-				937F849621DA3C8B00DD82F8 /* example4.cpp in Sources */,
-				937F849E21DA3C8B00DD82F8 /* example12.cpp in Sources */,
-				937F84A821DA3C8B00DD82F8 /* example22.cpp in Sources */,
-				93A54A3322E1E5DC00AB4C09 /* example27.cpp in Sources */,
-				93718CA5227C589E00E22497 /* t_case5.cpp in Sources */,
+				939B69CF2433858E0013068E /* example9.cpp in Sources */,
+				939B69D62433858E0013068E /* example16.cpp in Sources */,
+				939B6A042434AB580013068E /* example30.cpp in Sources */,
+				939B69E02433858E0013068E /* example26.cpp in Sources */,
+				939B69C82433858E0013068E /* example2.cpp in Sources */,
 				93718CAF227C589E00E22497 /* t_case15.cpp in Sources */,
-				939AC05A232A6ECE00575859 /* example28.cpp in Sources */,
 				93EA944B22DDB48D0034663D /* t_case25.cpp in Sources */,
-				93AC264323C5C2CD00752FA5 /* example29.cpp in Sources */,
-				937F849721DA3C8B00DD82F8 /* example5.cpp in Sources */,
-				937F84A921DA3C8B00DD82F8 /* example23.cpp in Sources */,
 				93AC268023C72C0A00752FA5 /* t_case27.cpp in Sources */,
 				937F848F21DA367500DD82F8 /* sb_tasks_queue.cpp in Sources */,
-				937F849A21DA3C8B00DD82F8 /* example8.cpp in Sources */,
-				93EA944F22DDB9F90034663D /* example26.cpp in Sources */,
 				937F849021DA367500DD82F8 /* sb_data_section_descriptor.cpp in Sources */,
+				939B69CC2433858E0013068E /* example6.cpp in Sources */,
 				93718CA0227C589E00E22497 /* t_kvdb.cpp in Sources */,
-				937F849421DA3C8B00DD82F8 /* example2.cpp in Sources */,
-				937F849D21DA3C8B00DD82F8 /* example11.cpp in Sources */,
 				937F849121DA367500DD82F8 /* sb_class_descriptor.cpp in Sources */,
-				937F84A121DA3C8B00DD82F8 /* example15.cpp in Sources */,
+				939B69E22433858E0013068E /* example28.cpp in Sources */,
+				939B6A062434AB880013068E /* t_case30.cpp in Sources */,
+				939B69E52434724F0013068E /* t_case5.cpp in Sources */,
 				93AB7F6022CB93AB00D5658C /* t_misc.cpp in Sources */,
-				937F84A521DA3C8B00DD82F8 /* example19.cpp in Sources */,
 				93718CA9227C589E00E22497 /* t_case9.cpp in Sources */,
-				937F84A621DA3C8B00DD82F8 /* example20.cpp in Sources */,
 				93718CA4227C589E00E22497 /* t_case4.cpp in Sources */,
-				937F84A321DA3C8B00DD82F8 /* example17.cpp in Sources */,
+				939B69D32433858E0013068E /* example13.cpp in Sources */,
+				939B69DA2433858E0013068E /* example20.cpp in Sources */,
+				939B69D02433858E0013068E /* example10.cpp in Sources */,
 				93718CA8227C589E00E22497 /* t_case8.cpp in Sources */,
-				937F84A721DA3C8B00DD82F8 /* example21.cpp in Sources */,
+				939B69D52433858E0013068E /* example15.cpp in Sources */,
+				939B69CD2433858E0013068E /* example7.cpp in Sources */,
 				93718CB4227C589E00E22497 /* t_case20.cpp in Sources */,
-				937F849321DA3C8B00DD82F8 /* example1.cpp in Sources */,
 				93718CAC227C589E00E22497 /* t_case12.cpp in Sources */,
 				93718CAB227C589E00E22497 /* t_case11.cpp in Sources */,
-				937F849C21DA3C8B00DD82F8 /* example10.cpp in Sources */,
-				937F849B21DA3C8B00DD82F8 /* example9.cpp in Sources */,
 				93718CAD227C589E00E22497 /* t_case13.cpp in Sources */,
-				937F84A021DA3C8B00DD82F8 /* example14.cpp in Sources */,
 				937F848E21DA367500DD82F8 /* sb_sqlite_adapter.cpp in Sources */,
+				939B69D72433858E0013068E /* example17.cpp in Sources */,
+				939B69DE2433858E0013068E /* example24.cpp in Sources */,
 				937F854721E615BB00DD82F8 /* t_traits.cpp in Sources */,
 				93718CA1227C589E00E22497 /* t_case1.cpp in Sources */,
 				93718CAE227C589E00E22497 /* t_case14.cpp in Sources */,
-				937F849521DA3C8B00DD82F8 /* example3.cpp in Sources */,
 				93718CB2227C589E00E22497 /* t_case18.cpp in Sources */,
+				939B69D22433858E0013068E /* example12.cpp in Sources */,
 				93718CA6227C589E00E22497 /* t_case6.cpp in Sources */,
+				939B69CA2433858E0013068E /* example4.cpp in Sources */,
+				939B69D92433858E0013068E /* example19.cpp in Sources */,
 				93A54A2F22DF444F00AB4C09 /* t_case26.cpp in Sources */,
+				939B69E32433858E0013068E /* example29.cpp in Sources */,
 				93718CA3227C589E00E22497 /* t_case3.cpp in Sources */,
+				939B69D12433858E0013068E /* example11.cpp in Sources */,
+				939B69DB2433858E0013068E /* example21.cpp in Sources */,
+				939B69DC2433858E0013068E /* example22.cpp in Sources */,
+				939B69D82433858E0013068E /* example18.cpp in Sources */,
 				93718CA7227C589E00E22497 /* t_case7.cpp in Sources */,
-				937F849821DA3C8B00DD82F8 /* example6.cpp in Sources */,
-				937F849F21DA3C8B00DD82F8 /* example13.cpp in Sources */,
 				93718CA2227C589E00E22497 /* t_case2.cpp in Sources */,
 				93718CB6227C589E00E22497 /* t_case22.cpp in Sources */,
 				93718CB5227C589E00E22497 /* t_case21.cpp in Sources */,
@@ -654,40 +665,41 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				939B69FE2434AB420013068E /* example24.cpp in Sources */,
 				93E60DBB205589C4009151ED /* sb_tasks_queue.cpp in Sources */,
-				93AC266123C5E6B700752FA5 /* example2.cpp in Sources */,
-				93AC266723C5E6B700752FA5 /* example8.cpp in Sources */,
-				93AC267C23C5E6B700752FA5 /* example29.cpp in Sources */,
-				93AC267823C5E6B700752FA5 /* example25.cpp in Sources */,
-				93AC266923C5E6B700752FA5 /* example10.cpp in Sources */,
-				93AC266D23C5E6B700752FA5 /* example14.cpp in Sources */,
+				939B6A022434AB420013068E /* example28.cpp in Sources */,
+				939B69F62434AB420013068E /* example16.cpp in Sources */,
+				939B6A012434AB420013068E /* example27.cpp in Sources */,
+				939B69ED2434AB420013068E /* example7.cpp in Sources */,
+				939B69F82434AB420013068E /* example18.cpp in Sources */,
+				939B69FF2434AB420013068E /* example25.cpp in Sources */,
+				939B69EA2434AB420013068E /* example4.cpp in Sources */,
+				939B69F22434AB420013068E /* example12.cpp in Sources */,
+				939B69FC2434AB420013068E /* example22.cpp in Sources */,
+				939B69EB2434AB420013068E /* example5.cpp in Sources */,
+				939B69FD2434AB420013068E /* example23.cpp in Sources */,
 				93B071FB20582B0E008D2FB6 /* sb_sqlite_adapter.cpp in Sources */,
-				93AC267123C5E6B700752FA5 /* example18.cpp in Sources */,
-				93AC267023C5E6B700752FA5 /* example17.cpp in Sources */,
-				93AC267323C5E6B700752FA5 /* example20.cpp in Sources */,
-				93AC266023C5E53F00752FA5 /* example1.cpp in Sources */,
-				93AC266C23C5E6B700752FA5 /* example13.cpp in Sources */,
-				93AC266E23C5E6B700752FA5 /* example15.cpp in Sources */,
-				93AC267523C5E6B700752FA5 /* example22.cpp in Sources */,
-				93AC266223C5E6B700752FA5 /* example3.cpp in Sources */,
-				93AC267223C5E6B700752FA5 /* example19.cpp in Sources */,
+				939B69EE2434AB420013068E /* example8.cpp in Sources */,
 				93BEDCF020A34894004166EB /* main.cpp in Sources */,
-				93AC266423C5E6B700752FA5 /* example5.cpp in Sources */,
-				93AC266B23C5E6B700752FA5 /* example12.cpp in Sources */,
-				93AC267A23C5E6B700752FA5 /* example27.cpp in Sources */,
-				93AC266823C5E6B700752FA5 /* example9.cpp in Sources */,
-				93AC267623C5E6B700752FA5 /* example23.cpp in Sources */,
-				93AC267723C5E6B700752FA5 /* example24.cpp in Sources */,
+				939B69E82434AB420013068E /* example2.cpp in Sources */,
+				939B69F12434AB420013068E /* example11.cpp in Sources */,
+				939B69E424339BEF0013068E /* example30.cpp in Sources */,
 				93B0720320591999008D2FB6 /* sb_data_section_descriptor.cpp in Sources */,
-				93AC266623C5E6B700752FA5 /* example7.cpp in Sources */,
-				93AC266A23C5E6B700752FA5 /* example11.cpp in Sources */,
-				93AC266523C5E6B700752FA5 /* example6.cpp in Sources */,
-				93AC266F23C5E6B700752FA5 /* example16.cpp in Sources */,
+				939B6A032434AB420013068E /* example29.cpp in Sources */,
+				939B6A002434AB420013068E /* example26.cpp in Sources */,
+				939B69F52434AB420013068E /* example15.cpp in Sources */,
+				939B69F92434AB420013068E /* example19.cpp in Sources */,
+				939B69FA2434AB420013068E /* example20.cpp in Sources */,
+				939B69F72434AB420013068E /* example17.cpp in Sources */,
+				939B69FB2434AB420013068E /* example21.cpp in Sources */,
+				939B69E72434AB420013068E /* example1.cpp in Sources */,
+				939B69F02434AB420013068E /* example10.cpp in Sources */,
+				939B69EF2434AB420013068E /* example9.cpp in Sources */,
+				939B69F42434AB420013068E /* example14.cpp in Sources */,
 				9336AAA2206A26EA00DF00CA /* sb_class_descriptor.cpp in Sources */,
-				93AC266323C5E6B700752FA5 /* example4.cpp in Sources */,
-				93AC267B23C5E6B700752FA5 /* example28.cpp in Sources */,
-				93AC267423C5E6B700752FA5 /* example21.cpp in Sources */,
-				93AC267923C5E6B700752FA5 /* example26.cpp in Sources */,
+				939B69E92434AB420013068E /* example3.cpp in Sources */,
+				939B69EC2434AB420013068E /* example6.cpp in Sources */,
+				939B69F32434AB420013068E /* example13.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
