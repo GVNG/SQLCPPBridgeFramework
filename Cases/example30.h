@@ -49,6 +49,7 @@ public:
     Case30Extra(int i)
         : info_(sql_bridge::to_string() << "info_" << i)
         {}
+    inline std::string const& info() const {return info_;}
 private:
     std::string info_;
 };

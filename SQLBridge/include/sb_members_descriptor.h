@@ -160,9 +160,18 @@ namespace sql_bridge
             ncnt->bind_comp(&el, extkey);
         }
 
-        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value &&
-                                                              !is_trivial_container<TFn>::value &&
-                                                              !is_container_of_containers<TFn>::value>::type _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value && !is_trivial_container<TFn>::value>::type _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey) {_bind_comp_cont<TFn>(el,dst,extkey);}
+
+        template<typename TFn> inline typename std::enable_if<!is_container_of_containers<TFn>::value && is_pointer<typename TFn::value_type>::value>::type _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        {
+            typedef typename TFn::value_type type;
+            size_t elemt = typeid(type).hash_code();
+            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name()));
+            for(auto const& ve : el)
+                ncnt->bind_comp(&(*ve), extkey);
+        }
+        
+        template<typename TFn> inline typename std::enable_if<!is_container_of_containers<TFn>::value && !is_pointer<typename TFn::value_type>::value>::type _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             typedef typename TFn::value_type type;
             size_t elemt = typeid(type).hash_code();
@@ -171,17 +180,23 @@ namespace sql_bridge
                 ncnt->bind_comp(&ve, extkey);
         }
 
-        template<typename TFn> inline typename std::enable_if<is_container_of_containers<TFn>::value &&
-                                                              !is_trivial_container<TFn>::value>::type _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        template<typename TFn> inline typename std::enable_if<is_container_of_containers<TFn>::value>::type _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
             data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name()));
             ncnt->bind_comp(&el, extkey);
         }
         
-        template<typename TFn> inline typename std::enable_if<is_map<TFn>::value &&
-                                                              !is_trivial_map<TFn>::value &&
-                                                              !is_container_of_containers<TFn>::value>::type _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        template<typename TFn> inline typename std::enable_if<is_map<TFn>::value && !is_trivial_map<TFn>::value>::type _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey) {_bind_comp_map<TFn>(el,dst,extkey);}
+
+        template<typename TFn> inline typename std::enable_if<is_container_of_containers<TFn>::value>::type _bind_comp_map(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        {
+            size_t elemt = typeid(TFn).hash_code();
+            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name()));
+            ncnt->bind_comp(&el, extkey);
+        }
+
+        template<typename TFn> inline typename std::enable_if<!is_container_of_containers<TFn>::value && !is_pointer<typename TFn::mapped_type>::value>::type _bind_comp_map(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             typedef typename TFn::key_type k_type;
             typedef typename TFn::mapped_type m_type;

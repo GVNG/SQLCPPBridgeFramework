@@ -255,18 +255,21 @@ namespace sql_bridge
     {
     };
     
-    template<bool,typename T> struct is_smart_pointer : std::integral_constant<bool, false> {};
+    template<bool,typename T> struct is_smart_pointer : std::integral_constant<bool, false> {typedef T type;};
     template<typename T> struct is_smart_pointer<true,T>
         : std::integral_constant<bool,  std::is_same<T,std::shared_ptr<typename T::element_type> >::value ||
-                                        std::is_same<T,std::unique_ptr<typename T::element_type> >::value ||
-                                        std::is_same<T,std::weak_ptr<typename T::element_type> >::value>
+                                        std::is_same<T,std::unique_ptr<typename T::element_type> >::value>
     {
+        typedef typename T::element_type type;
     };
     
     template<typename T> struct is_pointer
         : std::integral_constant<bool,  std::is_pointer<T>::value ||
                                         is_smart_pointer<has_element_type<T>::value,T>::value>
     {
+        typedef typename std::remove_pointer<T>::type T1;
+        typedef typename std::conditional<is_smart_pointer<has_element_type<T>::value,T>::value, typename is_smart_pointer<has_element_type<T>::value,T>::type, T1>::type T2;
+        typedef T2 type;
     };
     
     template<typename T> struct is_sql_acceptable

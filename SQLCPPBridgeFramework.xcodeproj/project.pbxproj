@@ -14,7 +14,6 @@
 		93718CA2227C589E00E22497 /* t_case2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84AD21DA3E8400DD82F8 /* t_case2.cpp */; };
 		93718CA3227C589E00E22497 /* t_case3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84AF21DA430D00DD82F8 /* t_case3.cpp */; };
 		93718CA4227C589E00E22497 /* t_case4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84B221DA43C800DD82F8 /* t_case4.cpp */; };
-		93718CA5227C589E00E22497 /* t_case5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84B421DA446E00DD82F8 /* t_case5.cpp */; };
 		93718CA6227C589E00E22497 /* t_case6.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84B621DA52D700DD82F8 /* t_case6.cpp */; };
 		93718CA7227C589E00E22497 /* t_case7.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84B821DA52E400DD82F8 /* t_case7.cpp */; };
 		93718CA8227C589E00E22497 /* t_case8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84BA21DA52F700DD82F8 /* t_case8.cpp */; };
@@ -46,7 +45,6 @@
 		939B69C82433858E0013068E /* example2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCBB209E0B2F004166EB /* example2.cpp */; };
 		939B69C92433858E0013068E /* example3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCC320A06CB5004166EB /* example3.cpp */; };
 		939B69CA2433858E0013068E /* example4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCC720A0939E004166EB /* example4.cpp */; };
-		939B69CB2433858E0013068E /* example5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCD320A1A60C004166EB /* example5.cpp */; };
 		939B69CC2433858E0013068E /* example6.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCDD20A3129E004166EB /* example6.cpp */; };
 		939B69CD2433858E0013068E /* example7.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCE720A32362004166EB /* example7.cpp */; };
 		939B69CE2433858E0013068E /* example8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCF220A34DB1004166EB /* example8.cpp */; };
@@ -71,6 +69,9 @@
 		939B69E12433858E0013068E /* example27.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93A54A3122E1E5DC00AB4C09 /* example27.cpp */; };
 		939B69E22433858E0013068E /* example28.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939AC058232A6ECE00575859 /* example28.cpp */; };
 		939B69E32433858E0013068E /* example29.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AC264123C5C2CD00752FA5 /* example29.cpp */; };
+		939B69E424339BEF0013068E /* example30.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939B69C4243383E10013068E /* example30.cpp */; };
+		939B69E52434724F0013068E /* t_case5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937F84B421DA446E00DD82F8 /* t_case5.cpp */; };
+		939B69E62434725B0013068E /* example5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCD320A1A60C004166EB /* example5.cpp */; };
 		93A54A2F22DF444F00AB4C09 /* t_case26.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93A54A2E22DF444F00AB4C09 /* t_case26.cpp */; };
 		93AB7F6022CB93AB00D5658C /* t_misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AB7F5F22CB93AB00D5658C /* t_misc.cpp */; };
 		93AC267E23C5E79200752FA5 /* t_case29.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AC267D23C5E79200752FA5 /* t_case29.cpp */; };
@@ -558,6 +559,7 @@
 			files = (
 				93718CB0227C589E00E22497 /* t_case16.cpp in Sources */,
 				939AC077232A7C8700575859 /* t_case28.cpp in Sources */,
+				939B69E62434725B0013068E /* example5.cpp in Sources */,
 				93718CB7227C589E00E22497 /* t_case23.cpp in Sources */,
 				939B69DF2433858E0013068E /* example25.cpp in Sources */,
 				939B69DD2433858E0013068E /* example23.cpp in Sources */,
@@ -572,7 +574,6 @@
 				939B69D42433858E0013068E /* example14.cpp in Sources */,
 				939B69E12433858E0013068E /* example27.cpp in Sources */,
 				93718CAA227C589E00E22497 /* t_case10.cpp in Sources */,
-				93718CA5227C589E00E22497 /* t_case5.cpp in Sources */,
 				939B69CF2433858E0013068E /* example9.cpp in Sources */,
 				939B69D62433858E0013068E /* example16.cpp in Sources */,
 				939B69E02433858E0013068E /* example26.cpp in Sources */,
@@ -586,6 +587,7 @@
 				93718CA0227C589E00E22497 /* t_kvdb.cpp in Sources */,
 				937F849121DA367500DD82F8 /* sb_class_descriptor.cpp in Sources */,
 				939B69E22433858E0013068E /* example28.cpp in Sources */,
+				939B69E52434724F0013068E /* t_case5.cpp in Sources */,
 				93AB7F6022CB93AB00D5658C /* t_misc.cpp in Sources */,
 				93718CA9227C589E00E22497 /* t_case9.cpp in Sources */,
 				93718CA4227C589E00E22497 /* t_case4.cpp in Sources */,
@@ -609,7 +611,6 @@
 				939B69D22433858E0013068E /* example12.cpp in Sources */,
 				93718CA6227C589E00E22497 /* t_case6.cpp in Sources */,
 				939B69CA2433858E0013068E /* example4.cpp in Sources */,
-				939B69CB2433858E0013068E /* example5.cpp in Sources */,
 				939B69D92433858E0013068E /* example19.cpp in Sources */,
 				93A54A2F22DF444F00AB4C09 /* t_case26.cpp in Sources */,
 				939B69E32433858E0013068E /* example29.cpp in Sources */,
@@ -632,6 +633,7 @@
 				93E60DBB205589C4009151ED /* sb_tasks_queue.cpp in Sources */,
 				93B071FB20582B0E008D2FB6 /* sb_sqlite_adapter.cpp in Sources */,
 				93BEDCF020A34894004166EB /* main.cpp in Sources */,
+				939B69E424339BEF0013068E /* example30.cpp in Sources */,
 				93B0720320591999008D2FB6 /* sb_data_section_descriptor.cpp in Sources */,
 				9336AAA2206A26EA00DF00CA /* sb_class_descriptor.cpp in Sources */,
 			);

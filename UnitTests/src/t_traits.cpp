@@ -86,11 +86,13 @@ TEST(Core,TraitsPointers)
     typedef std::shared_ptr<int> _t_shared_int_pointer;
     typedef std::unique_ptr<int> _t_unique_int_pointer;
     typedef std::weak_ptr<int> _t_weak_int_pointer;
+    typedef std::vector<int> _t_vector_int;
 
     ASSERT_EQ(sql_bridge::is_pointer<_t_simple_int_pointer>::value, true);
     ASSERT_EQ(sql_bridge::is_pointer<_t_simple_int_const_pointer>::value, true);
     ASSERT_EQ(sql_bridge::is_pointer<int>::value, false);
     ASSERT_EQ(sql_bridge::is_pointer<_t_shared_int_pointer>::value, true);
     ASSERT_EQ(sql_bridge::is_pointer<_t_unique_int_pointer>::value, true);
-    ASSERT_EQ(sql_bridge::is_pointer<_t_weak_int_pointer>::value, true);
+    ASSERT_EQ(sql_bridge::is_pointer<_t_weak_int_pointer>::value, false); // doesn't support the operator *
+    ASSERT_EQ(sql_bridge::is_pointer<_t_vector_int>::value, false);
 }
