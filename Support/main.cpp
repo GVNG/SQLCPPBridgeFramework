@@ -62,6 +62,7 @@
 #include "example27.h"
 #include "example28.h"
 #include "example29.h"
+#include "example30.h"
 
 int main(int argc, char** argv)
 {
@@ -576,6 +577,23 @@ int main(int argc, char** argv)
             cont.save(src);
             cont.load(dst);
             assert(src==dst);
+            std::cout << "is ok. ";
+        }
+        
+        {
+            time_tracker trk;
+            sql_bridge::context cont(storage["case30"]);
+            std::cout << "Case 30 ";
+            Case30Map dst,src
+            {
+                {"k1", std::make_shared<Case30>(1)},
+                {"k2", std::make_shared<Case30>(2)},
+                {"k3", std::make_shared<Case30>(3)},
+            };
+            cont.save(src);
+            cont.load(dst);
+            for(auto const& k : src)
+                assert(*k.second==*dst[k.first]);
             std::cout << "is ok. ";
         }
 #endif

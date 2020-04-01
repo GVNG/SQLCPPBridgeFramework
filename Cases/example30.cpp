@@ -1,9 +1,9 @@
 //
-//  example28.h
+//  example30.cpp
 //  SQLCPPBridgeFramework
 //
-//  Created by Roman Makhnenko on 12/09/2019.
-//  Copyright © 2019 DataArt.
+//  Created by Roman Makhnenko on 31/03/2020.
+//  Copyright © 2020 DataArt.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -28,45 +28,27 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
-#ifndef example28_h
-#define example28_h
+#include "example30.h"
 
-#include "sqlcppbridge.h"
-
-class Case28Extra
+DEFINE_SQL_TABLE(extra, Case30Extra)
 {
-    DECLARE_SQL_ACCESS(Case28Extra);
-public:
-    Case28Extra(long v = 0)
-        : val_(v)
-        {};
-    inline bool operator == (Case28Extra const& rv) const {return val_==rv.val_;}
-protected:
-    long val_;
+    bind("Info",    &Case30Extra::info_),
 };
 
-class Case28
+DEFINE_SQL_TABLE(main, Case30)
 {
-    DECLARE_SQL_ACCESS(Case28);
-public:
-    Case28()
-        : db_id_(0)
-        , extra_(0)
-        {}
-    void fill(size_t num)
-    {
-        extra_ = num;
-        members_.clear();
-        members_.reserve(num);
-        for(size_t i=0; i!=num; ++i)
-            members_.push_back(Case28Extra((long)i+1));
-    }
-    inline bool operator == (Case28 const& rv) const {return members_==rv.members_ && db_id_==rv.db_id_ && extra_==rv.extra_;}
-    int64_t db_id_;
-    size_t extra_;
-private:
-    std::vector<Case28Extra> members_;
+    bind("Ext",    &Case30::extra_),
 };
 
-#endif /* example28_h */
+DEFINE_SQL_TRIVIAL_TABLE(mn, Case30Map);
+
+DEFINE_SQL_DATABASE(case30, 1, Case30Map, Case30, Case30Extra)::upgrade_structure(size_t from, size_t to)
+{
+    // ------------------------------------------------------------------------------------
+    // you can place here the upgrade script from the 'from' to the 'to' version
+    // something like below, or whatever SQL statements you want
+    //
+    //if (from<=2 && to>2)
+    //    execute("CREATE INDEX IF NOT EXISTS BLAH_BLAH_INDEX ON MY_TABLE (BLAH_BLAH_ID)");
+    // ------------------------------------------------------------------------------------
+};

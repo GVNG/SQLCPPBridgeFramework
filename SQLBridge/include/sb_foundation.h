@@ -145,12 +145,19 @@ namespace sql_bridge
             , index_type_(it)
             , depends_(0,"","")
             {};
+        
+        template<typename TFn> TFn allocate_object() const {return _allocate_object<TFn>();}
     private:
         size_t type_id_;
         std::string field_name_;
         e_db_index_type index_type_;
         class_link depends_;
         class_descriptors_container inheritances_;
+
+#pragma mark - allocator
+        template<typename TFn> inline typename std::enable_if<std::is_pointer<TFn>::value,std::unique_ptr<TFn> >::type _allocate_object() const {return std::make_unique<typename is_pointer<TFn>::type>();}
+        template<typename TFn> inline typename std::enable_if<std::is_same<TFn,std::shared_ptr<typename is_pointer<TFn>::type> >::value,TFn>::type _allocate_object() const {return std::make_shared<typename is_pointer<TFn>::type>();}
+        template<typename TFn> inline typename std::enable_if<std::is_same<TFn,std::unique_ptr<typename is_pointer<TFn>::type> >::value,TFn>::type _allocate_object() const {return std::make_unique<typename is_pointer<TFn>::type>();}
     };
     
     class data_update_context

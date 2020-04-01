@@ -1,9 +1,9 @@
 //
-//  example28.h
-//  SQLCPPBridgeFramework
+//  t_case30.cpp
+//  Tests
 //
-//  Created by Roman Makhnenko on 12/09/2019.
-//  Copyright © 2019 DataArt.
+//  Created by Roman Makhnenko on 01/04/2020.
+//  Copyright © 2020 DataArt.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -28,45 +28,20 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
-#ifndef example28_h
-#define example28_h
+#include "t_db_fixture.h"
+#include "example30.h"
 
-#include "sqlcppbridge.h"
-
-class Case28Extra
+TEST_F(DBFixture, Case30)
 {
-    DECLARE_SQL_ACCESS(Case28Extra);
-public:
-    Case28Extra(long v = 0)
-        : val_(v)
-        {};
-    inline bool operator == (Case28Extra const& rv) const {return val_==rv.val_;}
-protected:
-    long val_;
-};
-
-class Case28
-{
-    DECLARE_SQL_ACCESS(Case28);
-public:
-    Case28()
-        : db_id_(0)
-        , extra_(0)
-        {}
-    void fill(size_t num)
+    sql_bridge::context cont(storage()["case30"]);
+    Case30Map dst,src
     {
-        extra_ = num;
-        members_.clear();
-        members_.reserve(num);
-        for(size_t i=0; i!=num; ++i)
-            members_.push_back(Case28Extra((long)i+1));
-    }
-    inline bool operator == (Case28 const& rv) const {return members_==rv.members_ && db_id_==rv.db_id_ && extra_==rv.extra_;}
-    int64_t db_id_;
-    size_t extra_;
-private:
-    std::vector<Case28Extra> members_;
-};
-
-#endif /* example28_h */
+        {"k1", std::make_shared<Case30>(1)},
+        {"k2", std::make_shared<Case30>(2)},
+        {"k3", std::make_shared<Case30>(3)},
+    };
+    cont.save(src);
+    cont.load(dst);
+    for(auto const& k : src)
+        ASSERT_EQ(*k.second,*dst[k.first]);
+}
