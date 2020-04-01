@@ -266,7 +266,28 @@ namespace sql_bridge
 
         template<typename TFn> inline typename std::enable_if<is_map<TFn>::value &&
                                                               !is_trivial_map<TFn>::value &&
-                                                              !is_container_of_containers<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
+                                                              !is_container_of_containers<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey) {_read_comp_map<TFn>(dst,cont,extkey);}
+
+        template<typename TFn> inline typename std::enable_if<is_pointer<typename TFn::mapped_type>::value>::type _read_comp_map(T& dst, data_update_context& cont, sql_value const& extkey)
+        {
+            typedef typename TFn::key_type k_type;
+            typedef typename TFn::mapped_type m_type;
+            typedef std::conditional_t<std::is_pointer<m_type>::value, std::unique_ptr<typename is_pointer<m_type>::type>, m_type> obj_type;
+
+            size_t elemt = typeid(m_type).hash_code();
+            (dst.*member_).clear();
+            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name()));
+            sql_value key((k_type()));
+            while(ncnt->is_ok())
+            {
+                obj_type var(allocate_object<m_type>());
+                ncnt->read(key);
+                ncnt->read_comp(&(*var), extkey);
+                (dst.*member_).insert({key.value<k_type>(),std::move(var)});
+            }
+        }
+
+        template<typename TFn> inline typename std::enable_if<!is_pointer<typename TFn::mapped_type>::value>::type _read_comp_map(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             typedef typename TFn::key_type k_type;
             typedef typename TFn::mapped_type m_type;
@@ -284,9 +305,11 @@ namespace sql_bridge
         }
 
         template<typename TFn> inline typename std::enable_if<is_container<TFn>::value &&
-                                                              is_kind_of_array<TFn>::value &&
                                                               !is_trivial_container<TFn>::value &&
-                                                              !is_container_of_containers<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
+                                                              !is_container_of_containers<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey) {_read_comp_cont<TFn>(dst,cont,extkey);}
+
+        template<typename TFn> inline typename std::enable_if<is_kind_of_array<TFn>::value &&
+                                                              !is_pointer<typename TFn::value_type>::value>::type _read_comp_cont(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             typedef typename TFn::value_type type;
             typedef typename TFn::iterator iterator;
@@ -305,11 +328,25 @@ namespace sql_bridge
                 throw sql_bridge_error(to_string() << "The table: \"" << ncnt->table_name() << "\" contains less elements than provided static container.",
                                        g_replace_static_recommendation);
         }
-        
-        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value &&
-                                                              !is_kind_of_array<TFn>::value &&
-                                                              !is_trivial_container<TFn>::value &&
-                                                              !is_container_of_containers<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
+
+        template<typename TFn> inline typename std::enable_if<!is_kind_of_array<TFn>::value &&
+                                                              is_pointer<typename TFn::value_type>::value>::type _read_comp_cont(T& dst, data_update_context& cont, sql_value const& extkey)
+        {
+            typedef typename TFn::value_type type;
+            typedef std::conditional_t<std::is_pointer<type>::value, std::unique_ptr<typename is_pointer<type>::type>, type> obj_type;
+            size_t elemt = typeid(type).hash_code();
+            _clear(dst.*member_);
+            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name()));
+            while(ncnt->is_ok())
+            {
+                obj_type var(allocate_object<type>());
+                ncnt->read_comp(&(*var), extkey);
+                add_to_container(dst.*member_, std::move(var));
+            }
+        }
+
+        template<typename TFn> inline typename std::enable_if<!is_kind_of_array<TFn>::value &&
+                                                              !is_pointer<typename TFn::value_type>::value>::type _read_comp_cont(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             typedef typename TFn::value_type type;
             size_t elemt = typeid(type).hash_code();

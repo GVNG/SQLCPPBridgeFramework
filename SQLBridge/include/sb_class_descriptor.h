@@ -72,7 +72,7 @@ namespace sql_bridge
             std::shared_ptr<type> ret(std::make_shared<make_shared_enabler>(desc));
             return ret;
         }
-    protected:
+        
     private:
         template<typename TMb, typename TCl> inline static typename std::enable_if<std::is_base_of<TCl, T>::value,class_descriptors_ptr>::type bind(std::string const& fn, TMb TCl::* m, e_db_index_type it = e_db_index_type::None)
         {
