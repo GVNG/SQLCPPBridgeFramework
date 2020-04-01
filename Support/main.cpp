@@ -585,13 +585,14 @@ int main(int argc, char** argv)
             time_tracker trk;
             sql_bridge::context cont(storage["case30"]);
             std::cout << "Case 30 ";
-            Case30Map src
+            Case30Map dst,src
             {
-                {"k1", Case30(1)},
-                {"k2", Case30(2)},
-                {"k3", Case30(3)},
+                {"k1", std::make_shared<Case30>(1)},
+                {"k2", std::make_shared<Case30>(2)},
+                {"k3", std::make_shared<Case30>(3)},
             };
             cont.save(src);
+//            cont.load(dst);
             
             std::cout << "is ok. ";
         }

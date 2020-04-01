@@ -38,8 +38,9 @@
 class Case30Extra;
 class Case30;
 typedef std::shared_ptr<Case30Extra> Case30ExtraPtr;
+typedef std::shared_ptr<Case30> Case30Ptr;
 typedef std::vector<Case30ExtraPtr> Case30ExtraContainer;
-typedef std::unordered_map<std::string,Case30> Case30Map;
+typedef std::unordered_map<std::string,Case30Ptr> Case30Map;
 
 class Case30Extra
 {

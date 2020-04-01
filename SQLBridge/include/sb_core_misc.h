@@ -33,6 +33,7 @@
 #define sb_core_misc_h
 
 #include <map>
+#include <unordered_map>
 #include <memory>
 #include <string>
 #include <vector>

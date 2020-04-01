@@ -15,6 +15,7 @@ TEST(Core, Traits)
     typedef std::set<int> _t_set;
     typedef std::vector<float> _t_vector;
     typedef std::array<char, 20> _t_array;
+    typedef std::unordered_map<int,int> _tunorderedmap;
     struct _t_set_inheritance : _t_set {};
     struct _t_set_priv_inheritance : private _t_set {};
     struct _t_vector_inheritance : _t_vector {};
@@ -25,7 +26,9 @@ TEST(Core, Traits)
     ASSERT_EQ(sql_bridge::is_map<_t_pair>::value, false);
     ASSERT_EQ(sql_bridge::is_pair<_t_map>::value, false);
     ASSERT_EQ(sql_bridge::is_pair<_t_pair>::value, true);
+    ASSERT_EQ(sql_bridge::is_pair<_tunorderedmap>::value, false);
     ASSERT_EQ(sql_bridge::is_set<_t_map>::value, false);
+    ASSERT_EQ(sql_bridge::is_set<_tunorderedmap>::value, false);
     ASSERT_EQ(sql_bridge::is_set<_t_set>::value, true);
     ASSERT_EQ(sql_bridge::is_set<_t_set_inheritance>::value, true);
     ASSERT_EQ(sql_bridge::is_set<_t_set_priv_inheritance>::value, false);
@@ -35,7 +38,8 @@ TEST(Core, Traits)
     ASSERT_EQ(sql_bridge::is_kind_of_array<_t_array>::value, true);
     ASSERT_EQ(sql_bridge::is_kind_of_array<_t_vector>::value, false);
     ASSERT_EQ(sql_bridge::is_kind_of_array<std::string>::value, false);
-    
+    ASSERT_EQ(sql_bridge::is_kind_of_array<_tunorderedmap>::value, false);
+
     ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_vector>::value, true);
     ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_map>::value, false);
     ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_set>::value, false);
@@ -48,21 +52,27 @@ TEST(Core,Traits2)
     typedef std::multimap<int, int> _tmultimap;
     typedef std::vector<int> _tvector;
     typedef std::set<int> _tset;
+    typedef std::unordered_map<int,int> _tunorderedmap;
     
     ASSERT_EQ(sql_bridge::is_map<_tmap>::value,true);
+    ASSERT_EQ(sql_bridge::is_map<_tunorderedmap>::value,true);
     ASSERT_EQ(sql_bridge::is_map<_tmultimap>::value,false);
     ASSERT_EQ(sql_bridge::is_multimap<_tmap>::value,false);
     ASSERT_EQ(sql_bridge::is_multimap<_tmultimap>::value,true);
+    ASSERT_EQ(sql_bridge::is_multimap<_tunorderedmap>::value,false);
     ASSERT_EQ(sql_bridge::is_any_map<_tmap>::value,true);
     ASSERT_EQ(sql_bridge::is_any_map<_tmultimap>::value,true);
+    ASSERT_EQ(sql_bridge::is_any_map<_tunorderedmap>::value,true);
     ASSERT_EQ(sql_bridge::is_container<_tmap>::value,false);
     ASSERT_EQ(sql_bridge::is_container<_tmultimap>::value,false);
+    ASSERT_EQ(sql_bridge::is_container<_tunorderedmap>::value,false);
     ASSERT_EQ(sql_bridge::is_container<_tvector>::value,true);
     ASSERT_EQ(sql_bridge::is_container<std::string>::value,false);
     ASSERT_EQ(sql_bridge::is_set<_tvector>::value,false);
     ASSERT_EQ(sql_bridge::is_set<_tset>::value,true);
     ASSERT_EQ(sql_bridge::is_trivial_map<_tmap>::value,true);
     ASSERT_EQ(sql_bridge::is_trivial_map<_tmultimap>::value,true);
+    ASSERT_EQ(sql_bridge::is_trivial_map<_tunorderedmap>::value,true);
 }
 
 TEST(Core,TraitsOptional)

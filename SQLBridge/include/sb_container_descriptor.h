@@ -129,6 +129,22 @@ namespace sql_bridge
 
         template<typename TFn> inline typename std::enable_if<is_container<TFn>::value>::type _bind_comp(TFn const& src,data_update_context& cont,sql_value const& extkey) {_bind_comp_container<TFn>(src,cont,extkey);}
 
+        template<typename TFn> inline typename std::enable_if<!is_trivial_container<TFn>::value && is_pointer<typename TFn::value_type>::value>::type _bind_comp_container(TFn const& src,data_update_context& cont,sql_value const& extkey)
+        {
+            size_t tid = typeid(typename is_pointer<typename TFn::value_type>::type).hash_code();
+            std::string const& refname(cont.forward_ref());
+            for(auto const& v : src)
+            {
+                if (!extkey.empty())
+                    cont.add(extkey);
+                cont.next(&v);
+                sql_value extid = cont.id_for_members(&v);
+                if (extid.empty())
+                    throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the forward link", "You should configure any type of index at least at one field in the definition of table");
+                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname));
+                ncnt->bind_comp(&(*v), extid);
+            }
+        }
         template<typename TFn> inline typename std::enable_if<!is_trivial_container<TFn>::value && !is_pointer<typename TFn::value_type>::value>::type _bind_comp_container(TFn const& src,data_update_context& cont,sql_value const& extkey)
         {
             size_t tid = typeid(typename TFn::value_type).hash_code();
@@ -157,6 +173,24 @@ namespace sql_bridge
         }
 
         template<typename TFn> inline typename std::enable_if<is_any_map<TFn>::value>::type _bind_comp(TFn const& src,data_update_context& cont,sql_value const& extkey) {_bind_comp_map<TFn>(src,cont,extkey);}
+
+        template<typename TFn> inline typename std::enable_if<!is_trivial_map<TFn>::value && is_pointer<typename TFn::mapped_type>::value>::type _bind_comp_map(TFn const& src,data_update_context& cont,sql_value const& extkey)
+        {
+            size_t tid = typeid(typename is_pointer<typename TFn::mapped_type>::type).hash_code();
+            std::string const& refname(cont.forward_ref());
+            for(auto const& v : src)
+            {
+                cont.add(sql_value(v.first));
+                if (!extkey.empty())
+                    cont.add(extkey);
+                cont.next(&v);
+                sql_value extid = cont.id_for_members(&v);
+                if (extid.empty())
+                    throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
+                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname));
+                ncnt->bind_comp(&(*v.second), extid);
+            }
+        }
         
         template<typename TFn> inline typename std::enable_if<!is_trivial_map<TFn>::value && !is_pointer<typename TFn::mapped_type>::value>::type _bind_comp_map(TFn const& src,data_update_context& cont,sql_value const& extkey)
         {
