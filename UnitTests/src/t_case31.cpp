@@ -40,7 +40,7 @@ TEST_F(DBFixture, Case31)
         std::make_shared<Case31>("k2","test-2",20),
         std::make_shared<Case31>("k3-100500","test-bbb",42),
     };
-    cont.save(src);
+    cont.replace(src);
     cont.order(&Case31::key_).load(dst);
     ASSERT_EQ(src.size(), dst.size());
     for(Case31Container::size_type i = 0; i!=src.size(); ++i)
