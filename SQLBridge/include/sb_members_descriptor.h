@@ -165,7 +165,8 @@ namespace sql_bridge
         template<typename TFn> inline typename std::enable_if<!is_container_of_containers<TFn>::value && is_pointer<typename TFn::value_type>::value>::type _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             typedef typename TFn::value_type type;
-            size_t elemt = typeid(type).hash_code();
+            size_t elemt = types_selector<TFn>::destination_id();
+//            size_t elemt = typeid(type).hash_code();
             data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name()));
             for(auto const& ve : el)
                 ncnt->bind_comp(&(*ve), extkey);
@@ -274,7 +275,7 @@ namespace sql_bridge
             typedef typename TFn::mapped_type m_type;
             typedef std::conditional_t<std::is_pointer<m_type>::value, std::unique_ptr<typename is_pointer<m_type>::type>, m_type> obj_type;
 
-            size_t elemt = typeid(m_type).hash_code();
+            size_t elemt = types_selector<TFn>::destination_id();
             (dst.*member_).clear();
             data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name()));
             sql_value key((k_type()));
@@ -291,7 +292,7 @@ namespace sql_bridge
         {
             typedef typename TFn::key_type k_type;
             typedef typename TFn::mapped_type m_type;
-            size_t elemt = typeid(m_type).hash_code();
+            size_t elemt = types_selector<TFn>::destination_id();
             (dst.*member_).clear();
             data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name()));
             sql_value key((k_type()));
@@ -313,7 +314,7 @@ namespace sql_bridge
         {
             typedef typename TFn::value_type type;
             typedef typename TFn::iterator iterator;
-            size_t elemt = typeid(type).hash_code();
+            size_t elemt = types_selector<TFn>::destination_id();
             data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name()));
             iterator pos = (dst.*member_).begin();
             while(ncnt->is_ok())
@@ -334,7 +335,7 @@ namespace sql_bridge
         {
             typedef typename TFn::value_type type;
             typedef std::conditional_t<std::is_pointer<type>::value, std::unique_ptr<typename is_pointer<type>::type>, type> obj_type;
-            size_t elemt = typeid(type).hash_code();
+            size_t elemt = types_selector<TFn>::destination_id();
             _clear(dst.*member_);
             data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name()));
             while(ncnt->is_ok())
@@ -349,7 +350,7 @@ namespace sql_bridge
                                                               !is_pointer<typename TFn::value_type>::value>::type _read_comp_cont(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             typedef typename TFn::value_type type;
-            size_t elemt = typeid(type).hash_code();
+            size_t elemt = types_selector<TFn>::destination_id();
             _clear(dst.*member_);
             data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name()));
             while(ncnt->is_ok())

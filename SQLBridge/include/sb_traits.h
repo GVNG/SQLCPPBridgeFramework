@@ -41,6 +41,7 @@
 #include <queue>
 #include <tuple>
 #include <typeinfo>
+#include <memory>
 
 namespace sql_bridge
 {
@@ -343,8 +344,8 @@ namespace sql_bridge
     {
         typedef typename std::conditional<map_type_check<is_any_map<T>::value,T>::value, typename map_type_check<is_any_map<T>::value,T>::type, T>::type T1;
         typedef typename std::conditional<container_type_check<is_container<T>::value,T>::value, typename container_type_check<is_container<T>::value, T>::type, T1>::type T2;
-        typedef T2 type;
-        static_assert(!std::is_same<type, void>::value,"No acceptable type selected");
+        static_assert(!std::is_same<T2, void>::value,"No acceptable type selected");
+        typedef typename is_pointer<T2>::type type;
         static size_t destination_id() {return typeid(type).hash_code();}
     };
     
