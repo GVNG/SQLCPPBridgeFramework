@@ -80,7 +80,7 @@ namespace sql_bridge
         {
             class_descriptors_map::const_iterator pos = classes_map_.find(tid);
             if (pos==classes_map_.end())
-                throw sql_bridge_error(to_string() << "Section: " << section_name() << ". There're incomplete definition of tables","You should check the set of yours DEFINE_SQL_TABLE macroses");
+                throw sql_bridge_error(to_string() << "Section: " << section_name() << ". There're incomplete definitions of tables","You should check the set of yours DEFINE_SQL_TABLE macroses");
             return pos->second;
         }
     protected:

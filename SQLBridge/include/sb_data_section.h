@@ -88,6 +88,8 @@ namespace sql_bridge
         data_section_descriptors_ptr descriptor_;
     private:
         
+        template<typename TFn> TFn allocate_object() const {return _allocate_object<TFn>();}
+
 #pragma mark - save
         
         template<typename T> inline typename std::enable_if<!is_container<T>::value && !is_any_map<T>::value>::type _save(T const& src)
@@ -106,7 +108,25 @@ namespace sql_bridge
         }
         template<typename T> inline typename std::enable_if<is_container<T>::value &&
                                                             !is_trivial_container<T>::value &&
-                                                            !is_container_of_containers<T>::value>::type _save(T const& src)
+                                                            !is_container_of_containers<T>::value>::type _save(T const& src) {_save_cont<T>(src);}
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::value_type>::value>::type _save_cont(T const& src)
+        {
+            if (descriptor_->has_description<T>())
+            {
+                size_t tid(typeid(T).hash_code());
+                data_update_context_ptr cont(create_context(tid));
+                cont->bind_comp(&src,sql_value());
+            }
+            else
+            {
+                typedef typename types_selector<T>::type type;
+                size_t tid = typeid(type).hash_code();
+                data_update_context_ptr cont(create_context(tid));
+                for(auto const& el : src)
+                    cont->bind_comp(&(*el),sql_value());
+            }
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::value_type>::value>::type _save_cont(T const& src)
         {
             if (descriptor_->has_description<T>())
             {
@@ -125,7 +145,30 @@ namespace sql_bridge
         }
         template<typename T> inline typename std::enable_if<is_any_map<T>::value &&
                                                             !is_trivial_map<T>::value &&
-                                                            !is_container_of_containers<T>::value>::type _save(T const& src)
+                                                            !is_container_of_containers<T>::value>::type _save(T const& src) {_save_map<T>(src);}
+
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::mapped_type>::value>::type _save_map(T const& src)
+        {
+            if (descriptor_->has_description<T>())
+            {
+                size_t tid(typeid(T).hash_code());
+                data_update_context_ptr cont(create_context(tid));
+                if (is_map<T>::value)
+                    for(auto const& el : src)
+                        cont->remove_by_key(sql_value(el.first));
+                cont->bind_comp(&src,sql_value());
+            }
+            else
+            {
+                typedef typename types_selector<T>::type type;
+                size_t tid = typeid(type).hash_code();
+                data_update_context_ptr cont(create_context(tid));
+                for(auto const& el : src)
+                    cont->bind_comp(&(*el.second),sql_value());
+            }
+        }
+
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::mapped_type>::value>::type _save_map(T const& src)
         {
             if (descriptor_->has_description<T>())
             {
@@ -225,7 +268,32 @@ namespace sql_bridge
         }
         template<typename T> inline typename std::enable_if<is_container<T>::value &&
                                                             !is_trivial_container<T>::value &&
-                                                            !is_container_of_containers<T>::value>::type _load(T& dst, std::string const& flt)
+                                                            !is_container_of_containers<T>::value>::type _load(T& dst, std::string const& flt){_load_cont(dst,flt);}
+
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::value_type>::value>::type _load_cont(T& dst, std::string const& flt)
+        {
+            if (descriptor_->has_description<T>())
+            {
+                size_t tid = typeid(T).hash_code();
+                data_update_context_ptr cont(create_reader(tid, flt));
+                cont->read(&dst);
+            }
+            else
+            {
+                typedef typename is_pointer<typename T::value_type>::type type;
+                size_t tid = types_selector<T>::destination_id();
+                typedef std::conditional_t<std::is_pointer<typename T::value_type>::value, std::unique_ptr<type>, typename T::value_type> obj_type;
+                data_update_context_ptr cont(create_reader(tid, flt));
+                dst.clear();
+                while(cont->is_ok())
+                {
+                    obj_type val(allocate_object<typename T::value_type>());
+                    cont->read(&(*val));
+                    add_to_container(dst, std::move(val));
+                }
+            }
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::value_type>::value>::type _load_cont(T& dst, std::string const& flt)
         {
             if (descriptor_->has_description<T>())
             {
@@ -236,7 +304,7 @@ namespace sql_bridge
             else
             {
                 typedef typename T::value_type type;
-                size_t tid = typeid(type).hash_code();
+                size_t tid = types_selector<T>::destination_id();
                 data_update_context_ptr cont(create_reader(tid, flt));
                 type val;
                 dst.clear();
@@ -249,7 +317,36 @@ namespace sql_bridge
         }
         template<typename T> inline typename std::enable_if<is_any_map<T>::value &&
                                                             !is_trivial_map<T>::value &&
-                                                            !is_container_of_containers<T>::value>::type _load(T& dst, std::string const& flt)
+                                                            !is_container_of_containers<T>::value>::type _load(T& dst, std::string const& flt) {_load_map<T>(dst,flt);}
+
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::mapped_type>::value>::type _load_map(T& dst, std::string const& flt)
+        {
+            if (descriptor_->has_description<T>())
+            {
+                size_t tid = typeid(T).hash_code();
+                data_update_context_ptr cont(create_reader(tid, flt));
+                cont->read(&dst);
+            }
+            else
+            {
+                typedef typename T::key_type k_type;
+                typedef typename T::mapped_type m_type;
+                typedef std::conditional_t<std::is_pointer<typename T::mapped_type>::value, std::unique_ptr<m_type>, typename T::mapped_type> obj_type;
+                size_t tid = types_selector<T>::destination_id();
+                data_update_context_ptr cont(create_reader(tid, flt));
+                dst.clear();
+                while(cont->is_ok())
+                {
+                    obj_type val(allocate_object<m_type>());
+                    cont->read(&(*val));
+                    sql_value key = cont->id_for_members(&val);
+                    if (key.empty())
+                        throw sql_bridge_error(to_string() << "Section: " << descriptor_->section_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
+                    dst.insert(typename T::value_type(key.value<k_type>(),std::move(val)));
+                }
+            }
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::mapped_type>::value>::type _load_map(T& dst, std::string const& flt)
         {
             if (descriptor_->has_description<T>())
             {
@@ -271,7 +368,7 @@ namespace sql_bridge
                     sql_value key = cont->id_for_members(&val);
                     if (key.empty())
                         throw sql_bridge_error(to_string() << "Section: " << descriptor_->section_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
-                    dst.insert(typename T::value_type(key.value<k_type>(),val));
+                    dst.insert(typename T::value_type(key.value<k_type>(),std::move(val)));
                 }
             }
         }
@@ -319,7 +416,13 @@ namespace sql_bridge
             data_update_context_ptr cont(create_context(tid,flt));
             cont->remove_all();
         }
+
+#pragma mark - allocator
         
+        template<typename TFn> inline typename std::enable_if<std::is_pointer<TFn>::value,std::unique_ptr<TFn> >::type _allocate_object() const {return std::make_unique<typename is_pointer<TFn>::type>();}
+        template<typename TFn> inline typename std::enable_if<std::is_same<TFn,std::shared_ptr<typename is_pointer<TFn>::type> >::value,TFn>::type _allocate_object() const {return std::make_shared<typename is_pointer<TFn>::type>();}
+        template<typename TFn> inline typename std::enable_if<std::is_same<TFn,std::unique_ptr<typename is_pointer<TFn>::type> >::value,TFn>::type _allocate_object() const {return std::make_unique<typename is_pointer<TFn>::type>();}
+
     };
 
     template<typename TStrategy> class _t_data_read_context
