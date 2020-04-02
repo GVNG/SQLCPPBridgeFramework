@@ -296,8 +296,14 @@ namespace sql_bridge
     {
     };
 
+    template<typename T> struct is_vector_bool
+        : std::integral_constant<bool,  std::is_same<T, std::vector<bool> >::value>
+    {
+    };
+
     template<typename T> struct is_back_pushable_container
-        : std::integral_constant<bool,  has_push_back<T>::value>
+        : std::integral_constant<bool,  has_push_back<T>::value ||
+                                        std::is_same<T, std::vector<bool> >::value >
     {
     };
 
