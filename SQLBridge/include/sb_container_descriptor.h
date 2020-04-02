@@ -161,7 +161,18 @@ namespace sql_bridge
                 ncnt->bind_comp(&v, extid);
             }
         }
-        template<typename TFn> inline typename std::enable_if<is_trivial_container<TFn>::value>::type _bind_comp_container(TFn const& src,data_update_context& cont,sql_value const& extkey)
+        template<typename TFn> inline typename std::enable_if<is_trivial_container<TFn>::value && is_vector_bool<TFn>::value>::type _bind_comp_container(TFn const& src,data_update_context& cont,sql_value const& extkey)
+        {
+            for(auto v : src)
+            {
+                bool t = v;
+                cont.add(sql_value(t));
+                if (!extkey.empty())
+                    cont.add(extkey);
+                cont.next(&t);
+            }
+        }
+        template<typename TFn> inline typename std::enable_if<is_trivial_container<TFn>::value && !is_vector_bool<TFn>::value>::type _bind_comp_container(TFn const& src,data_update_context& cont,sql_value const& extkey)
         {
             for(auto const& v : src)
             {
