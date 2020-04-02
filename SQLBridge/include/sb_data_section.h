@@ -209,7 +209,27 @@ namespace sql_bridge
         }
         template<typename T> inline typename std::enable_if<is_container<T>::value &&
                                                             !is_trivial_container<T>::value &&
-                                                            !is_container_of_containers<T>::value>::type _replace(T const& src)
+                                                            !is_container_of_containers<T>::value>::type _replace(T const& src) {_replace_cont<T>(src);}
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::value_type>::value>::type _replace_cont(T const& src)
+        {
+            if (descriptor_->has_description<T>())
+            {
+                size_t tid(typeid(T).hash_code());
+                data_update_context_ptr cont(create_context(tid));
+                cont->remove_all();
+                cont->bind_comp(&src,sql_value());
+            }
+            else
+            {
+                typedef typename types_selector<T>::type type;
+                size_t tid = typeid(type).hash_code();
+                data_update_context_ptr cont(create_context(tid));
+                cont->remove_all();
+                for(auto const& el : src)
+                    cont->bind_comp(&(*el),sql_value());
+            }
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::value_type>::value>::type _replace_cont(T const& src)
         {
             if (descriptor_->has_description<T>())
             {
@@ -230,7 +250,27 @@ namespace sql_bridge
         }
         template<typename T> inline typename std::enable_if<is_any_map<T>::value &&
                                                             !is_trivial_map<T>::value &&
-                                                            !is_container_of_containers<T>::value>::type _replace(T const& src)
+                                                            !is_container_of_containers<T>::value>::type _replace(T const& src) {_replace_map<T>(src);}
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::mapped_type>::value>::type _replace_map(T const& src)
+        {
+            if (descriptor_->has_description<T>())
+            {
+                size_t tid(typeid(T).hash_code());
+                data_update_context_ptr cont(create_context(tid));
+                cont->remove_all();
+                cont->bind_comp(&src,sql_value());
+            }
+            else
+            {
+                typedef typename types_selector<T>::type type;
+                size_t tid = typeid(type).hash_code();
+                data_update_context_ptr cont(create_context(tid));
+                cont->remove_all();
+                for(auto const& el : src)
+                    cont->bind_comp(&(*el.second),sql_value());
+            }
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::mapped_type>::value>::type _replace_map(T const& src)
         {
             if (descriptor_->has_description<T>())
             {
@@ -387,12 +427,22 @@ namespace sql_bridge
             data_update_context_ptr cont(create_context(tid));
             cont->remove_if_possible(&src);
         }
-        
+
         template<typename T> inline typename std::enable_if<is_container<T>::value &&
                                                             !is_trivial_container<T>::value &&
-                                                            !is_container_of_containers<T>::value>::type _remove(T const& src)
+                                                            !is_container_of_containers<T>::value>::type _remove(T const& src) {_remove_cont<T>(src);}
+
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::value_type>::value>::type _remove_cont(T const& src)
         {
-            size_t tid = typeid(typename T::value_type).hash_code();
+            size_t tid = types_selector<T>::destination_id();
+            data_update_context_ptr cont(create_context(tid));
+            for(auto const& el : src)
+                cont->remove_if_possible(&(*el));
+        }
+
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::value_type>::value>::type _remove_cont(T const& src)
+        {
+            size_t tid = types_selector<T>::destination_id();
             data_update_context_ptr cont(create_context(tid));
             for(auto const& el : src)
                 cont->remove_if_possible(&el);
