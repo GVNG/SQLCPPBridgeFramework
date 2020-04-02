@@ -64,6 +64,7 @@
 #include "example29.h"
 #include "example30.h"
 #include "example31.h"
+#include "example32.h"
 
 int main(int argc, char** argv)
 {
@@ -613,6 +614,21 @@ int main(int argc, char** argv)
             assert(src.size()==dst.size());
             for(Case31Container::size_type i = 0; i!=src.size(); ++i)
                 assert(*src[i]==*dst[i]);
+            std::cout << "is ok. ";
+        }
+        
+        {
+            time_tracker trk;
+            sql_bridge::context cont(storage["case32"]);
+            std::cout << "Case 32 ";
+            Case32Container dst,src
+            {
+                Case32(50,true),
+                Case32(25,false),
+            };
+            cont.replace(src);
+            cont.load(dst);
+            assert(src==dst);
             std::cout << "is ok. ";
         }
 #endif
