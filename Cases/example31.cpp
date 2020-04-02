@@ -1,8 +1,8 @@
 //
-//  example30.h
+//  example31.cpp
 //  SQLCPPBridgeFramework
 //
-//  Created by Roman Makhnenko on 31/03/2020.
+//  Created by Roman Makhnenko on 02/04/2020.
 //  Copyright © 2020 DataArt.
 //  All rights reserved.
 //
@@ -28,53 +28,22 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
-#ifndef example30_h
-#define example30_h
+#include "example31.h"
 
-#include "sqlcppbridge.h"
-
-class Case30Extra;
-class Case30;
-typedef std::shared_ptr<Case30Extra> Case30ExtraPtr;
-typedef std::shared_ptr<Case30> Case30Ptr;
-typedef std::vector<Case30ExtraPtr> Case30ExtraContainer;
-typedef std::unordered_map<std::string,Case30Ptr> Case30Map;
-
-class Case30Extra
+DEFINE_SQL_TABLE(main, Case31)
 {
-    DECLARE_SQL_ACCESS(Case30Extra);
-public:
-    Case30Extra() {}
-    Case30Extra(int i)
-        : info_(sql_bridge::to_string() << "info_" << i)
-        {}
-    inline std::string const& info() const {return info_;}
-    inline bool operator != (Case30Extra const& rv) const {return info_!=rv.info_;}
-private:
-    std::string info_;
+    bind("key",     &Case31::key_,      e_db_index_type::Unique),
+    bind("v1",      &Case31::val1_),
+    bind("v2",      &Case31::val2_),
 };
 
-class Case30
+DEFINE_SQL_DATABASE(case31, 1, Case31)::upgrade_structure(size_t from, size_t to)
 {
-    DECLARE_SQL_ACCESS(Case30);
-public:
-    Case30() {};
-    Case30(int num)
-    {
-        for(int i=0; i!=100; ++i)
-            extra_.push_back(std::make_shared<Case30Extra>(i+num*100));
-    }
-    inline bool operator == (Case30 const& rv) const
-    {
-        if (extra_.size()!=rv.extra_.size()) return false;
-        for(Case30ExtraContainer::size_type i=0; i!=extra_.size(); ++i)
-            if (*extra_[i]!=*rv.extra_[i]) return false;
-        return true;
-    }
-
-private:
-    Case30ExtraContainer extra_;
+    // ------------------------------------------------------------------------------------
+    // you can place here the upgrade script from the 'from' to the 'to' version
+    // something like below, or whatever SQL statements you want
+    //
+    //if (from<=2 && to>2)
+    //    execute("CREATE INDEX IF NOT EXISTS BLAH_BLAH_INDEX ON MY_TABLE (BLAH_BLAH_ID)");
+    // ------------------------------------------------------------------------------------
 };
-
-#endif /* example30_h */

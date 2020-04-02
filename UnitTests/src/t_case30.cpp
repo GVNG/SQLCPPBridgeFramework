@@ -42,6 +42,7 @@ TEST_F(DBFixture, Case30)
     };
     cont.save(src);
     cont.load(dst);
+    ASSERT_EQ(src.size(), dst.size());
     for(auto const& k : src)
         ASSERT_EQ(*k.second,*dst[k.first]);
 }

@@ -1,8 +1,8 @@
 //
-//  example30.h
+//  example31.h
 //  SQLCPPBridgeFramework
 //
-//  Created by Roman Makhnenko on 31/03/2020.
+//  Created by Roman Makhnenko on 02/04/2020.
 //  Copyright © 2020 DataArt.
 //  All rights reserved.
 //
@@ -29,52 +29,33 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
-#ifndef example30_h
-#define example30_h
+#ifndef example31_h
+#define example31_h
 
 #include "sqlcppbridge.h"
 
-class Case30Extra;
-class Case30;
-typedef std::shared_ptr<Case30Extra> Case30ExtraPtr;
-typedef std::shared_ptr<Case30> Case30Ptr;
-typedef std::vector<Case30ExtraPtr> Case30ExtraContainer;
-typedef std::unordered_map<std::string,Case30Ptr> Case30Map;
+class Case31;
+typedef std::shared_ptr<Case31> Case31Ptr;
+typedef std::vector<Case31Ptr> Case31Container;
 
-class Case30Extra
+class Case31
 {
-    DECLARE_SQL_ACCESS(Case30Extra);
+    DECLARE_SQL_ACCESS(Case31);
 public:
-    Case30Extra() {}
-    Case30Extra(int i)
-        : info_(sql_bridge::to_string() << "info_" << i)
-        {}
-    inline std::string const& info() const {return info_;}
-    inline bool operator != (Case30Extra const& rv) const {return info_!=rv.info_;}
+    Case31()
+        : val2_(0)
+        {};
+    Case31(std::string const& k, std::string const& v1, int v2)
+        : key_(k)
+        , val1_(v1)
+        , val2_(v2)
+        {};
+    inline bool operator == (Case31 const& rv) const {return key_==rv.key_ && val1_==rv.val1_ && val2_==rv.val2_;}
+
+    std::string key_;
 private:
-    std::string info_;
+    std::string val1_;
+    int val2_;
 };
 
-class Case30
-{
-    DECLARE_SQL_ACCESS(Case30);
-public:
-    Case30() {};
-    Case30(int num)
-    {
-        for(int i=0; i!=100; ++i)
-            extra_.push_back(std::make_shared<Case30Extra>(i+num*100));
-    }
-    inline bool operator == (Case30 const& rv) const
-    {
-        if (extra_.size()!=rv.extra_.size()) return false;
-        for(Case30ExtraContainer::size_type i=0; i!=extra_.size(); ++i)
-            if (*extra_[i]!=*rv.extra_[i]) return false;
-        return true;
-    }
-
-private:
-    Case30ExtraContainer extra_;
-};
-
-#endif /* example30_h */
+#endif /* example31_h */
