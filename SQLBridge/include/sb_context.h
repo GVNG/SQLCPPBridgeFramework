@@ -252,15 +252,50 @@ namespace sql_bridge
         }
         template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _save(T const& src) const
         {
+            db_task_ptr task(std::make_shared< save_task<T> >(src,data_));
+            std::future<void> ret(task->get_future());
             db_tasks_queue_interface_ptr qp = queue_.lock();
-            if (qp!=nullptr) qp->add( std::make_shared<save_task<typename is_pointer<T>::type> >(*src,data_));
+            if (qp!=nullptr)
+            {
+                qp->add( task );
+                ret.get();
+            }
         }
         template<typename T> inline typename std::enable_if<!is_pointer<T>::value && !is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _save(T const& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<save_task<T> >(src,data_));
         }
-        template<typename T> inline typename std::enable_if<is_container<T>::value || is_map<T>::value>::type _save(T const& src) const
+        template<typename T> inline typename std::enable_if<is_container<T>::value>::type _save(T const& src) const {_save_cont<T>(src);}
+        template<typename T> inline typename std::enable_if<is_map<T>::value>::type _save(T const& src) const {_save_map<T>(src);}
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::value_type>::value>::type _save_cont(T const& src) const
+        {
+            db_task_ptr task(std::make_shared< save_task<T> >(src,data_));
+            std::future<void> ret(task->get_future());
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr)
+            {
+                qp->add( task );
+                ret.get();
+            }
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::value_type>::value>::type _save_cont(T const& src) const
+        {
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr) qp->add( std::make_shared<save_task<T> >(src,data_));
+        }
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::mapped_type>::value>::type _save_map(T const& src) const
+        {
+            db_task_ptr task(std::make_shared< save_task<T> >(src,data_));
+            std::future<void> ret(task->get_future());
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr)
+            {
+                qp->add( task );
+                ret.get();
+            }
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::mapped_type>::value>::type _save_map(T const& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<save_task<T> >(src,data_));
@@ -270,10 +305,39 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<save_task<T> >(std::move(src),data_));
         }
-        template<typename T> inline typename std::enable_if<is_container<T>::value || is_map<T>::value>::type _save_m(T&& src) const
+        template<typename T> inline typename std::enable_if<is_container<T>::value>::type _save_m(T&& src) const {_save_cont_m<T>(std::move(src));}
+        template<typename T> inline typename std::enable_if<is_map<T>::value>::type _save_m(T&& src) const {_save_map_m<T>(std::move(src));}
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::value_type>::value>::type _save_cont_m(T&& src) const
+        {
+            db_task_ptr task(std::make_shared< save_task<T> >(std::move(src),data_));
+            std::future<void> ret(task->get_future());
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr)
+            {
+                qp->add( task );
+                ret.get();
+            }
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::value_type>::value>::type _save_cont_m(T&& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<save_task<T> >(std::move(src),data_));
+        }
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::mapped_type>::value>::type _save_map_m(T&& src) const
+        {
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr) qp->add( std::make_shared<save_task<T> >(std::move(src),data_));
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::mapped_type>::value>::type _save_map_m(T&& src) const
+        {
+            db_task_ptr task(std::make_shared< save_task<T> >(std::move(src),data_));
+            std::future<void> ret(task->get_future());
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr)
+            {
+                qp->add( task );
+                ret.get();
+            }
         }
 #pragma mark - load
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load(T const&,std::string const&,typename async_load_task<T>::_fn_failed, typename async_load_task<T>::_fn_success_load) const
@@ -330,8 +394,13 @@ namespace sql_bridge
         {
             throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
         }
-        template<typename T> inline typename std::enable_if<is_container<T>::value || is_map<T>::value>::type _remove(T const& src) const {_remove_container<T>(src);}
-        template<typename T> inline typename std::enable_if<is_trivial_container<T>::value || is_trivial_map<T>::value>::type _remove_container(T const&) const
+        template<typename T> inline typename std::enable_if<is_container<T>::value>::type _remove(T const& src) const {_remove_cont<T>(src);}
+        template<typename T> inline typename std::enable_if<is_map<T>::value>::type _remove(T const& src) const {_remove_map<T>(src);}
+        template<typename T> inline typename std::enable_if<is_trivial_container<T>::value>::type _remove_cont(T const&) const
+        {
+            throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
+        }
+        template<typename T> inline typename std::enable_if<is_trivial_map<T>::value>::type _remove_map(T const&) const
         {
             throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
         }
@@ -339,22 +408,38 @@ namespace sql_bridge
         {
             throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
         }
-        template<typename T> inline typename std::enable_if<is_container<T>::value || is_map<T>::value>::type _remove_m(T&& src) const {_remove_container_m<T>(std::move(src));}
-        template<typename T> inline typename std::enable_if<is_trivial_container<T>::value || is_trivial_map<T>::value>::type _remove_container_m(T&&) const
+        template<typename T> inline typename std::enable_if<is_container<T>::value>::type _remove_m(T&& src) const {_remove_cont_m<T>(std::move(src));}
+        template<typename T> inline typename std::enable_if<is_map<T>::value>::type _remove_m(T&& src) const {_remove_map_m<T>(std::move(src));}
+        template<typename T> inline typename std::enable_if<is_trivial_container<T>::value>::type _remove_cont_m(T&&) const
+        {
+            throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
+        }
+        template<typename T> inline typename std::enable_if<is_trivial_map<T>::value>::type _remove_map_m(T&&) const
         {
             throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
         }
         template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _remove(T const& src) const
         {
+            db_task_ptr task(std::make_shared< remove_task<T> >(src,data_));
+            std::future<void> ret(task->get_future());
             db_tasks_queue_interface_ptr qp = queue_.lock();
-            if (qp!=nullptr) qp->add( std::make_shared<remove_task<typename is_pointer<T>::type> >(*src,data_));
+            if (qp!=nullptr)
+            {
+                qp->add( task );
+                ret.get();
+            }
         }
         template<typename T> inline typename std::enable_if<!is_pointer<T>::value && !is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _remove(T const& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<remove_task<T> >(src,data_));
         }
-        template<typename T> inline typename std::enable_if<!is_trivial_container<T>::value && !is_trivial_map<T>::value>::type _remove_container(T const& src) const
+        template<typename T> inline typename std::enable_if<!is_trivial_container<T>::value && !is_pointer<typename T::value_type>::value>::type _remove_cont(T const& src) const
+        {
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr) qp->add( std::make_shared<remove_task<T> >(src,data_));
+        }
+        template<typename T> inline typename std::enable_if<!is_trivial_map<T>::value && !is_pointer<typename T::mapped_type>::value>::type _remove_map(T const& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<remove_task<T> >(src,data_));
@@ -364,7 +449,12 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<remove_task<T> >(std::move(src),data_));
         }
-        template<typename T> inline typename std::enable_if<!is_trivial_container<T>::value && !is_trivial_map<T>::value>::type _remove_container_m(T&& src) const
+        template<typename T> inline typename std::enable_if<!is_trivial_container<T>::value && !is_pointer<typename T::value_type>::value>::type _remove_cont_m(T&& src) const
+        {
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr) qp->add( std::make_shared<remove_task<T> >(std::move(src),data_));
+        }
+        template<typename T> inline typename std::enable_if<!is_trivial_map<T>::value && !is_pointer<typename T::mapped_type>::value>::type _remove_map_m(T&& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<remove_task<T> >(std::move(src),data_));
@@ -393,22 +483,82 @@ namespace sql_bridge
         {
             throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
         }
-        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _replace(T const& src) const
+        template<typename T> inline typename std::enable_if<!is_pointer<T>::value && !is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _replace(T const& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<replace_task<T> >(src,data_));
         }
-        template<typename T> inline typename std::enable_if<is_container<T>::value || is_map<T>::value>::type _replace(T const& src) const
+        template<typename T> inline typename std::enable_if<is_container<T>::value>::type _replace(T const& src) const {_replace_cont<T>(src);}
+        template<typename T> inline typename std::enable_if<is_map<T>::value>::type _replace(T const& src) const {_replace_map<T>(src);}
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::value_type>::value>::type _replace_cont(T const& src) const
+        {
+            db_task_ptr task(std::make_shared< replace_task<T> >(src,data_));
+            std::future<void> ret(task->get_future());
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr)
+            {
+                qp->add( task );
+                ret.get();
+            }
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::value_type>::value>::type _replace_cont(T const& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<replace_task<T> >(src,data_));
         }
-        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _replace_m(T&& src) const
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::mapped_type>::value>::type _replace_map(T const& src) const
+        {
+            db_task_ptr task(std::make_shared< replace_task<T> >(src,data_));
+            std::future<void> ret(task->get_future());
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr)
+            {
+                qp->add( task );
+                ret.get();
+            }
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::mapped_type>::value>::type _replace_map(T const& src) const
+        {
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr) qp->add( std::make_shared<replace_task<T> >(src,data_));
+        }
+
+        template<typename T> inline typename std::enable_if<!is_pointer<T>::value && !is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _replace_m(T&& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<replace_task<T> >(std::move(src),data_));
         }
-        template<typename T> inline typename std::enable_if<is_container<T>::value || is_map<T>::value>::type _replace_m(T&& src) const
+        
+        template<typename T> inline typename std::enable_if<is_container<T>::value>::type _replace_m(T&& src) const {_replace_cont_m<T>(std::move(src));}
+        template<typename T> inline typename std::enable_if<is_map<T>::value>::type _replace_m(T&& src) const {_replace_map_m<T>(std::move(src));}
+        template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _replace_cont_m(T&& src) const
+        {
+            db_task_ptr task(std::make_shared< replace_task<T> >(std::move(src),data_));
+            std::future<void> ret(task->get_future());
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr)
+            {
+                qp->add( task );
+                ret.get();
+            }
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<T>::value>::type _replace_cont_m(T&& src) const
+        {
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr) qp->add( std::make_shared<replace_task<T> >(std::move(src),data_));
+        }
+        template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _replace_map_m(T&& src) const
+        {
+            db_task_ptr task(std::make_shared< replace_task<T> >(std::move(src),data_));
+            std::future<void> ret(task->get_future());
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr)
+            {
+                qp->add( task );
+                ret.get();
+            }
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<T>::value>::type _replace_map_m(T&& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr) qp->add( std::make_shared<replace_task<T> >(std::move(src),data_));
