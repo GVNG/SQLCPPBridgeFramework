@@ -60,20 +60,24 @@ class Case30
     DECLARE_SQL_ACCESS(Case30);
 public:
     Case30() {};
-    Case30(int num)
+    Case30(std::string const& k,int num)
+        : key_(k)
     {
         for(int i=0; i!=100; ++i)
             extra_.push_back(std::make_shared<Case30Extra>(i+num*100));
     }
     inline bool operator == (Case30 const& rv) const
     {
+        if (key_!=rv.key_) return false;
         if (extra_.size()!=rv.extra_.size()) return false;
         for(Case30ExtraContainer::size_type i=0; i!=extra_.size(); ++i)
             if (*extra_[i]!=*rv.extra_[i]) return false;
         return true;
     }
+    inline std::string const& key() const {return key_;}
 
 private:
+    std::string key_;
     Case30ExtraContainer extra_;
 };
 

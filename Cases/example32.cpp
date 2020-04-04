@@ -36,7 +36,7 @@ DEFINE_SQL_TABLE(main, Case32)
 };
 
 DEFINE_SQL_TRIVIAL_TABLE(cont, Case32Container);
-DEFINE_SQL_TRIVIAL_TABLE(bts, Case32Bitset);
+DEFINE_SQL_TRIVIAL_TABLE(bts, Case32BoolVector);
 
 DEFINE_SQL_DATABASE(case32, 1, Case32Container, Case32)::upgrade_structure(size_t from, size_t to)
 {

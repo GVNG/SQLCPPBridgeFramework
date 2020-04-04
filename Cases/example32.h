@@ -36,7 +36,7 @@
 
 class Case32;
 typedef std::vector<Case32> Case32Container;
-typedef std::vector<bool> Case32Bitset;
+typedef std::vector<bool> Case32BoolVector;
 
 class Case32
 {
@@ -48,7 +48,7 @@ public:
         {};
     inline bool operator == (Case32 const& rv) const {return member_==rv.member_;}
 private:
-    Case32Bitset member_;
+    Case32BoolVector member_;
 };
 
 #endif /* example32_h */
