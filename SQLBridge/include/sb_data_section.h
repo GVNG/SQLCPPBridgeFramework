@@ -91,8 +91,15 @@ namespace sql_bridge
         template<typename TFn> TFn allocate_object() const {return _allocate_object<TFn>();}
 
 #pragma mark - save
-        
-        template<typename T> inline typename std::enable_if<!is_container<T>::value && !is_any_map<T>::value>::type _save(T const& src)
+
+        template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _save(T const& src)
+        {
+            size_t tid = types_selector<T>::destination_id();
+            data_update_context_ptr cont(create_context(tid));
+            cont->bind_comp(&(*src), sql_value());
+        }
+
+        template<typename T> inline typename std::enable_if<!is_pointer<T>::value && !is_container<T>::value && !is_any_map<T>::value>::type _save(T const& src)
         {
             size_t tid = typeid(T).hash_code();
             data_update_context_ptr cont(create_context(tid));
@@ -291,8 +298,14 @@ namespace sql_bridge
         }
         
 #pragma mark - load
-        
-        template<typename T> inline typename std::enable_if<!is_container<T>::value && !is_any_map<T>::value>::type _load(T& dst, std::string const& flt)
+
+        template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _load(T& dst, std::string const& flt)
+        {
+            size_t tid = types_selector<T>::destination_id();
+            data_update_context_ptr cont(create_reader(tid, flt));
+            cont->read(&(*dst));
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<T>::value && !is_container<T>::value && !is_any_map<T>::value>::type _load(T& dst, std::string const& flt)
         {
             size_t tid = typeid(T).hash_code();
             data_update_context_ptr cont(create_reader(tid, flt));
@@ -419,8 +432,15 @@ namespace sql_bridge
         template<typename TFn, typename TVal> inline typename std::enable_if<!is_back_pushable_container<TFn>::value>::type add_to_container(TFn& dst,TVal&& v) const {dst.insert(dst.end(),std::move(v));}
 
 #pragma mark - remove
-        
-        template<typename T> inline typename std::enable_if<!is_container<T>::value &&
+
+        template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _remove(T const& src)
+        {
+            size_t tid = types_selector<T>::destination_id();
+            data_update_context_ptr cont(create_context(tid));
+            cont->remove_if_possible(&(*src));
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<T>::value &&
+                                                            !is_container<T>::value &&
                                                             !is_any_map<T>::value>::type _remove(T const& src)
         {
             size_t tid = typeid(T).hash_code();
