@@ -379,7 +379,7 @@ namespace sql_bridge
                 {
                     obj_type val(allocate_object<m_type>());
                     cont->read(&(*val));
-                    sql_value key = cont->id_for_members(&val);
+                    sql_value key = cont->id_for_members(&(*val));
                     if (key.empty())
                         throw sql_bridge_error(to_string() << "Section: " << descriptor_->section_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
                     dst.insert(typename T::value_type(key.value<k_type>(),std::move(val)));

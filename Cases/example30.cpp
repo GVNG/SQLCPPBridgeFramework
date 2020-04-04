@@ -37,12 +37,11 @@ DEFINE_SQL_TABLE(extra, Case30Extra)
 
 DEFINE_SQL_TABLE(main, Case30)
 {
-    bind("Ext",    &Case30::extra_),
+    bind("Key",     &Case30::key_,      e_db_index_type::Unique),
+    bind("Ext",     &Case30::extra_),
 };
 
-DEFINE_SQL_TRIVIAL_TABLE(mn, Case30Map);
-
-DEFINE_SQL_DATABASE(case30, 1, Case30Map, Case30, Case30Extra)::upgrade_structure(size_t from, size_t to)
+DEFINE_SQL_DATABASE(case30, 1, Case30, Case30Extra)::upgrade_structure(size_t from, size_t to)
 {
     // ------------------------------------------------------------------------------------
     // you can place here the upgrade script from the 'from' to the 'to' version

@@ -588,12 +588,18 @@ int main(int argc, char** argv)
             std::cout << "Case 30 ";
             Case30Map dst,src
             {
-                {"k1", std::make_shared<Case30>(1)},
-                {"k2", std::make_shared<Case30>(2)},
-                {"k3", std::make_shared<Case30>(3)},
+                {"k1", std::make_shared<Case30>("k1",1)},
+                {"k2", std::make_shared<Case30>("k2",2)},
+                {"k3", std::make_shared<Case30>("k3",3)},
             };
             cont.save(src);
+            Case30Ptr k4 = std::make_shared<Case30>("k4",4);
+            cont.save(k4);
+            cont.remove(src["k2"]);
+            src.insert({k4->key(),k4});
+            src.erase("k2");
             cont.load(dst);
+            assert(src.size()==dst.size());
             for(auto const& k : src)
                 assert(*k.second==*dst[k.first]);
             std::cout << "is ok. ";
@@ -633,7 +639,6 @@ int main(int argc, char** argv)
         }
 #endif
 
-        
     }
     catch (std::exception& ex)
     {
