@@ -162,7 +162,7 @@ namespace sql_bridge
         }
         inline bool operator < (optional_value const& rv) const
         {
-            if (optional_ && rv.optional_) return false;
+            if (optional_ && rv.optional_) return true;
             if (!optional_ && !rv.optional_) return value_<rv.value_;
             return optional_;
         }
