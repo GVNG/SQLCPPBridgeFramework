@@ -88,8 +88,6 @@ namespace sql_bridge
         data_section_descriptors_ptr descriptor_;
     private:
         
-        template<typename TFn> TFn allocate_object() const {return _allocate_object<TFn>();}
-
 #pragma mark - save
 
         template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _save(T const& src)
@@ -340,7 +338,7 @@ namespace sql_bridge
                 dst.clear();
                 while(cont->is_ok())
                 {
-                    obj_type val(allocate_object<typename T::value_type>());
+                    obj_type val(_allocate_object<typename T::value_type>());
                     cont->read(&(*val));
                     add_to_container(dst, std::move(val));
                 }
@@ -384,18 +382,18 @@ namespace sql_bridge
             {
                 typedef typename T::key_type k_type;
                 typedef typename T::mapped_type m_type;
-                typedef std::conditional_t<std::is_pointer<typename T::mapped_type>::value, std::unique_ptr<m_type>, typename T::mapped_type> obj_type;
+                typedef std::conditional_t<std::is_pointer<typename T::mapped_type>::value, std::unique_ptr<typename is_pointer<m_type>::type>, typename T::mapped_type> obj_type;
                 size_t tid = types_selector<T>::destination_id();
                 data_update_context_ptr cont(create_reader(tid, flt));
                 dst.clear();
                 while(cont->is_ok())
                 {
-                    obj_type val(allocate_object<m_type>());
+                    obj_type val(_allocate_object<m_type>());
                     cont->read(&(*val));
                     sql_value key = cont->id_for_members(&(*val));
                     if (key.empty())
                         throw sql_bridge_error(to_string() << "Section: " << descriptor_->section_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
-                    dst.insert(typename T::value_type(key.value<k_type>(),std::move(val)));
+                    add_to_map(dst,key.value<k_type>(),std::move(val));
                 }
             }
         }
@@ -421,15 +419,22 @@ namespace sql_bridge
                     sql_value key = cont->id_for_members(&val);
                     if (key.empty())
                         throw sql_bridge_error(to_string() << "Section: " << descriptor_->section_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
-                    dst.insert(typename T::value_type(key.value<k_type>(),std::move(val)));
+                    add_to_map(dst,key.value<k_type>(),std::move(val));
                 }
             }
         }
         
 #pragma mark - add to container
 
-        template<typename TFn, typename TVal> inline typename std::enable_if<is_back_pushable_container<TFn>::value>::type add_to_container(TFn& dst,TVal&& v) const {dst.push_back(std::move(v));}
-        template<typename TFn, typename TVal> inline typename std::enable_if<!is_back_pushable_container<TFn>::value>::type add_to_container(TFn& dst,TVal&& v) const {dst.insert(dst.end(),std::move(v));}
+        template<typename TFn, typename TKey, typename TVal> inline typename std::enable_if<!std::is_pointer<typename TFn::mapped_type>::value>::type add_to_map(TFn& dst,TKey const& k,TVal&& v) const {dst.insert(typename TFn::value_type(k,std::move(v)));}
+        template<typename TFn, typename TKey, typename TVal> inline typename std::enable_if<std::is_pointer<typename TFn::mapped_type>::value>::type add_to_map(TFn& dst,TKey const& k,TVal&& v) const {dst.insert(typename TFn::value_type(k,v.release()));}
+
+        template<typename TFn, typename TVal> inline typename std::enable_if<!std::is_pointer<typename TFn::value_type>::value>::type add_to_container(TFn& dst,TVal&& v) const {_add_to_container(dst,std::move(v));}
+        template<typename TFn, typename TVal> inline typename std::enable_if<std::is_pointer<typename TFn::value_type>::value>::type add_to_container(TFn& dst,TVal&& v) const {_add_to_container_ptr(dst,std::move(v));}
+        template<typename TFn, typename TVal> inline typename std::enable_if<is_back_pushable_container<TFn>::value>::type _add_to_container(TFn& dst,TVal&& v) const {dst.push_back(std::move(v));}
+        template<typename TFn, typename TVal> inline typename std::enable_if<!is_back_pushable_container<TFn>::value>::type _add_to_container(TFn& dst,TVal&& v) const {dst.insert(dst.end(),std::move(v));}
+        template<typename TFn, typename TVal> inline typename std::enable_if<is_back_pushable_container<TFn>::value>::type _add_to_container_ptr(TFn& dst,TVal&& v) const {dst.push_back(v.release());}
+        template<typename TFn, typename TVal> inline typename std::enable_if<!is_back_pushable_container<TFn>::value>::type _add_to_container_ptr(TFn& dst,TVal&& v) const {dst.insert(dst.end(),v.release());}
 
 #pragma mark - remove
 
@@ -489,7 +494,7 @@ namespace sql_bridge
 
 #pragma mark - allocator
         
-        template<typename TFn> inline typename std::enable_if<std::is_pointer<TFn>::value,std::unique_ptr<TFn> >::type _allocate_object() const {return std::make_unique<typename is_pointer<TFn>::type>();}
+        template<typename TFn> inline typename std::enable_if<std::is_pointer<TFn>::value,std::unique_ptr<typename is_pointer<TFn>::type> >::type _allocate_object() const {return std::make_unique<typename is_pointer<TFn>::type>();}
         template<typename TFn> inline typename std::enable_if<std::is_same<TFn,std::shared_ptr<typename is_pointer<TFn>::type> >::value,TFn>::type _allocate_object() const {return std::make_shared<typename is_pointer<TFn>::type>();}
         template<typename TFn> inline typename std::enable_if<std::is_same<TFn,std::unique_ptr<typename is_pointer<TFn>::type> >::value,TFn>::type _allocate_object() const {return std::make_unique<typename is_pointer<TFn>::type>();}
 
