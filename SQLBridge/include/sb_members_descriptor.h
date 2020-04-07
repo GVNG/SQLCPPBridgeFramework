@@ -284,7 +284,7 @@ namespace sql_bridge
                 obj_type var(allocate_object<m_type>());
                 ncnt->read(key);
                 ncnt->read_comp(&(*var), extkey);
-                (dst.*member_).insert({key.value<k_type>(),std::move(var)});
+                add_to_map(dst.*member_, key.value<k_type>(), std::move(var));
             }
         }
 
@@ -301,7 +301,7 @@ namespace sql_bridge
                 m_type var;
                 ncnt->read(key);
                 ncnt->read_comp(&var, extkey);
-                (dst.*member_).insert({key.value<k_type>(),std::move(var)});
+                add_to_map(dst.*member_, key.value<k_type>(), std::move(var));
             }
         }
 
@@ -367,9 +367,14 @@ namespace sql_bridge
         template<typename TFn> inline typename std::enable_if<!is_kind_of_array<TFn>::value>::type _clear(TFn& el) {el.clear();}
 
 #pragma mark - containers inserter
-        
-        template<typename TFn, typename TArg> inline typename std::enable_if<is_back_pushable_container<TFn>::value>::type add_to_container(TFn& ct, TArg&& ar) {ct.push_back(std::move(ar));}
-        template<typename TFn, typename TArg> inline typename std::enable_if<!is_back_pushable_container<TFn>::value>::type add_to_container(TFn& ct, TArg&& ar) {ct.insert(ct.end(),std::move(ar));}
+        template<typename TFn, typename TKey, typename TArg> inline typename std::enable_if<std::is_pointer<typename TFn::mapped_type>::value>::type add_to_map(TFn& ct, TKey const& k, TArg&& ar) {ct.insert(typename TFn::value_type(k,ar.release()));}
+        template<typename TFn, typename TKey, typename TArg> inline typename std::enable_if<!std::is_pointer<typename TFn::mapped_type>::value>::type add_to_map(TFn& ct, TKey const& k, TArg&& ar) {ct.insert(typename TFn::value_type(k,std::move(ar)));}
+        template<typename TFn, typename TArg> inline typename std::enable_if<!std::is_pointer<typename TFn::value_type>::value>::type add_to_container(TFn& ct, TArg&& ar) {_add_to_container(ct,std::move(ar));}
+        template<typename TFn, typename TArg> inline typename std::enable_if<std::is_pointer<typename TFn::value_type>::value>::type add_to_container(TFn& ct, TArg&& ar) {_add_to_container_ptr(ct,std::move(ar));}
+        template<typename TFn, typename TArg> inline typename std::enable_if<is_back_pushable_container<TFn>::value>::type _add_to_container(TFn& ct, TArg&& ar) {ct.push_back(std::move(ar));}
+        template<typename TFn, typename TArg> inline typename std::enable_if<!is_back_pushable_container<TFn>::value>::type _add_to_container(TFn& ct, TArg&& ar) {ct.insert(ct.end(),std::move(ar));}
+        template<typename TFn, typename TArg> inline typename std::enable_if<is_back_pushable_container<TFn>::value>::type _add_to_container_ptr(TFn& ct, TArg&& ar) {ct.push_back(ar.release());}
+        template<typename TFn, typename TArg> inline typename std::enable_if<!is_back_pushable_container<TFn>::value>::type _add_to_container_ptr(TFn& ct, TArg&& ar) {ct.insert(ct.end(),ar.release());}
 
         TMb T::*member_;
         class_descriptors_ptr description_;

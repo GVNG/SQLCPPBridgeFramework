@@ -65,6 +65,7 @@
 #include "example30.h"
 #include "example31.h"
 #include "example32.h"
+#include "example33.h"
 
 int main(int argc, char** argv)
 {
@@ -635,6 +636,37 @@ int main(int argc, char** argv)
             cont.replace(src);
             cont.load(dst);
             assert(src==dst);
+            std::cout << "is ok. ";
+        }
+        
+        {
+            time_tracker trk;
+            sql_bridge::context cont(storage["case33"]);
+            std::cout << "Case 33 ";
+            
+            Case33Container dst,src
+            {
+                new Case33(1),
+                new Case33(2),
+                new Case33(3),
+                new Case33(4),
+            };
+            Case33Map chk;
+            cont.save(src);
+            cont.order(&Case33::key_).load(dst);
+            cont.load(chk);
+
+            assert(src.size()==dst.size());
+            for(Case33Container::size_type i = 0; i!=src.size(); ++i)
+            {
+                assert(*src[i]==*dst[i]);
+                assert(*src[i]==*chk[src[i]->key_]);
+            }
+
+            for(auto v : src) delete v;
+            for(auto v : dst) delete v;
+            for(auto v : chk) delete v.second;
+                
             std::cout << "is ok. ";
         }
 #endif
