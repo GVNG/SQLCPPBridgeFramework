@@ -104,7 +104,7 @@ namespace sql_bridge
         for(auto& mb : cur->second->members())
         {
             fields_definition fld{mb->field_name(),mb->sql_type(),false,false};
-            if (mb->index_type()==e_db_index_type::Unique && ret.empty())
+            if (mb->index_type()==e_db_index_type::Unique && ret.empty() && dp.ref_field_name().empty())
             {
                 ret = member_for_index_ref(e_db_key_mode::Unique,mb->field_name());
                 chld_index_ref = fields_definition{to_string() << dp.table_name() << "_" << mb->field_name(),mb->sql_type(),false,true};
@@ -126,7 +126,11 @@ namespace sql_bridge
             }
             else
             if (mb->index_type()==e_db_index_type::Unique)
-                dp.add_index_to_create(index_to_field_pair(mb->index_type(),mb->field_name()));
+            {
+                if (ret.empty() && !dp.ref_field_name().empty())
+                    ret = member_for_index_ref(mb->field_name());
+                dp.add_index_to_create(index_to_field_pair(dp.ref_field_name().empty()?mb->index_type():e_db_index_type::Basic,mb->field_name()));
+            }
             
             if (!fld.type_.empty())
                 dp.add_field(fld);
@@ -170,7 +174,7 @@ namespace sql_bridge
                 throw sql_bridge_error(g_internal_error_text,g_architecture_error_text);
             if (tids_in_proc.find(chl.source_id())!=tids_in_proc.end())
             {
-//                throw sql_bridge_error("Recursive dependencies don't support yet","You should wait the next releases or simplificate your object model.");
+                throw sql_bridge_error("Recursive dependencies don't support yet","You should wait the next releases or simplificate your object model.");
                 
 //                ret = member_for_index_ref(e_db_key_mode::None,to_string() << "sqlcpp_recursive_field");
 //                dp.add_field({ret.name(),def_recursive_type,false,true});
