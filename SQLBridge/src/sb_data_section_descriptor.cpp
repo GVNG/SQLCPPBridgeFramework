@@ -75,10 +75,19 @@ namespace sql_bridge
     
 #pragma mark - descriptor
     
-    void data_section_descriptor::prepare_relations(class_links_container& dst,std::string const& def_internal_type, std::string const& def_recursive_type) const
+    void data_section_descriptor::prepare_relations(class_links_container& dst,
+                                                    std::string const& def_internal_type,
+                                                    std::string const& def_recursive_type) const
     {
         for(class_descriptors_map::const_iterator src = classes_map_.begin(); src!=classes_map_.end(); ++src)
         {
+            if (src->second->used_pointers())
+            {
+                dst.push_back(class_link(src->second->type_id(),
+                                         src->second->table_name(),
+                                         ""));
+                continue;
+            }
             class_descriptors_map::const_iterator trg = std::find_if(classes_map_.begin(),
                                                                      classes_map_.end(),
                                                                      [&src](class_descriptors_map::value_type const& vt)
@@ -87,13 +96,18 @@ namespace sql_bridge
                 return vt.second->has_child(src->second->type_id());
             });
             if (trg==classes_map_.end())
-                dst.push_back(class_link(src->second->type_id(),src->second->table_name(),""));
+                dst.push_back(class_link(src->second->type_id(),
+                                         src->second->table_name(),
+                                         ""));
         }
         for(auto& dp : dst)
             dp.update_for_key_mode(lookup_for_key_mode(dp,def_internal_type,def_recursive_type,size_t_set()));
     }
 
-    member_for_index_ref data_section_descriptor::lookup_for_key_mode(class_link& dp, std::string const& def_internal_type, std::string const& def_recursive_type, size_t_set tids_in_proc) const
+    member_for_index_ref data_section_descriptor::lookup_for_key_mode(class_link& dp,
+                                                                      std::string const& def_internal_type,
+                                                                      std::string const& def_recursive_type,
+                                                                      size_t_set tids_in_proc) const
     {
         class_descriptors_map::const_iterator cur = classes_map_.find(dp.source_id());
         if (cur==classes_map_.end())

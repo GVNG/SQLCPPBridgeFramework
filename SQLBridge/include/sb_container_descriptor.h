@@ -50,7 +50,7 @@ namespace sql_bridge
         
     public:
         _t_container_descriptor()
-            : class_descriptor(typeid(T).hash_code())
+            : class_descriptor(typeid(T).hash_code(),false)
             {}
         
 #pragma clang diagnostic push

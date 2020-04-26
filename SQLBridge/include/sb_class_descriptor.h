@@ -49,8 +49,8 @@ namespace sql_bridge
         static class_descriptors_container const members_;
         
     public:
-        _t_class_descriptor()
-            : class_descriptor(typeid(T).hash_code())
+        _t_class_descriptor(bool used_pointers = false)
+            : class_descriptor(typeid(T).hash_code(),used_pointers)
             {}
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundefined-var-template"
@@ -123,7 +123,7 @@ namespace sql_bridge
                                                                      !is_container_of_containers<TFn>::value,class_descriptors_ptr>::type _create_nt_containers_description()
         {
             typedef _t_class_descriptor<TStrategy, typename is_pointer<typename TFn::value_type>::type> type;
-            return std::make_shared<type>();
+            return std::make_shared<type>(true);
         }
         
         template<typename TFn> inline static typename std::enable_if<is_container<TFn>::value &&
@@ -142,7 +142,7 @@ namespace sql_bridge
             typedef typename is_pointer<typename TFn::mapped_type>::type mapped;
             static_assert(is_sql_acceptable<key>::value, "The key of the maps-like containers must be trivial");
             typedef _t_class_descriptor<TStrategy,mapped> type;
-            return std::make_shared<type>();
+            return std::make_shared<type>(true);
         }
 
         template<typename TFn> inline static typename std::enable_if<is_any_map<TFn>::value &&

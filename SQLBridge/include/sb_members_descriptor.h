@@ -68,7 +68,7 @@ namespace sql_bridge
 #pragma mark - constructor
         
         _t_member_descriptor(std::string const& fn, TMb T::* m, e_db_index_type it, class_descriptors_ptr desc)
-            : class_descriptor(typeid(typename types_selector<TMb>::type).hash_code(),fn,it)
+            : class_descriptor(typeid(typename types_selector<TMb>::type).hash_code(),is_pointer<TMb>::value,fn,it)
             , member_(m)
             , description_(desc)
             {}

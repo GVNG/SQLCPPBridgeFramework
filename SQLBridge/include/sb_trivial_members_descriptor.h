@@ -41,7 +41,7 @@ namespace sql_bridge
     {
     public:
         _t_link_member_descriptor()
-            : class_descriptor(0,"",e_db_index_type::None)
+            : class_descriptor(0,false,"",e_db_index_type::None)
             {}
 
         class_descriptors_container const& members() const override {static const class_descriptors_container def;return def;}
@@ -64,7 +64,7 @@ namespace sql_bridge
     {
     public:
         _t_trivial_member_descriptor(std::string const& fn, e_db_index_type idt = e_db_index_type::None)
-            : class_descriptor(0,fn,idt)
+            : class_descriptor(0,false,fn,idt)
             {}
         
         class_descriptors_container const& members() const override {static const class_descriptors_container def;return def;}
