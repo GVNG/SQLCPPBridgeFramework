@@ -55,7 +55,7 @@ namespace sql_bridge
 
     protected:
         _t_inheritance_descriptor(class_descriptors_ptr desc)
-            : class_descriptor(typeid(TParent).hash_code())
+            : class_descriptor(typeid(TParent).hash_code(),false)
             , description_(desc)
             {}
 

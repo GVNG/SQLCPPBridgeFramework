@@ -117,7 +117,10 @@ namespace sql_bridge
         inline std::string const& field_name() const {return field_name_;}
         inline class_link const& depends() const {return depends_;}
         inline class_descriptors_container const& inheritances() const {return inheritances_;}
+        inline bool used_pointers() const {return used_pointers_;}
         bool has_child(size_t ch) const;
+        bool has_unique_key() const;
+        std::string const& sql_type_for_unique_key() const;
 
         inline void update_for_depends(class_link const& cl)
         {
@@ -134,16 +137,18 @@ namespace sql_bridge
         }
         
     protected:
-        class_descriptor(size_t tp)
+        class_descriptor(size_t tp, bool up)
             : type_id_(tp)
             , index_type_(e_db_index_type::None)
             , depends_(0,"","")
+            , used_pointers_(up)
             {};
-        class_descriptor(size_t tp, std::string const& fn, e_db_index_type it)
+        class_descriptor(size_t tp, bool up, std::string const& fn, e_db_index_type it)
             : type_id_(tp)
             , field_name_(fn)
             , index_type_(it)
             , depends_(0,"","")
+            , used_pointers_(up)
             {};
         
         template<typename TFn> TFn allocate_object() const {return _allocate_object<TFn>();}
@@ -153,6 +158,7 @@ namespace sql_bridge
         e_db_index_type index_type_;
         class_link depends_;
         class_descriptors_container inheritances_;
+        bool used_pointers_;
 
 #pragma mark - allocator
         template<typename TFn> inline typename std::enable_if<std::is_pointer<TFn>::value,std::unique_ptr<typename is_pointer<TFn>::type> >::type _allocate_object() const {return std::make_unique<typename is_pointer<TFn>::type>();}

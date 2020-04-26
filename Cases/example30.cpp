@@ -32,12 +32,12 @@
 
 DEFINE_SQL_TABLE(extra, Case30Extra)
 {
-    bind("Info",    &Case30Extra::info_),
+    bind("Info",    &Case30Extra::info_,    e_db_index_type::Unique),
 };
 
 DEFINE_SQL_TABLE(main, Case30)
 {
-    bind("Key",     &Case30::key_,      e_db_index_type::Unique),
+    bind("Key",     &Case30::key_,          e_db_index_type::Unique),
     bind("Ext",     &Case30::extra_),
 };
 
