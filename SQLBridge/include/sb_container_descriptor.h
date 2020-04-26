@@ -44,6 +44,10 @@ namespace sql_bridge
     template<typename TStrategy, typename T> class _t_container_descriptor
         : public class_descriptor
     {
+    private:
+        static std::string const table_name_;
+        static class_descriptors_container const members_;
+        
     public:
         _t_container_descriptor()
             : class_descriptor(typeid(T).hash_code())
@@ -75,6 +79,9 @@ namespace sql_bridge
 
         template<typename TFn> inline static typename std::enable_if<!is_trivial_container<TFn>::value && is_pointer<typename TFn::value_type>::value,class_descriptors_container>::type _create_members_for_container()
         {
+            typedef _t_link_member_descriptor<TStrategy, typename is_pointer<typename TFn::value_type>::type> type;
+            class_descriptors_container ret = {std::make_shared<type>(),};
+            return ret;
         }
         
         template<typename TFn> inline static typename std::enable_if<!is_trivial_container<TFn>::value && !is_pointer<typename TFn::value_type>::value,class_descriptors_container>::type _create_members_for_container()
@@ -83,6 +90,7 @@ namespace sql_bridge
             class_descriptors_container ret = {std::make_shared<type>(),};
             return ret;
         }
+        
         template<typename TFn> inline static typename std::enable_if<is_trivial_container<TFn>::value,class_descriptors_container>::type _create_members_for_container()
         {
             typedef _t_trivial_member_descriptor<TStrategy, typename TFn::value_type> type;
@@ -113,6 +121,7 @@ namespace sql_bridge
             };
             return ret;
         }
+        
         template<typename TFn> inline static typename std::enable_if<is_trivial_map<TFn>::value,class_descriptors_container>::type _create_members_for_map()
         {
             typedef _t_trivial_member_descriptor<TStrategy, typename TFn::key_type> k_type;
@@ -364,9 +373,6 @@ namespace sql_bridge
             }
         }
         
-        // members
-        static std::string const table_name_;
-        static class_descriptors_container const members_;
     };
 };
 

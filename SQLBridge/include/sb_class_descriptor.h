@@ -44,6 +44,10 @@ namespace sql_bridge
     template<typename TStrategy, typename T> class _t_class_descriptor
         : public class_descriptor
     {
+    private:
+        static std::string const table_name_;
+        static class_descriptors_container const members_;
+        
     public:
         _t_class_descriptor()
             : class_descriptor(typeid(T).hash_code())
@@ -81,7 +85,9 @@ namespace sql_bridge
             std::shared_ptr<type> ret(std::make_shared<make_shared_enabler>(fn,m,it,_create_description<TMb>()));
             return ret;
         }
-
+        
+#pragma mark - create description
+        
         template<typename TFn> inline static typename std::enable_if<is_optional_or_trivial<TFn>::value,class_descriptors_ptr>::type _create_description() {return class_descriptors_ptr();}
         template<typename TFn> inline static typename std::enable_if<is_optional_or_trivial<TFn>::value,class_descriptors_ptr>::type _create_description_pub() {return class_descriptors_ptr();}
         template<typename TFn> inline static typename std::enable_if<is_container<TFn>::value || is_map<TFn>::value,class_descriptors_ptr>::type _create_description() {return _create_containers_description<TFn>();}
@@ -149,7 +155,9 @@ namespace sql_bridge
             typedef _t_class_descriptor<TStrategy,mapped> type;
             return std::make_shared<type>();
         }
+        
 #pragma mark - bind
+        
         template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _bind_comp(TFn const&,data_update_context&,sql_value const&) {}
         template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _bind_comp(TFn const& el,data_update_context& cont,sql_value const& extkey)
         {
@@ -169,7 +177,9 @@ namespace sql_bridge
                 if (md->index_type()!=e_db_index_type::PrimaryKey)
                     md->bind_comp(&el, cont, uid);
         }
+        
 #pragma mark - read
+        
         template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _read(T&, data_update_context&) {}
         template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _read(T& dst, data_update_context& cont) {_read_comp<TFn>(dst,cont,sql_value());}
         template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _read_comp(T&, data_update_context&, sql_value const&) {}
@@ -188,8 +198,6 @@ namespace sql_bridge
             }
         }
 
-        static std::string const table_name_;
-        static class_descriptors_container const members_;
     };
         
 };

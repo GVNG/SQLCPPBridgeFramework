@@ -43,4 +43,21 @@ namespace sql_bridge
         return type_id()==ch || reference_description().first==ch;
     }
     
+    bool class_descriptor::has_unique_key() const
+    {
+        for(auto const& mb : members())
+            if (mb->index_type()==e_db_index_type::Unique)
+                return true;
+        return false;
+    }
+    
+    std::string const& class_descriptor::sql_type_for_unique_key() const
+    {
+        for(auto const& mb : members())
+            if (mb->index_type()==e_db_index_type::Unique)
+                return mb->sql_type();
+        static std::string const def;
+        return def;
+    }
+    
 };

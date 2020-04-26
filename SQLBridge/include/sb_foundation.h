@@ -118,6 +118,8 @@ namespace sql_bridge
         inline class_link const& depends() const {return depends_;}
         inline class_descriptors_container const& inheritances() const {return inheritances_;}
         bool has_child(size_t ch) const;
+        bool has_unique_key() const;
+        std::string const& sql_type_for_unique_key() const;
 
         inline void update_for_depends(class_link const& cl)
         {
