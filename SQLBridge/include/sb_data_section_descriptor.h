@@ -76,8 +76,8 @@ namespace sql_bridge
             typedef typename TStrategy::template sql_types<long long> long_sql;
             typedef typename TStrategy::template sql_types<std::string> string_sql;
             ret->prepare_relations(rel,
-                                   long_sql::template type_name<long long>(),
-                                   string_sql::template type_name<std::string>());
+                                   long_sql::type_name(),
+                                   string_sql::type_name());
             TStrategy::create_statements(rel);
             ret->dump_statements(rel);
             ret->apply_links(rel);
