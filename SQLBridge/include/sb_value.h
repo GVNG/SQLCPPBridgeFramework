@@ -35,6 +35,10 @@
 
 namespace sql_bridge
 {
+    struct sql_value;
+    typedef std::vector<sql_value> sql_values_container;
+    typedef std::map<sql_value,sql_value> sql_values_map;
+    
     struct sql_value
     {
         template<bool> struct _t_optional_adapter{};
@@ -43,6 +47,19 @@ namespace sql_bridge
         template<bool> struct _t_chrono_adapter {};
         enum class e_key_type {Empty,Integer,Real,String};
         inline bool empty() const {return type_==e_key_type::Empty;}
+        
+        inline bool operator < (sql_value const& rv) const
+        {
+            if (type_!=rv.type_) return type_<rv.type_;
+            switch(type_)
+            {
+                case e_key_type::Integer: return iValue_<rv.iValue_;
+                case e_key_type::Real: return rValue_<rv.rValue_;
+                case e_key_type::String: return tValue_<rv.tValue_;
+                default: break;
+            }
+            return false;
+        }
         
         inline sql_value()
             : type_(e_key_type::Empty)
@@ -79,6 +96,11 @@ namespace sql_bridge
         template<typename T> inline sql_value(T const& rv, _t_chrono_adapter<true>)
             : type_(e_key_type::Real)
             , rValue_(static_cast<double>(rv.time_since_epoch().count()) / T::clock::period::den * T::clock::period::num)
+            , iValue_(0)
+            {};
+        template<typename T> inline sql_value(T const& rv, _t_chrono_adapter<false>)
+            : type_(e_key_type::Empty)
+            , rValue_(0)
             , iValue_(0)
             {};
         template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value,T>::type value() const

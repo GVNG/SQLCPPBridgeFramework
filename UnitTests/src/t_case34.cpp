@@ -1,8 +1,8 @@
 //
-//  example30.cpp
-//  SQLCPPBridgeFramework
+//  t_case34.cpp
+//  Tests
 //
-//  Created by Roman Makhnenko on 31/03/2020.
+//  Created by Roman Makhnenko on 27/04/2020.
 //  Copyright © 2020 DataArt.
 //  All rights reserved.
 //
@@ -28,27 +28,24 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "example30.h"
+#include <stdio.h>
 
-DEFINE_SQL_TABLE(extra, Case30Extra)
-{
-    bind("Info",    &Case30Extra::info_,    e_db_index_type::Unique),
-    bind("Data",    &Case30Extra::data_),
-};
+#include "t_db_fixture.h"
+#include "example34.h"
 
-DEFINE_SQL_TABLE(main, Case30)
+TEST_F(DBFixture, Case34)
 {
-    bind("Key",     &Case30::key_,          e_db_index_type::Unique),
-    bind("Ext",     &Case30::extra_),
-};
-
-DEFINE_SQL_DATABASE(case30, 1, Case30, Case30Extra)::upgrade_structure(size_t from, size_t to)
-{
-    // ------------------------------------------------------------------------------------
-    // you can place here the upgrade script from the 'from' to the 'to' version
-    // something like below, or whatever SQL statements you want
-    //
-    //if (from<=2 && to>2)
-    //    execute("CREATE INDEX IF NOT EXISTS BLAH_BLAH_INDEX ON MY_TABLE (BLAH_BLAH_ID)");
-    // ------------------------------------------------------------------------------------
-};
+    sql_bridge::context cont(storage()["case34"]);
+    Case34Container dst,src
+    {
+        Case34(1),
+        Case34(2),
+        Case34(3),
+        Case34(4),
+        Case34(5),
+        Case34(6),
+    };
+    cont.replace(src);
+    cont.load(dst);
+    ASSERT_EQ(src,dst);
+}

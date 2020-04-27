@@ -107,6 +107,7 @@ namespace sql_bridge
         virtual void bind(void const*,data_update_context&) = 0;
         virtual void bind_comp(void const*,data_update_context&,sql_value const&) = 0;
         virtual sql_value expand(void const*) = 0;
+        virtual sql_value try_cast() const = 0;
         virtual void read(void*,data_update_context&) = 0;
         virtual void read_comp(void*,data_update_context&,sql_value const&) = 0;
         virtual bool is_this_mem_ptr(void const*,void const*) const = 0;
@@ -121,6 +122,8 @@ namespace sql_bridge
         bool has_child(size_t ch) const;
         bool has_unique_key() const;
         std::string const& sql_type_for_unique_key() const;
+        std::string const& field_name_for_unique_key() const;
+        sql_value sql_value_for_unique_key() const;
 
         inline void update_for_depends(class_link const& cl)
         {
@@ -161,6 +164,7 @@ namespace sql_bridge
         bool used_pointers_;
 
 #pragma mark - allocator
+        
         template<typename TFn> inline typename std::enable_if<std::is_pointer<TFn>::value,std::unique_ptr<typename is_pointer<TFn>::type> >::type _allocate_object() const {return std::make_unique<typename is_pointer<TFn>::type>();}
         template<typename TFn> inline typename std::enable_if<std::is_same<TFn,std::shared_ptr<typename is_pointer<TFn>::type> >::value,TFn>::type _allocate_object() const {return std::make_shared<typename is_pointer<TFn>::type>();}
         template<typename TFn> inline typename std::enable_if<std::is_same<TFn,std::unique_ptr<typename is_pointer<TFn>::type> >::value,TFn>::type _allocate_object() const {return std::make_unique<typename is_pointer<TFn>::type>();}
@@ -185,6 +189,7 @@ namespace sql_bridge
         virtual void read(sql_value&) = 0;
         virtual sql_value id_for_members(void const*) const = 0;
         virtual data_update_context_ptr context_for_member(size_t,sql_value const&, std::string const&) = 0;
+        virtual data_update_context_ptr context_from_root(size_t, std::string const&) = 0;
         virtual void remove_if_possible(void const*) = 0;
         virtual void remove_by_key(sql_value const&) = 0;
         virtual void remove_all() = 0;

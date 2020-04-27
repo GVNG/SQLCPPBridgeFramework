@@ -117,7 +117,8 @@ namespace sql_bridge
 
 #pragma mark - sqlite_adapter::sql_updater
 
-    sqlite_adapter::sql_updater::sql_updater(sql_file const& db, std::string const& sttm)
+    sqlite_adapter::sql_updater::sql_updater(sql_file const& db,
+                                             std::string const& sttm)
         : statement_(db[sttm])
         , need_step_(false)
         , txt_statement_(sttm)
@@ -177,20 +178,32 @@ namespace sql_bridge
 
 #pragma mark - sqlite_adapter::sql_reader
 
-    sqlite_adapter::sql_reader::sql_reader(sql_file const& db, std::string const& stm, sql_value const& extkey)
+    sqlite_adapter::sql_reader::sql_reader(sql_file const& db,
+                                           std::string const& stm,
+                                           sql_value const& extkey)
         : statement_(db[stm])
         , valid_(statement_)
         , txt_statement_(stm)
         , fld_num_(0)
+        , postponed_init_(true)
     {
         if (txt_statement_.empty()) return;
         if (!valid_)
             throw sql_error(g_err_cantread,txt_statement_,db.err_code());
         if (valid_)
         {
-            if (!extkey.empty()) bind(extkey);
-            valid_ = sqlite3_step(statement_)==SQLITE_ROW;
+            if (!extkey.empty())
+                bind(extkey);
         }
+    }
+    
+    void sqlite_adapter::sql_reader::postponed_init()
+    {
+        if (!postponed_init_) return;
+        fld_num_ = 0;
+        if (valid_)
+            valid_ = sqlite3_step(statement_)==SQLITE_ROW;
+        postponed_init_ = false;
     }
     
     bool sqlite_adapter::sql_reader::next()
@@ -203,7 +216,9 @@ namespace sql_bridge
         
 #pragma mark - sqlite_adapter::sql_reader_kv
     
-    sqlite_adapter::sql_reader_kv::sql_reader_kv(sql_file const& db, std::string const& table, std::string const& key)
+    sqlite_adapter::sql_reader_kv::sql_reader_kv(sql_file const& db,
+                                                 std::string const& table,
+                                                 std::string const& key)
         : state_(nullptr)
         , valid_(false)
     {
@@ -214,7 +229,9 @@ namespace sql_bridge
             valid_ = sqlite3_step(state_)==SQLITE_ROW;
     }
     
-    sqlite_adapter::sql_reader_kv::sql_reader_kv(sql_file const& db, std::string const& table, bool keep_order)
+    sqlite_adapter::sql_reader_kv::sql_reader_kv(sql_file const& db,
+                                                 std::string const& table,
+                                                 bool keep_order)
         : state_(nullptr)
         , valid_(false)
     {
@@ -236,7 +253,8 @@ namespace sql_bridge
     
 #pragma mark - sqlite_adapter - methods
     
-    sqlite_adapter::sql_inserter_kv sqlite_adapter::create_table(sql_file const& db,std::string const& type)
+    sqlite_adapter::sql_inserter_kv sqlite_adapter::create_table(sql_file const& db,
+                                                                 std::string const& type)
     {
         if (created_tables_.find(type)==created_tables_.end())
         {

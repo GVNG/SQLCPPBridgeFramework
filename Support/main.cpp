@@ -66,6 +66,7 @@
 #include "example31.h"
 #include "example32.h"
 #include "example33.h"
+#include "example34.h"
 
 int main(int argc, char** argv)
 {
@@ -667,6 +668,25 @@ int main(int argc, char** argv)
             for(auto v : dst) delete v;
             for(auto v : chk) delete v.second;
                 
+            std::cout << "is ok. ";
+        }
+
+        {
+            time_tracker trk;
+            sql_bridge::context cont(storage["case34"]);
+            std::cout << "Case 34 ";
+            Case34Container dst,src
+            {
+                Case34(1),
+                Case34(2),
+                Case34(3),
+                Case34(4),
+                Case34(5),
+                Case34(6),
+            };
+            cont.replace(src);
+            cont.load(dst);
+            assert(src==dst);
             std::cout << "is ok. ";
         }
 #endif

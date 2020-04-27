@@ -536,7 +536,7 @@ namespace sql_bridge
             return reader_.next();
         }
 
-        void add(sql_value const& var) override {}
+        void add(sql_value const& var) override {reader_.bind(var);}
         void remove_if_possible(void const*) override {}
         void remove_all() override {}
         void remove_by_key(sql_value const&) override {}
@@ -579,6 +579,13 @@ namespace sql_bridge
             throw sql_bridge_error(to_string() << "Table: " << table_name() <<". " << g_internal_error_text, g_architecture_error_text);
         }
 
+        data_update_context_ptr context_from_root(size_t etid,std::string const& flt) override
+        {
+            class_descriptors_ptr desc((*hierarhy_)[etid]);
+            class_link const& tl(desc->depends());
+            return data_update_context_ptr(new _t_data_read_context<TStrategy>(file_,desc,tl,hierarhy_,flt,sql_value()));
+        }
+        
     private:
         typename TStrategy::sql_file const& file_;
         data_section_descriptors_ptr hierarhy_;
@@ -635,6 +642,12 @@ namespace sql_bridge
                 if (tl.source_id()==etid && ref==tl.ref_field_name())
                     return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::no_transactions_lock>(file_,(*hierarhy_)[etid],tl,hierarhy_,""));
             throw sql_bridge_error(to_string() << "Table: " << table_name() <<". " << g_internal_error_text, g_architecture_error_text);
+        }
+        data_update_context_ptr context_from_root(size_t etid,std::string const& flt) override
+        {
+            class_descriptors_ptr desc((*hierarhy_)[etid]);
+            class_link const& tl(desc->depends());
+            return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::no_transactions_lock>(file_,desc,tl,hierarhy_,flt));
         }
         bool next(void const* dat) override
         {

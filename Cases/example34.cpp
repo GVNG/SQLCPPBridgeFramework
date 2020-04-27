@@ -1,8 +1,8 @@
 //
-//  example30.cpp
+//  example34.cpp
 //  SQLCPPBridgeFramework
 //
-//  Created by Roman Makhnenko on 31/03/2020.
+//  Created by Roman Makhnenko on 27/04/2020.
 //  Copyright © 2020 DataArt.
 //  All rights reserved.
 //
@@ -28,21 +28,20 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "example30.h"
+#include "example34.h"
 
-DEFINE_SQL_TABLE(extra, Case30Extra)
+DEFINE_SQL_TABLE(extra, Case34Extra)
 {
-    bind("Info",    &Case30Extra::info_,    e_db_index_type::Unique),
-    bind("Data",    &Case30Extra::data_),
+    bind("Info",    &Case34Extra::info_,    e_db_index_type::Unique),
+    bind("Data",    &Case34Extra::data_),
 };
 
-DEFINE_SQL_TABLE(main, Case30)
+DEFINE_SQL_TABLE(main, Case34)
 {
-    bind("Key",     &Case30::key_,          e_db_index_type::Unique),
-    bind("Ext",     &Case30::extra_),
+    bind("Ext",     &Case34::extra_),
 };
 
-DEFINE_SQL_DATABASE(case30, 1, Case30, Case30Extra)::upgrade_structure(size_t from, size_t to)
+DEFINE_SQL_DATABASE(case34, 1, Case34, Case34Extra)::upgrade_structure(size_t from, size_t to)
 {
     // ------------------------------------------------------------------------------------
     // you can place here the upgrade script from the 'from' to the 'to' version
