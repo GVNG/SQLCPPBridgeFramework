@@ -226,13 +226,44 @@ namespace sql_bridge
                                                               !is_pointer<typename TFn::mapped_type>::value>::type _bind_comp_map(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             typedef typename TFn::key_type k_type;
-            typedef typename TFn::mapped_type m_type;
+            typedef typename is_pointer<typename TFn::mapped_type>::type m_type;
             size_t elemt = typeid(m_type).hash_code();
             data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name()));
             for(auto const& ve : el)
             {
                 ncnt->add(ve.first);
                 ncnt->bind_comp(&ve.second, extkey);
+            }
+        }
+
+        template<typename TFn> inline typename std::enable_if<!is_container_of_containers<TFn>::value &&
+                                                              is_pointer<typename TFn::mapped_type>::value>::type _bind_comp_map(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        {
+            typedef typename TFn::key_type k_type;
+            typedef typename is_pointer<typename TFn::mapped_type>::type m_type;
+            size_t elemt = typeid(m_type).hash_code();
+            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name()));
+            if (description_->used_pointers() && description_->has_unique_key())
+            {
+                data_update_context_ptr excnt(dst.context_from_root(elemt,""));
+                for(auto const& ve : el)
+                {
+                    sql_value key = excnt->id_for_members(&(*ve.second));
+                    ncnt->add(ve.first);
+                    ncnt->add(key);
+                    ncnt->add(extkey);
+                    ncnt->next(nullptr);
+                }
+                for(auto const& ve : el)
+                    excnt->bind_comp(&(*ve.second), sql_value());
+            }
+            else
+            {
+                for(auto const& ve : el)
+                {
+                    ncnt->add(ve.first);
+                    ncnt->bind_comp(&(*ve.second), extkey);
+                }
             }
         }
 
@@ -310,7 +341,32 @@ namespace sql_bridge
             sql_value key((k_type()));
             if (description_->used_pointers() && description_->has_unique_key())
             {
-                throw sql_bridge_error(g_future_release_err_text, g_internal_error_text);
+                sql_values_map ids_container;
+                sql_value sbkey = description_->sql_value_for_unique_key();
+                to_string fld;
+                while(ncnt->is_ok())
+                {
+                    ncnt->read(key);
+                    ncnt->read(sbkey);
+                    ncnt->next(nullptr);
+                    ids_container.insert({sbkey,key});
+                    fld << "?,";
+                }
+                if (ids_container.empty()) return;
+                fld.remove_from_tail(1);
+                std::string filter = to_string()
+                    << TStrategy::sql_where()
+                    << TStrategy::sql_where_in(description_->field_name_for_unique_key(),fld);
+                data_update_context_ptr elmcnt(cont.context_from_root(elemt,filter));
+                for(auto const& kv : ids_container)
+                    elmcnt->add(kv.first);
+                while(elmcnt->is_ok())
+                {
+                    obj_type var(allocate_object<m_type>());
+                    elmcnt->read_comp(&(*var), sql_value());
+                    sql_value kv = elmcnt->id_for_members(&(*var));
+                    add_to_map(dst.*member_, ids_container.find(kv)->second.value<k_type>(), std::move(var));
+                }
             }
             else
             {
