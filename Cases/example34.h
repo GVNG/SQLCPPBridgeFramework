@@ -1,8 +1,8 @@
 //
-//  example30.cpp
+//  example34.h
 //  SQLCPPBridgeFramework
 //
-//  Created by Roman Makhnenko on 31/03/2020.
+//  Created by Roman Makhnenko on 27/04/2020.
 //  Copyright © 2020 DataArt.
 //  All rights reserved.
 //
@@ -28,27 +28,56 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "example30.h"
+#pragma once
+#ifndef example34_h
+#define example34_h
 
-DEFINE_SQL_TABLE(extra, Case30Extra)
+#include "sqlcppbridge.h"
+
+class Case34Extra;
+class Case34;
+typedef std::shared_ptr<Case34Extra> Case34ExtraPtr;
+typedef std::map<std::string,Case34ExtraPtr> Case34ExtraContainer;
+typedef std::vector<Case34> Case34Container;
+
+class Case34Extra
 {
-    bind("Info",    &Case30Extra::info_,    e_db_index_type::Unique),
-    bind("Data",    &Case30Extra::data_),
+    DECLARE_SQL_ACCESS(Case34Extra);
+public:
+    Case34Extra() {}
+    Case34Extra(int i)
+        : info_(sql_bridge::to_string() << "info_" << i)
+        , data_(i)
+        {}
+    inline std::string const& info() const {return info_;}
+    inline bool operator != (Case34Extra const& rv) const {return info_!=rv.info_ || data_!=rv.data_;}
+    inline bool operator < (Case34Extra const& rv) const {return info_<rv.info_;}
+private:
+    std::string info_;
+    int data_;
 };
 
-DEFINE_SQL_TABLE(main, Case30)
+class Case34
 {
-    bind("Key",     &Case30::key_,          e_db_index_type::Unique),
-    bind("Ext",     &Case30::extra_),
+    DECLARE_SQL_ACCESS(Case34);
+public:
+    Case34() {};
+    Case34(int num)
+    {
+        for(int i=0; i!=100; ++i)
+            extra_.insert({sql_bridge::to_string() << "k" << i,std::make_shared<Case34Extra>(i+num*100)});
+    }
+    inline bool operator == (Case34 const& rv) const
+    {
+        if (extra_.size()!=rv.extra_.size()) return false;
+        for(auto const& kv : extra_)
+            if (*kv.second!=*rv.extra_.find(kv.first)->second) return false;
+        return true;
+    }
+    
+private:
+    Case34ExtraContainer extra_;
 };
 
-DEFINE_SQL_DATABASE(case30, 1, Case30, Case30Extra)::upgrade_structure(size_t from, size_t to)
-{
-    // ------------------------------------------------------------------------------------
-    // you can place here the upgrade script from the 'from' to the 'to' version
-    // something like below, or whatever SQL statements you want
-    //
-    //if (from<=2 && to>2)
-    //    execute("CREATE INDEX IF NOT EXISTS BLAH_BLAH_INDEX ON MY_TABLE (BLAH_BLAH_ID)");
-    // ------------------------------------------------------------------------------------
-};
+
+#endif /* example34_h */

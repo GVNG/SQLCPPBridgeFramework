@@ -168,13 +168,13 @@ namespace sql_bridge
             ~sql_reader() {};
 
             bool next();
-            inline bool is_valid() const {return valid_;}
-            inline bool is_null() {bool ret = sqlite3_column_type(statement_, fld_num_)==SQLITE_NULL; if (ret) fld_num_++; return ret;}
-            template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value>::type read_value(T& v) {v=static_cast<T>(sqlite3_column_double(statement_, fld_num_++));}
-            template<typename T> inline typename std::enable_if<is_convertible_to_text<T>::value>::type read_value(T& v) {v=reinterpret_cast<const char*>(sqlite3_column_text(statement_, fld_num_++));}
-            template<typename T> inline typename std::enable_if<is_convertible_to_int<T>::value>::type read_value(T& v) {v=static_cast<T>(sqlite3_column_int64(statement_, fld_num_++));}
+            inline bool is_valid() {postponed_init();return valid_;}
+            inline bool is_null() {postponed_init();bool ret = sqlite3_column_type(statement_, fld_num_)==SQLITE_NULL; if (ret) fld_num_++; return ret;}
+            template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value>::type read_value(T& v) {postponed_init();v=static_cast<T>(sqlite3_column_double(statement_, fld_num_++));}
+            template<typename T> inline typename std::enable_if<is_convertible_to_text<T>::value>::type read_value(T& v) {postponed_init();v=reinterpret_cast<const char*>(sqlite3_column_text(statement_, fld_num_++));}
+            template<typename T> inline typename std::enable_if<is_convertible_to_int<T>::value>::type read_value(T& v) {postponed_init();v=static_cast<T>(sqlite3_column_int64(statement_, fld_num_++));}
            
-            template<typename T> inline void bind(T const& val) {bind_value(val,1);}
+            template<typename T> inline void bind(T const& val) {bind_value(val,++fld_num_);}
             inline void bind(sql_value const& val)
             {
                 switch(val.type_)
@@ -196,13 +196,14 @@ namespace sql_bridge
         private:
             // data
             sqlite3_stmt* statement_;
-            bool valid_;
+            bool valid_, postponed_init_;
             std::string txt_statement_;
             int fld_num_;
             // methods
             template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value>::type bind_value(T const& val, int fld) {sqlite3_bind_double(statement_, fld, val);}
             template<typename T> inline typename std::enable_if<is_convertible_to_int<T>::value>::type bind_value(T const& val, int fld) {sqlite3_bind_int64(statement_, fld, static_cast<sqlite3_int64>(val));}
             template<typename T> inline typename std::enable_if<is_convertible_to_text<T>::value>::type bind_value(T const& val, int fld) {sqlite3_bind_text(statement_, fld, val.c_str(), (int)val.size(), SQLITE_TRANSIENT);}
+            void postponed_init();
         };
         
 #pragma mark - sql_updater
@@ -300,8 +301,8 @@ namespace sql_bridge
 
         static std::string sql_where_between(std::string const& fld, std::string const& from, std::string const& to) {return to_string() << fld << " BETWEEN " << from << " AND " << to;}
         static std::string sql_where_not_between(std::string const& fld, std::string const& from, std::string const& to) {return to_string() << fld << " NOT BETWEEN " << from << " AND " << to;}
-        static std::string sql_where_in(std::string const& fld, std::string const& val) {return to_string() << fld << " IN ( " << val << ")";}
-        static std::string sql_where_not_in(std::string const& fld, std::string const& val) {return to_string() << fld << " NOT IN ( " << val << ")";}
+        static std::string sql_where_in(std::string const& fld, std::string const& val) {return to_string() << fld << " IN ( " << val << " )";}
+        static std::string sql_where_not_in(std::string const& fld, std::string const& val) {return to_string() << fld << " NOT IN ( " << val << " )";}
 
     private:
         static void create_statements(class_link&, std::string const& relfrom = "");

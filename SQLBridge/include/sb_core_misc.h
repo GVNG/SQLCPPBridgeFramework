@@ -53,6 +53,7 @@ namespace sql_bridge
     static std::string const g_key_field_name("sb_key");
     static std::string const g_value_field_name("sb_val");
     static std::string const g_internal_error_text("Internal error");
+    static std::string const g_future_release_err_text("Not implemented yet");
     static std::string const g_architecture_error_text("It's probably an error of architecture. Ask the author to resolve this issue.");
     static std::string const g_expand_static_recommendation("You should expand used static container or change it to dynamic.");
     static std::string const g_replace_static_recommendation("Some part of elements haven't been initialized. Use dynamic container instead.");

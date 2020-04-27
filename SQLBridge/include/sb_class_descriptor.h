@@ -63,6 +63,7 @@ namespace sql_bridge
         void bind(void const* val, data_update_context& cont) override {}
         void bind_comp(void const* val, data_update_context& cont, sql_value const& extkey) override {_bind_comp<T>(*static_cast<T const*>(val),cont,extkey);}
         sql_value expand(void const*) override {return sql_value();}
+        sql_value try_cast() const override {return _try_cast<T>();}
         void read(void* dst,data_update_context& cont) override {_read<T>(*static_cast<T*>(dst),cont);}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {_read_comp<T>(*static_cast<T*>(dst),cont,extkey);}
         bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
@@ -85,6 +86,11 @@ namespace sql_bridge
             std::shared_ptr<type> ret(std::make_shared<make_shared_enabler>(fn,m,it,_create_description<TMb>()));
             return ret;
         }
+        
+#pragma mark - try cast
+        
+        template<typename TFn> inline static typename std::enable_if<is_sql_acceptable<TFn>::value,sql_value>::type _try_cast() {return sql_value(TFn());}
+        template<typename TFn> inline static typename std::enable_if<!is_sql_acceptable<TFn>::value,sql_value>::type _try_cast() {return sql_value();}
         
 #pragma mark - create description
         
