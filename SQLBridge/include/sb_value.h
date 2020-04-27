@@ -35,6 +35,9 @@
 
 namespace sql_bridge
 {
+    struct sql_value;
+    typedef std::vector<sql_value> sql_values_container;
+    
     struct sql_value
     {
         template<bool> struct _t_optional_adapter{};
@@ -79,6 +82,11 @@ namespace sql_bridge
         template<typename T> inline sql_value(T const& rv, _t_chrono_adapter<true>)
             : type_(e_key_type::Real)
             , rValue_(static_cast<double>(rv.time_since_epoch().count()) / T::clock::period::den * T::clock::period::num)
+            , iValue_(0)
+            {};
+        template<typename T> inline sql_value(T const& rv, _t_chrono_adapter<false>)
+            : type_(e_key_type::Empty)
+            , rValue_(0)
             , iValue_(0)
             {};
         template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value,T>::type value() const

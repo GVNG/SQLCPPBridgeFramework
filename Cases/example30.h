@@ -48,11 +48,14 @@ public:
     Case30Extra() {}
     Case30Extra(int i)
         : info_(sql_bridge::to_string() << "info_" << i)
+        , data_(i)
         {}
     inline std::string const& info() const {return info_;}
-    inline bool operator != (Case30Extra const& rv) const {return info_!=rv.info_;}
+    inline bool operator != (Case30Extra const& rv) const {return info_!=rv.info_ || data_!=rv.data_;}
+    inline bool operator < (Case30Extra const& rv) const {return info_<rv.info_;}
 private:
     std::string info_;
+    int data_;
 };
 
 class Case30
@@ -75,7 +78,7 @@ public:
         return true;
     }
     inline std::string const& key() const {return key_;}
-
+    
 private:
     std::string key_;
     Case30ExtraContainer extra_;

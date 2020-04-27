@@ -81,7 +81,7 @@ namespace sql_bridge
     {
         for(class_descriptors_map::const_iterator src = classes_map_.begin(); src!=classes_map_.end(); ++src)
         {
-            if (src->second->used_pointers())
+            if (src->second->used_pointers() && src->second->has_unique_key())
             {
                 dst.push_back(class_link(src->second->type_id(),
                                          src->second->table_name(),
@@ -113,8 +113,19 @@ namespace sql_bridge
         if (cur==classes_map_.end())
             throw sql_bridge_error(to_string() << "Unspecified table with name \"" << dp.table_name() <<"\"",
                                    to_string() << "You should use \"DEFINE_SQL_TABLE(" << dp.table_name() << "...\" macro somewhere in one of yours compile units");
+
         member_for_index_ref ret;
         fields_definition chld_index_ref{"","",false,false};
+
+        if (cur->second->used_pointers() &&
+            cur->second->has_unique_key() &&
+            !dp.ref_field_name().empty())
+        {
+            fields_definition fld{"key_for_ref",cur->second->sql_type_for_unique_key(),false,false};
+            dp.add_field(fld);
+            return ret;
+        }
+        
         for(auto& mb : cur->second->members())
         {
             fields_definition fld{mb->field_name(),mb->sql_type(),false,false};

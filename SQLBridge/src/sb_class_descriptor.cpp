@@ -60,4 +60,21 @@ namespace sql_bridge
         return def;
     }
     
+    sql_value class_descriptor::sql_value_for_unique_key() const
+    {
+        for(auto const& mb : members())
+            if (mb->index_type()==e_db_index_type::Unique)
+                return mb->try_cast();
+        return sql_value();
+    }
+    
+    std::string const& class_descriptor::field_name_for_unique_key() const
+    {
+        for(auto const& mb : members())
+            if (mb->index_type()==e_db_index_type::Unique)
+                return mb->field_name();
+        static std::string const def;
+        return def;
+    }
+    
 };

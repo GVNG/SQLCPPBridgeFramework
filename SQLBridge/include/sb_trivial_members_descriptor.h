@@ -52,6 +52,7 @@ namespace sql_bridge
         void bind(void const*,data_update_context&) override {};
         void bind_comp(void const*,data_update_context&,sql_value const&) override {};
         sql_value expand(void const*) override {return sql_value();}
+        sql_value try_cast() const override {return sql_value();}
         void read(void*,data_update_context&) override {}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {};
         bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
@@ -75,6 +76,7 @@ namespace sql_bridge
         void bind(void const*,data_update_context&) override {};
         void bind_comp(void const*,data_update_context&,sql_value const&) override {};
         sql_value expand(void const*) override {return sql_value();}
+        sql_value try_cast() const override {return sql_value();}
         void read(void*,data_update_context&) override {}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {};
         bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
