@@ -47,18 +47,17 @@ namespace sql_bridge
             typedef typename std::decay<T>::type _t_base;
         public:
             save_task(T const& src,data_sections_ptr section)
-                : section_(section)
+                : db_task(section)
                 , data_(src)
                 {};
             save_task(T&& src,data_sections_ptr section)
-                : section_(section)
+                : db_task(section)
                 , data_(std::move(src))
                 {};
             
             inline void run_task() override {section_->save(data_);}
             void error(base_sql_error const& err) override {std::cerr << err.what() << std::endl;}
         private:
-            data_sections_ptr section_;
             _t_base data_;
         };
 
@@ -67,17 +66,16 @@ namespace sql_bridge
             typedef typename std::decay<T>::type _t_base;
         public:
             replace_task(T const& src,data_sections_ptr section)
-                : section_(section)
+                : db_task(section)
                 , data_(src)
                 {};
             replace_task(T&& src,data_sections_ptr section)
-                : section_(section)
+                : db_task(section)
                 , data_(std::move(src))
                 {};
             inline void run_task() override {section_->replace(data_);}
             void error(base_sql_error const& err) override {std::cerr << err.what() << std::endl;}
         private:
-            data_sections_ptr section_;
             _t_base data_;
         };
 
@@ -86,14 +84,13 @@ namespace sql_bridge
             typedef typename std::decay<T>::type _t_base;
         public:
             load_task(data_sections_ptr section, std::string const& flt)
-                : section_(section)
+                : db_task(section)
                 , filter_(flt)
                 {};
             inline void run_task() override {section_->load(data_,filter_);}
             inline _t_base&& data() {return std::move(data_);}
             void error(base_sql_error const& err) override {throw err;}
         private:
-            data_sections_ptr section_;
             std::string filter_;
             _t_base data_;
         };
@@ -106,7 +103,7 @@ namespace sql_bridge
             typedef std::function<void(base_sql_error const&)> _fn_failed;
             
             async_load_task(_t_base const& src, data_sections_ptr section, std::string const& flt, _fn_failed fl, _fn_success_load fs)
-                : section_(section)
+                : db_task(section)
                 , filter_(flt)
                 , data_(src)
                 , fn_success_(fs)
@@ -132,7 +129,66 @@ namespace sql_bridge
             }
             inline _t_base&& data() {return std::move(data_);}
         private:
-            data_sections_ptr section_;
+            std::string filter_;
+            _t_base data_;
+            _fn_success_load fn_success_;
+            _fn_failed fn_failed_;
+        };
+
+        template<typename T> class load_page_task : public db_task
+        {
+            typedef typename std::decay<T>::type _t_base;
+        public:
+            load_page_task(_t_base& dst, data_sections_ptr section, size_t pgsz, std::string const& flt)
+                : db_task(section)
+                , page_size_(pgsz)
+                , filter_(flt)
+                , data_(dst)
+                {};
+            inline void run_task() override {section_->load(data_,filter_);}
+            void error(base_sql_error const& err) override {throw err;}
+        private:
+            size_t page_size_;
+            std::string filter_;
+            _t_base& data_;
+        };
+
+        template<typename T> class async_load_page_task : public db_task
+        {
+            typedef typename std::decay<T>::type _t_base;
+        public:
+            typedef std::function<void(_t_base&&)> _fn_success_load;
+            typedef std::function<void(base_sql_error const&)> _fn_failed;
+            
+            async_load_page_task(_t_base const& src, data_sections_ptr section, size_t pgsz, std::string const& flt, _fn_failed fl, _fn_success_load fs)
+                : db_task(section)
+                , page_size_(pgsz)
+                , filter_(flt)
+                , data_(src)
+                , fn_success_(fs)
+                , fn_failed_(fl)
+                {};
+            void run_task() override
+            {
+                section_->load(data_,filter_);
+                if (fn_success_)
+                    fn_success_(std::move(data_));
+            };
+            void error(base_sql_error const& err) override
+            {
+                if (fn_failed_)
+                    fn_failed_(err);
+                else
+                {
+                    _t_base def;
+                    if (fn_success_)
+                        fn_success_(std::move(def));
+                    std::cerr << err.what() << std::endl;
+                }
+            }
+            inline _t_base&& data() {return std::move(data_);}
+        private:
+            size_t page_size_;
             std::string filter_;
             _t_base data_;
             _fn_success_load fn_success_;
@@ -144,17 +200,16 @@ namespace sql_bridge
             typedef typename std::decay<T>::type _t_base;
         public:
             remove_task(T const& src,data_sections_ptr section)
-                : section_(section)
+                : db_task(section)
                 , data_(src)
                 {};
             remove_task(T&& src,data_sections_ptr section)
-                : section_(section)
+                : db_task(section_)
                 , data_(std::move(src))
                 {};
             inline void run_task() override {section_->remove(data_);}
             void error(base_sql_error const& err) override {std::cerr << err.what() << std::endl;}
         private:
-            data_sections_ptr section_;
             _t_base data_;
         };
 
@@ -164,12 +219,11 @@ namespace sql_bridge
             typedef typename _t_base::key_type _t_key;
         public:
             remove_by_key_task(_t_key const& val, data_sections_ptr section)
-                : section_(section)
+                : db_task(section)
                 , value_(val)
                 {};
             inline void run_task() override {section_->remove_by_key<T>(value_);}
         private:
-            data_sections_ptr section_;
             _t_key const value_;
         };
 
@@ -178,12 +232,11 @@ namespace sql_bridge
             typedef typename std::decay<T>::type _t_base;
         public:
             remove_if_task(std::string const& flt, data_sections_ptr section)
-                : section_(section)
+                : db_task(section)
                 , condition_(flt)
                 {};
             inline void run_task() override {section_->remove_if<T>(condition_);}
         private:
-            data_sections_ptr section_;
             std::string const condition_;
         };
 
@@ -213,12 +266,16 @@ namespace sql_bridge
         template<typename T> inline context& load(T const& dst, std::string const& flt, typename async_load_task<T>::_fn_failed fl, typename async_load_task<T>::_fn_success_load fs) {_load<T>(dst,build_suffix(flt),fl,fs);return *this;}
         template<typename T> inline context& load(T const& dst, std::string const& flt, typename async_load_task<T>::_fn_success_load fs) {_load<T>(dst,build_suffix(flt),nullptr,fs);return *this;}
 
+        template<typename T> inline context& load(size_t pgsz, T& dst, std::string const& flt = "") {_load_page<T>(pgsz,dst,build_suffix(flt));return *this;}
+        template<typename T> inline context& load(size_t pgsz, T const& dst, std::string const& flt, typename async_load_page_task<T>::_fn_failed fl, typename async_load_page_task<T>::_fn_success_load fs) {_load_page<T>(pgsz,dst,build_suffix(flt),fl,fs);return *this;}
+        template<typename T> inline context& load(size_t pgsz, T const& dst, std::string const& flt, typename async_load_page_task<T>::_fn_success_load fs) {_load_page<T>(pgsz,dst,build_suffix(flt),nullptr,fs);return *this;}
+
         template<typename T> inline context& remove(T const& src) {_remove<T>(src);return *this;}
         template<typename T> inline context& remove(T& src) {_remove<T>(src);return *this;}
         template<typename T> inline context& remove(T&& src) {_remove_m<T>(std::move(src));return *this;}
 
         template<typename T> inline typename std::enable_if<is_map<T>::value,context&>::type remove(typename T::key_type const& val) {_remove_by_key<T>(val);return *this;}
-        template<typename T> inline context& remove_if(std::string const& flt = "") {typedef typename types_selector<T>::type type;_remove_if<type>(build_suffix(flt));return *this;}
+        template<typename T> inline context& remove_if(std::string const& flt = "") {_remove_if<typename types_selector<T>::type>(build_suffix(flt));return *this;}
 
         template<typename T> inline context& replace(T const& src) {_replace<T>(src);return *this;}
         template<typename T> inline context& replace(T& src) {_replace<T>(src);return *this;}
@@ -241,7 +298,9 @@ namespace sql_bridge
 
     private:
         // methods
+        
 #pragma mark - save
+        
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _save(T const&) const
         {
             throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
@@ -339,23 +398,42 @@ namespace sql_bridge
                 ret.get();
             }
         }
+        
+#pragma mark - load page
+        
+        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load_page(size_t,T const&,std::string const&,typename async_load_task<T>::_fn_failed, typename async_load_task<T>::_fn_success_load) const
+        {
+            throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
+        }
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load_page(size_t pgsz, T const& dst,std::string const& flt,typename async_load_task<T>::_fn_failed fl, typename async_load_task<T>::_fn_success_load fs) const
+        {
+            db_task_ptr task(std::make_shared< async_load_page_task<T> >(dst,data_,pgsz,flt,fl,fs));
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr) qp->add(task);
+        }
+        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load_page(size_t,T&,std::string const&) const
+        {
+            throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
+        }
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load_page(size_t pgsz, T& dst,std::string const& flt) const
+        {
+            db_task_ptr task(std::make_shared< load_page_task<T> >(dst,data_,pgsz,flt));
+            std::future<void> ret(task->get_future());
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr)
+            {
+                qp->add(task);
+                ret.get();
+            }
+        }
+
 #pragma mark - load
+        
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load(T const&,std::string const&,typename async_load_task<T>::_fn_failed, typename async_load_task<T>::_fn_success_load) const
         {
             throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
         }
-        template<typename T> inline typename std::enable_if<is_container<T>::value || is_map<T>::value>::type _load(T const& dst,std::string const& flt,typename async_load_task<T>::_fn_failed fl, typename async_load_task<T>::_fn_success_load fs) const {_load_container<T>(dst,flt,fl,fs);}
-        template<typename T> inline typename std::enable_if<is_trivial_container<T>::value || is_trivial_map<T>::value>::type _load_container(T const&,std::string const&,typename async_load_task<T>::_fn_failed fl, typename async_load_task<T>::_fn_success_load fs) const
-        {
-            throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
-        }
-        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _load(T const& dst,std::string const& flt,typename async_load_task<T>::_fn_failed fl, typename async_load_task<T>::_fn_success_load fs) const
-        {
-            db_task_ptr task(std::make_shared< async_load_task<T> >(dst,data_,flt,fl,fs));
-            db_tasks_queue_interface_ptr qp = queue_.lock();
-            if (qp!=nullptr) qp->add(task);
-        }
-        template<typename T> inline typename std::enable_if<!is_trivial_container<T>::value && !is_trivial_map<T>::value>::type _load_container(T const& dst,std::string const& flt,typename async_load_task<T>::_fn_failed fl, typename async_load_task<T>::_fn_success_load fs) const
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load(T const& dst,std::string const& flt,typename async_load_task<T>::_fn_failed fl, typename async_load_task<T>::_fn_success_load fs) const
         {
             db_task_ptr task(std::make_shared< async_load_task<T> >(dst,data_,flt,fl,fs));
             db_tasks_queue_interface_ptr qp = queue_.lock();
@@ -365,7 +443,7 @@ namespace sql_bridge
         {
             throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
         }
-        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _load(T& dst,std::string const& flt) const
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load(T& dst,std::string const& flt) const
         {
             db_task_ptr task(std::make_shared< load_task<T> >(data_,flt));
             std::future<void> ret(task->get_future());
@@ -377,18 +455,7 @@ namespace sql_bridge
                 dst = static_cast<load_task<T>*>(task.get())->data();
             }
         }
-        template<typename T> inline typename std::enable_if<is_container<T>::value || is_map<T>::value>::type _load(T& dst,std::string const& flt) const
-        {
-            db_task_ptr task(std::make_shared< load_task<T> >(data_,flt));
-            std::future<void> ret(task->get_future());
-            db_tasks_queue_interface_ptr qp = queue_.lock();
-            if (qp!=nullptr)
-            {
-                qp->add(task);
-                ret.get();
-                dst = static_cast<load_task<T>*>(task.get())->data();
-            }
-        }
+        
 #pragma mark - remove
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _remove(T const&) const
         {
