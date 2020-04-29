@@ -88,7 +88,8 @@ namespace sql_bridge
         template<bool> struct _t_var_last_adapter {};
         template<bool> struct _t_inheritance_adapter {};
 
-        #pragma mark - check inheritance
+#pragma mark - check inheritance
+        
         template<typename... Ts> inline static void _check_inheritance(_t_data_section_descriptor& inst) {inst._check_inheritance<Ts...>(_t_var_last_adapter<sizeof...(Ts)<=2>());}
         template<typename TFs, typename TSc, typename... Ts> inline void _check_inheritance(_t_var_last_adapter<false>)
         {
@@ -112,7 +113,8 @@ namespace sql_bridge
             fspos->second->update_for_inheritances(desc);
         };
 
-        #pragma mark - init
+#pragma mark - init
+        
         template<typename... Ts> inline static void _init(_t_data_section_descriptor& inst) {inst._init<Ts...>(_t_var_last_adapter<sizeof...(Ts)==1>());}
         template<typename TPar> inline void _init(_t_var_last_adapter<true>) {_register_class<TPar>();}
         template<typename TPar, typename... Ts> inline void _init(_t_var_last_adapter<false>)
@@ -121,7 +123,8 @@ namespace sql_bridge
             _init<Ts...>(_t_var_last_adapter<sizeof...(Ts)==1>());
         }
 
-        #pragma mark - register classes
+#pragma mark - register classes
+        
         template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _register_class() {};
         template<typename TFn> inline typename std::enable_if<is_container<TFn>::value || is_map<TFn>::value>::type _register_class() {_register_container<TFn>();}
         template<typename TFn> inline typename std::enable_if<!is_container<TFn>::value && !is_map<TFn>::value && !is_sql_acceptable<TFn>::value>::type _register_class()
@@ -154,7 +157,8 @@ namespace sql_bridge
             size_t code = typeid(TFn).hash_code();
             classes_map_.insert({code,desc});
         }
-        #pragma mark - misc
+        
+#pragma mark - misc
 
         _t_data_section_descriptor(std::string const& name, size_t ver)
             : data_section_descriptor(name,ver)

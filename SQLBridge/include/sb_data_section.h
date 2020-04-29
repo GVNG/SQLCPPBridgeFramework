@@ -46,6 +46,7 @@ namespace sql_bridge
     public:
         template<typename T> inline void save(T const& src) {_save<T>(src);}
         template<typename T> inline void load(T& dst, std::string const& flt) {_load<T>(dst,flt);};
+        template<typename T> inline void load_page(size_t pgsz, T& dst, std::string const& flt) {_load_page<T>(pgsz,dst,flt);};
         template<typename T> inline void remove(T const& src) {_remove<T>(src);}
         template<typename T> inline void remove_if(std::string const& src) {_remove_if<T>(src);}
         template<typename T> inline typename std::enable_if<is_any_map<T>::value>::type remove_by_key(typename T::key_type const& src) {_remove_by_key<T>(src);}
@@ -83,7 +84,7 @@ namespace sql_bridge
             {};
         
         virtual data_update_context_ptr create_context(size_t,std::string const& = std::string()) const = 0;
-        virtual data_update_context_ptr create_reader(size_t,std::string const&) const = 0;
+        virtual data_update_context_ptr create_reader(size_t,std::string const&,size_t) const = 0; // tid,filter,page
 
         data_section_descriptors_ptr descriptor_;
     private:
@@ -294,19 +295,32 @@ namespace sql_bridge
                     cont->bind_comp(&el.second,sql_value());
             }
         }
-        
+
+#pragma mark - load page
+
+        template<typename T> inline typename std::enable_if<!is_pointer<T>::value &&
+                                                            !is_container<T>::value &&
+                                                            !is_any_map<T>::value>::type _load_page(size_t pgsz, T& dst, std::string const& flt)
+        {
+            size_t tid = typeid(T).hash_code();
+            data_update_context_ptr cont(create_reader(tid, flt, pgsz));
+            cont->read(&dst);
+        }
+
 #pragma mark - load
 
         template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _load(T& dst, std::string const& flt)
         {
             size_t tid = types_selector<T>::destination_id();
-            data_update_context_ptr cont(create_reader(tid, flt));
+            data_update_context_ptr cont(create_reader(tid, flt, 0));
             cont->read(&(*dst));
         }
-        template<typename T> inline typename std::enable_if<!is_pointer<T>::value && !is_container<T>::value && !is_any_map<T>::value>::type _load(T& dst, std::string const& flt)
+        template<typename T> inline typename std::enable_if<!is_pointer<T>::value &&
+                                                            !is_container<T>::value &&
+                                                            !is_any_map<T>::value>::type _load(T& dst, std::string const& flt)
         {
             size_t tid = typeid(T).hash_code();
-            data_update_context_ptr cont(create_reader(tid, flt));
+            data_update_context_ptr cont(create_reader(tid, flt, 0));
             cont->read(&dst);
         }
         template<typename T> inline typename std::enable_if<is_trivial_container<T>::value ||
@@ -314,7 +328,7 @@ namespace sql_bridge
                                                             is_container_of_containers<T>::value>::type _load(T& dst, std::string const& flt)
         {
             size_t tid = typeid(T).hash_code();
-            data_update_context_ptr cont(create_reader(tid, flt));
+            data_update_context_ptr cont(create_reader(tid, flt, 0));
             cont->read(&dst);
         }
         template<typename T> inline typename std::enable_if<is_container<T>::value &&
@@ -326,7 +340,7 @@ namespace sql_bridge
             if (descriptor_->has_description<T>())
             {
                 size_t tid = typeid(T).hash_code();
-                data_update_context_ptr cont(create_reader(tid, flt));
+                data_update_context_ptr cont(create_reader(tid, flt, 0));
                 cont->read(&dst);
             }
             else
@@ -334,7 +348,7 @@ namespace sql_bridge
                 typedef typename is_pointer<typename T::value_type>::type type;
                 size_t tid = types_selector<T>::destination_id();
                 typedef std::conditional_t<std::is_pointer<typename T::value_type>::value, std::unique_ptr<type>, typename T::value_type> obj_type;
-                data_update_context_ptr cont(create_reader(tid, flt));
+                data_update_context_ptr cont(create_reader(tid, flt, 0));
                 dst.clear();
                 while(cont->is_ok())
                 {
@@ -349,14 +363,14 @@ namespace sql_bridge
             if (descriptor_->has_description<T>())
             {
                 size_t tid = typeid(T).hash_code();
-                data_update_context_ptr cont(create_reader(tid, flt));
+                data_update_context_ptr cont(create_reader(tid, flt, 0));
                 cont->read(&dst);
             }
             else
             {
                 typedef typename T::value_type type;
                 size_t tid = types_selector<T>::destination_id();
-                data_update_context_ptr cont(create_reader(tid, flt));
+                data_update_context_ptr cont(create_reader(tid, flt, 0));
                 type val;
                 dst.clear();
                 while(cont->is_ok())
@@ -375,7 +389,7 @@ namespace sql_bridge
             if (descriptor_->has_description<T>())
             {
                 size_t tid = typeid(T).hash_code();
-                data_update_context_ptr cont(create_reader(tid, flt));
+                data_update_context_ptr cont(create_reader(tid, flt, 0));
                 cont->read(&dst);
             }
             else
@@ -384,7 +398,7 @@ namespace sql_bridge
                 typedef typename T::mapped_type m_type;
                 typedef std::conditional_t<std::is_pointer<typename T::mapped_type>::value, std::unique_ptr<typename is_pointer<m_type>::type>, typename T::mapped_type> obj_type;
                 size_t tid = types_selector<T>::destination_id();
-                data_update_context_ptr cont(create_reader(tid, flt));
+                data_update_context_ptr cont(create_reader(tid, flt, 0));
                 dst.clear();
                 while(cont->is_ok())
                 {
@@ -402,7 +416,7 @@ namespace sql_bridge
             if (descriptor_->has_description<T>())
             {
                 size_t tid = typeid(T).hash_code();
-                data_update_context_ptr cont(create_reader(tid, flt));
+                data_update_context_ptr cont(create_reader(tid, flt, 0));
                 cont->read(&dst);
             }
             else
@@ -410,7 +424,7 @@ namespace sql_bridge
                 typedef typename T::key_type k_type;
                 typedef typename T::mapped_type m_type;
                 size_t tid = typeid(m_type).hash_code();
-                data_update_context_ptr cont(create_reader(tid, flt));
+                data_update_context_ptr cont(create_reader(tid, flt, 0));
                 m_type val;
                 dst.clear();
                 while(cont->is_ok())
@@ -509,8 +523,9 @@ namespace sql_bridge
                              class_link const& lnk,
                              data_section_descriptors_ptr hr,
                              std::string const& flt,
-                             sql_value const& extkey)
-            : data_update_context(desc,lnk)
+                             sql_value const& extkey,
+                             size_t pgsz)
+            : data_update_context(desc,lnk,pgsz)
             , file_(fl)
             , hierarhy_(hr)
             , reader_(fl,to_string() << lnk.statements().select_ << " " << (flt.empty()?lnk.statements().select_app_:flt), extkey)
@@ -571,19 +586,19 @@ namespace sql_bridge
             return member_for_id_?member_for_id_->expand(dat):sql_value();
         }
 
-        data_update_context_ptr context_for_member(size_t etid, sql_value const& extkey, std::string const& ref) override
+        data_update_context_ptr context_for_member(size_t etid, sql_value const& extkey, std::string const& ref, size_t pgsz) override
         {
             for(auto const& tl : link_.target())
                 if (tl.source_id()==etid && ref==tl.ref_field_name())
-                    return data_update_context_ptr(new _t_data_read_context<TStrategy>(file_,(*hierarhy_)[etid],tl,hierarhy_,"",extkey));
+                    return data_update_context_ptr(new _t_data_read_context<TStrategy>(file_,(*hierarhy_)[etid],tl,hierarhy_,"",extkey,0));
             throw sql_bridge_error(to_string() << "Table: " << table_name() <<". " << g_internal_error_text, g_architecture_error_text);
         }
 
-        data_update_context_ptr context_from_root(size_t etid,std::string const& flt) override
+        data_update_context_ptr context_from_root(size_t etid,std::string const& flt, size_t pgsz) override
         {
             class_descriptors_ptr desc((*hierarhy_)[etid]);
             class_link const& tl(desc->depends());
-            return data_update_context_ptr(new _t_data_read_context<TStrategy>(file_,desc,tl,hierarhy_,flt,sql_value()));
+            return data_update_context_ptr(new _t_data_read_context<TStrategy>(file_,desc,tl,hierarhy_,flt,sql_value(),0));
         }
         
     private:
@@ -601,7 +616,7 @@ namespace sql_bridge
     {
     public:
         _t_data_update_context(typename TStrategy::sql_file const& fl, class_descriptors_ptr desc, class_link const& lnk, data_section_descriptors_ptr hr, std::string const& flt)
-            : data_update_context(desc,lnk)
+            : data_update_context(desc,lnk,0)
             , TTransactionLock(fl)
             , file_(fl)
             , inserter_(fl,link_.statements().insert_)
@@ -636,14 +651,14 @@ namespace sql_bridge
                 inserter_.bind(var);
         }
         void read(sql_value&) override {}
-        data_update_context_ptr context_for_member(size_t etid, sql_value const&, std::string const& ref) override
+        data_update_context_ptr context_for_member(size_t etid, sql_value const&, std::string const& ref, size_t) override
         {
             for(auto const& tl : link_.target())
                 if (tl.source_id()==etid && ref==tl.ref_field_name())
                     return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::no_transactions_lock>(file_,(*hierarhy_)[etid],tl,hierarhy_,""));
             throw sql_bridge_error(to_string() << "Table: " << table_name() <<". " << g_internal_error_text, g_architecture_error_text);
         }
-        data_update_context_ptr context_from_root(size_t etid,std::string const& flt) override
+        data_update_context_ptr context_from_root(size_t etid,std::string const& flt, size_t) override
         {
             class_descriptors_ptr desc((*hierarhy_)[etid]);
             class_link const& tl(desc->depends());
@@ -737,10 +752,10 @@ namespace sql_bridge
             class_descriptors_ptr desc = (*descriptor_)[tid];
             return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::transactions_lock>(*this,desc,desc->depends(),descriptor_,flt));
         }
-        data_update_context_ptr create_reader(size_t tid, std::string const& flt) const override
+        data_update_context_ptr create_reader(size_t tid, std::string const& flt, size_t pgsz) const override
         {
             class_descriptors_ptr desc = (*descriptor_)[tid];
-            return data_update_context_ptr(new _t_data_read_context<TStrategy>(*this,desc,desc->depends(),descriptor_,flt,sql_value()));
+            return data_update_context_ptr(new _t_data_read_context<TStrategy>(*this,desc,desc->depends(),descriptor_,flt,sql_value(),pgsz));
         }
         
         std::string order_by(std::string const& fld) override {return TStrategy::sql_order_by(fld);}

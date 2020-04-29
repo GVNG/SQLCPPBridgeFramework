@@ -68,6 +68,7 @@ namespace sql_bridge
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {_read_comp<T>(*static_cast<T*>(dst),cont,extkey);}
         bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
         bool is_target_map() const override {return is_map<T>::value;}
+        bool is_not_empty_container(void const* src) const override {return _is_not_empty_container<T>(*static_cast<T const*>(src));}
 
         template<typename TFn> static class_descriptors_ptr create_description() {return _create_description_pub<TFn>();}
         template<typename TFn> static class_descriptors_ptr create_inheritance(class_descriptors_ptr desc)
@@ -87,6 +88,20 @@ namespace sql_bridge
             return ret;
         }
         
+#pragma mark - check for empty containers
+        
+        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value ||
+                                                              is_map<TFn>::value,bool>::type _is_not_empty_container(T const& el) const
+        {
+            return !el.empty();
+        }
+
+        template<typename TFn> inline typename std::enable_if<!is_container<TFn>::value &&
+                                                              !is_map<TFn>::value,bool>::type _is_not_empty_container(T const& el) const
+        {
+            return false;
+        }
+
 #pragma mark - try cast
         
         template<typename TFn> inline static typename std::enable_if<is_sql_acceptable<TFn>::value,sql_value>::type _try_cast() {return sql_value(TFn());}

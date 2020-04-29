@@ -53,6 +53,7 @@ namespace sql_bridge
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {_read_comp<TParent>(*static_cast<TChild*>(dst),cont,extkey);}
         bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
         bool is_target_map() const override {return is_map<TChild>::value;}
+        bool is_not_empty_container(void const*) const override {return false;}
 
     protected:
         _t_inheritance_descriptor(class_descriptors_ptr desc)
@@ -66,14 +67,14 @@ namespace sql_bridge
         template<typename TFn> inline void _bind_comp(TParent const& el, data_update_context& cont, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,std::string()));
+            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,std::string(),0));
             ncnt->bind_comp(&el, extkey);
         };
 #pragma mark - read
         template<typename TFn> inline void _read_comp(TParent& dst, data_update_context& cont, sql_value const& extkey)
         {
             size_t elemt = typeid(TParent).hash_code();
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,std::string()));
+            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,std::string(),0));
             if(ncnt->is_ok())
                 ncnt->read_comp(&dst, extkey);
         };

@@ -102,7 +102,11 @@ namespace sql_bridge
             typedef std::function<void(_t_base&&)> _fn_success_load;
             typedef std::function<void(base_sql_error const&)> _fn_failed;
             
-            async_load_task(_t_base const& src, data_sections_ptr section, std::string const& flt, _fn_failed fl, _fn_success_load fs)
+            async_load_task(_t_base const& src,
+                            data_sections_ptr section,
+                            std::string const& flt,
+                            _fn_failed fl,
+                            _fn_success_load fs)
                 : db_task(section)
                 , filter_(flt)
                 , data_(src)
@@ -139,13 +143,16 @@ namespace sql_bridge
         {
             typedef typename std::decay<T>::type _t_base;
         public:
-            load_page_task(_t_base& dst, data_sections_ptr section, size_t pgsz, std::string const& flt)
+            load_page_task(_t_base& dst,
+                           data_sections_ptr section,
+                           size_t pgsz,
+                           std::string const& flt)
                 : db_task(section)
                 , page_size_(pgsz)
                 , filter_(flt)
                 , data_(dst)
                 {};
-            inline void run_task() override {section_->load(data_,filter_);}
+            inline void run_task() override {section_->load_page(page_size_,data_,filter_);}
             void error(base_sql_error const& err) override {throw err;}
         private:
             size_t page_size_;
@@ -160,7 +167,12 @@ namespace sql_bridge
             typedef std::function<void(_t_base&&)> _fn_success_load;
             typedef std::function<void(base_sql_error const&)> _fn_failed;
             
-            async_load_page_task(_t_base const& src, data_sections_ptr section, size_t pgsz, std::string const& flt, _fn_failed fl, _fn_success_load fs)
+            async_load_page_task(_t_base const& src,
+                                 data_sections_ptr section,
+                                 size_t pgsz,
+                                 std::string const& flt,
+                                 _fn_failed fl,
+                                 _fn_success_load fs)
                 : db_task(section)
                 , page_size_(pgsz)
                 , filter_(flt)
@@ -170,7 +182,7 @@ namespace sql_bridge
                 {};
             void run_task() override
             {
-                section_->load(data_,filter_);
+                section_->load_page(page_size_,data_,filter_);
                 if (fn_success_)
                     fn_success_(std::move(data_));
             };
