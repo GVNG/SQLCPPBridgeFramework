@@ -293,7 +293,7 @@ namespace sql_bridge
         template<typename T> inline context& replace(T& src) {_replace<T>(src);return *this;}
         template<typename T> inline context& replace(T&& src) {_replace_m<T>(std::move(src));return *this;}
         
-        inline context& limit(size_t count, size_t offset = 0) {_limit(count,offset);return *this;}
+        inline context& limit(size_t count, size_t offset = 0) {_limit(range(offset,count));return *this;}
         inline context& sql_or() {_sql_or();return *this;}
         inline context& sql_and() {_sql_and();return *this;}
 
@@ -658,12 +658,12 @@ namespace sql_bridge
 
 #pragma mark - limit
 
-        void _limit(size_t count, size_t offset)
+        void _limit(range rng)
         {
             suffixes_.erase(std::remove_if(suffixes_.begin(),
                                            suffixes_.end(),
                                            [](suffix_bare_ptr sfx){return sfx->weight()==e_weight::LIMIT;}),suffixes_.end());
-            suffixes_.push_back(std::make_shared<suffix_limit>(count,offset));
+            suffixes_.push_back(std::make_shared<suffix_limit>(rng));
         }
 
 #pragma mark - where

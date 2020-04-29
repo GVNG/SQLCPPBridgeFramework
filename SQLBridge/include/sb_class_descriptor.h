@@ -206,8 +206,11 @@ namespace sql_bridge
         template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _read_comp(T&, data_update_context&, sql_value const&) {}
         template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
         {
-            for(auto const& md : cont.members())
-                md->read(&dst, cont);
+            if (!cont.use_pages() || !has_not_empty_members(&dst))
+            {
+                for(auto const& md : cont.members())
+                    md->read(&dst, cont);
+            }
             cont.next(nullptr);
             sql_value uid = cont.id_for_members(&dst);
             if (!uid.empty())

@@ -76,5 +76,13 @@ namespace sql_bridge
         static std::string const def;
         return def;
     }
+        
+    bool class_descriptor::has_not_empty_members(void const* src) const
+    {
+        for(auto const& mb : members())
+            if (mb->is_not_empty_container(src))
+                return true;
+        return false;
+    }
     
 };

@@ -122,6 +122,7 @@ namespace sql_bridge
         inline bool used_pointers() const {return used_pointers_;}
         bool has_child(size_t ch) const;
         bool has_unique_key() const;
+        bool has_not_empty_members(void const*) const;
         std::string const& sql_type_for_unique_key() const;
         std::string const& field_name_for_unique_key() const;
         sql_value sql_value_for_unique_key() const;
@@ -183,32 +184,32 @@ namespace sql_bridge
         inline void read_comp(void* dat,sql_value const& extid) {return descriptor_->read_comp(dat,*this,extid);}
         inline std::string const& forward_ref() const {return link_.target().front().ref_field_name();}
         inline std::string const& table_name() const {return link_.table_name();}
-        inline size_t page_size() const {return page_size_;}
-        inline bool use_pages() const {return page_size_>0;}
+        inline range const& page() const {return page_;}
+        inline bool use_pages() const {return !page_.empty();}
 
         virtual bool is_ok() = 0;
         virtual void add(sql_value const&) = 0;
         virtual bool next(void const*) = 0;
         virtual void read(sql_value&) = 0;
         virtual sql_value id_for_members(void const*) const = 0;
-        virtual data_update_context_ptr context_for_member(size_t,sql_value const&, std::string const&, size_t) = 0;
-        virtual data_update_context_ptr context_from_root(size_t, std::string const&, size_t) = 0;
+        virtual data_update_context_ptr context_for_member(size_t, sql_value const&, std::string const&, range const&) = 0;
+        virtual data_update_context_ptr context_from_root(size_t, std::string const&, range const&) = 0;
         virtual void remove_if_possible(void const*) = 0;
         virtual void remove_by_key(sql_value const&) = 0;
         virtual void remove_all() = 0;
         virtual void check_for_update_ability(void const*) = 0;
         
     protected:
-        data_update_context(class_descriptors_ptr desc, class_link const& lnk, size_t pgsz)
+        data_update_context(class_descriptors_ptr desc, class_link const& lnk, range const& pgsz)
             : descriptor_(desc)
             , link_(lnk)
+            , page_(pgsz)
             , remove_all_used_(false)
-            , page_size_(pgsz)
             {}
         class_descriptors_ptr descriptor_;
         class_link const& link_;
+        range page_;
         bool remove_all_used_;
-        size_t page_size_;
     };
 
 };

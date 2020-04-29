@@ -154,7 +154,7 @@ namespace sql_bridge
                 sql_value extid = cont.id_for_members(&v);
                 if (extid.empty())
                     throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the forward link", "You should configure any type of index at least at one field in the definition of table");
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, 0));
+                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
                 ncnt->bind_comp(&(*v), extid);
             }
         }
@@ -170,7 +170,7 @@ namespace sql_bridge
                 sql_value extid = cont.id_for_members(&v);
                 if (extid.empty())
                     throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the forward link", "You should configure any type of index at least at one field in the definition of table");
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, 0));
+                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
                 ncnt->bind_comp(&v, extid);
             }
         }
@@ -211,7 +211,7 @@ namespace sql_bridge
                 sql_value extid = cont.id_for_members(&v);
                 if (extid.empty())
                     throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, 0));
+                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
                 ncnt->bind_comp(&(*v.second), extid);
             }
         }
@@ -229,7 +229,7 @@ namespace sql_bridge
                 sql_value extid = cont.id_for_members(&v);
                 if (extid.empty())
                     throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, 0));
+                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
                 ncnt->bind_comp(&v.second, extid);
             }
         }
@@ -283,7 +283,7 @@ namespace sql_bridge
             {
                 cont.next(nullptr);
                 sql_value extid = cont.id_for_members(&dst);
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, 0));
+                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
                 obj_type v(allocate_object<typename TFn::value_type>());
                 ncnt->read_comp(&(*v), extid);
                 add_to_container(dst, std::move(v));
@@ -299,7 +299,7 @@ namespace sql_bridge
             {
                 cont.next(nullptr);
                 sql_value extid = cont.id_for_members(&dst);
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, 0));
+                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
                 type v;
                 ncnt->read_comp(&v, extid);
                 add_to_container(dst, std::move(v));
@@ -336,7 +336,7 @@ namespace sql_bridge
                 if (extid.empty())
                     throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
                 obj_type v(allocate_object<typename TFn::mapped_type>());
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, 0));
+                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
                 ncnt->read_comp(&(*v), extid);
                 dst.insert(typename TFn::value_type(key.value<k_type>(),std::move(v)));
             }
@@ -357,7 +357,7 @@ namespace sql_bridge
                 if (extid.empty())
                     throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
                 m_type v;
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, 0));
+                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
                 ncnt->read_comp(&v, extid);
                 dst.insert(typename TFn::value_type(key.value<k_type>(),std::move(v)));
             }

@@ -181,7 +181,7 @@ namespace sql_bridge
         template<typename TFn> inline typename std::enable_if<is_trivial_container<TFn>::value || is_trivial_map<TFn>::value>::type _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
             ncnt->bind_comp(&el, extkey);
         }
 
@@ -190,7 +190,7 @@ namespace sql_bridge
         template<typename TFn> inline typename std::enable_if<!is_container_of_containers<TFn>::value && is_pointer<typename TFn::value_type>::value>::type _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             size_t elemt = types_selector<TFn>::destination_id();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
 
             if (description_->used_pointers() && description_->has_unique_key())
             {
@@ -201,7 +201,7 @@ namespace sql_bridge
                     ncnt->add(extkey);
                     ncnt->next(&key);
                 }
-                data_update_context_ptr excnt(dst.context_from_root(elemt,"",0));
+                data_update_context_ptr excnt(dst.context_from_root(elemt,"",range()));
                 for(auto const& ve : el)
                     excnt->bind_comp(&(*ve), sql_value());
             }
@@ -216,7 +216,7 @@ namespace sql_bridge
         {
             typedef typename TFn::value_type type;
             size_t elemt = typeid(type).hash_code();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
             for(auto const& ve : el)
                 ncnt->bind_comp(&ve, extkey);
         }
@@ -224,7 +224,7 @@ namespace sql_bridge
         template<typename TFn> inline typename std::enable_if<is_container_of_containers<TFn>::value>::type _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
             ncnt->bind_comp(&el, extkey);
         }
         
@@ -233,7 +233,7 @@ namespace sql_bridge
         template<typename TFn> inline typename std::enable_if<is_container_of_containers<TFn>::value>::type _bind_comp_map(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
             ncnt->bind_comp(&el, extkey);
         }
 
@@ -243,7 +243,7 @@ namespace sql_bridge
             typedef typename TFn::key_type k_type;
             typedef typename is_pointer<typename TFn::mapped_type>::type m_type;
             size_t elemt = typeid(m_type).hash_code();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
             for(auto const& ve : el)
             {
                 ncnt->add(ve.first);
@@ -257,10 +257,10 @@ namespace sql_bridge
             typedef typename TFn::key_type k_type;
             typedef typename is_pointer<typename TFn::mapped_type>::type m_type;
             size_t elemt = typeid(m_type).hash_code();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
             if (description_->used_pointers() && description_->has_unique_key())
             {
-                data_update_context_ptr excnt(dst.context_from_root(elemt,"",0));
+                data_update_context_ptr excnt(dst.context_from_root(elemt,"",range()));
                 for(auto const& ve : el)
                 {
                     sql_value key = excnt->id_for_members(&(*ve.second));
@@ -286,7 +286,7 @@ namespace sql_bridge
                                                               !is_map<TFn>::value>::type _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
             ncnt->bind_comp(&el, extkey);
         }
 
@@ -320,7 +320,7 @@ namespace sql_bridge
                                                               !is_container<TFn>::value && !is_map<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
             ncnt->read_comp(&(dst.*member_), extkey);
         }
 
@@ -328,7 +328,7 @@ namespace sql_bridge
                                                               !is_trivial_container<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
             ncnt->read_comp(&(dst.*member_), extkey);
         }
 
@@ -336,7 +336,7 @@ namespace sql_bridge
         {
             size_t elemt = typeid(TFn).hash_code();
             _clear(dst.*member_);
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
             ncnt->read_comp(&(dst.*member_), extkey);
         }
 
@@ -352,7 +352,7 @@ namespace sql_bridge
 
             size_t elemt = types_selector<TFn>::destination_id();
             (dst.*member_).clear();
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
             sql_value key((k_type()));
             if (description_->used_pointers() && description_->has_unique_key())
             {
@@ -372,7 +372,7 @@ namespace sql_bridge
                 std::string filter = to_string()
                     << TStrategy::sql_where()
                     << TStrategy::sql_where_in(description_->field_name_for_unique_key(),fld);
-                data_update_context_ptr elmcnt(cont.context_from_root(elemt,filter,0));
+                data_update_context_ptr elmcnt(cont.context_from_root(elemt,filter,range()));
                 for(auto const& kv : ids_container)
                     elmcnt->add(kv.first);
                 while(elmcnt->is_ok())
@@ -401,7 +401,7 @@ namespace sql_bridge
             typedef typename TFn::mapped_type m_type;
             size_t elemt = types_selector<TFn>::destination_id();
             (dst.*member_).clear();
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
             sql_value key((k_type()));
             while(ncnt->is_ok())
             {
@@ -422,7 +422,7 @@ namespace sql_bridge
             typedef typename TFn::value_type type;
             typedef typename TFn::iterator iterator;
             size_t elemt = types_selector<TFn>::destination_id();
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
             iterator pos = (dst.*member_).begin();
             while(ncnt->is_ok())
             {
@@ -444,7 +444,7 @@ namespace sql_bridge
             typedef std::conditional_t<std::is_pointer<type>::value, std::unique_ptr<typename is_pointer<type>::type>, type> obj_type;
             size_t elemt = types_selector<TFn>::destination_id();
             _clear(dst.*member_);
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
             if (description_->used_pointers() && description_->has_unique_key())
             {
                 sql_values_container ids_container;
@@ -462,7 +462,7 @@ namespace sql_bridge
                 std::string filter = to_string()
                     << TStrategy::sql_where()
                     << TStrategy::sql_where_in(description_->field_name_for_unique_key(),fld);
-                data_update_context_ptr elmcnt(cont.context_from_root(elemt,filter,0));
+                data_update_context_ptr elmcnt(cont.context_from_root(elemt,filter,range()));
                 for(auto const& kv : ids_container)
                     elmcnt->add(kv);
                 while(elmcnt->is_ok())
@@ -489,7 +489,7 @@ namespace sql_bridge
             typedef typename TFn::value_type type;
             size_t elemt = types_selector<TFn>::destination_id();
             _clear(dst.*member_);
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),0));
+            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
             while(ncnt->is_ok())
             {
                 type var;
