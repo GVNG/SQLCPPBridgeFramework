@@ -1,8 +1,8 @@
 //
-//  t_case34.cpp
-//  Tests
+//  example35.cpp
+//  SQLCPPBridgeFramework
 //
-//  Created by Roman Makhnenko on 27/04/2020.
+//  Created by Roman Makhnenko on 28/04/2020.
 //  Copyright © 2020 DataArt.
 //  All rights reserved.
 //
@@ -28,22 +28,27 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "t_db_fixture.h"
-#include "example34.h"
+#include "example35.h"
 
-TEST_F(DBFixture, Case34)
+DEFINE_SQL_TABLE(extra, Case35Log)
 {
-    sql_bridge::context cont(storage()["case34"]);
-    Case34Container dst,src
-    {
-        Case34(1),
-        Case34(2),
-        Case34(3),
-        Case34(4),
-        Case34(5),
-        Case34(6),
-    };
-    cont.replace(src);
-    cont.load(dst);
-    ASSERT_EQ(src,dst);
-}
+    bind("Val",     &Case35Log::value_),
+    bind("ID",      &Case35Log::db_id_,     e_db_index_type::PrimaryKey),
+};
+
+DEFINE_SQL_TABLE(main, Case35)
+{
+    bind("Key",     &Case35::key_,          e_db_index_type::Unique),
+    bind("Log",     &Case35::log_container_),
+};
+
+DEFINE_SQL_DATABASE(case35, 1, Case35, Case35Log)::upgrade_structure(size_t from, size_t to)
+{
+    // ------------------------------------------------------------------------------------
+    // you can place here the upgrade script from the 'from' to the 'to' version
+    // something like below, or whatever SQL statements you want
+    //
+    //if (from<=2 && to>2)
+    //    execute("CREATE INDEX IF NOT EXISTS BLAH_BLAH_INDEX ON MY_TABLE (BLAH_BLAH_ID)");
+    // ------------------------------------------------------------------------------------
+};

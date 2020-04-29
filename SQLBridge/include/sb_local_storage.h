@@ -51,7 +51,8 @@ namespace sql_bridge
             typedef typename std::decay<T>::type _t_base;
         public:
             load_task(T const& src, std::string const& key, db_proc_queue_ptr const& trg)
-                : kvdb_(trg)
+                : db_task(data_sections_ptr())
+                , kvdb_(trg)
                 , def_value_(src)
                 , key_(key)
                 {};
@@ -74,7 +75,8 @@ namespace sql_bridge
             typedef typename std::decay<T>::type _t_base;
         public:
             save_task(T const& src, std::string const& key, db_proc_queue_ptr const& trg)
-                : kvdb_(trg)
+                : db_task(data_sections_ptr())
+                , kvdb_(trg)
                 , data_(src)
                 , key_(key)
                 {};
@@ -97,7 +99,8 @@ namespace sql_bridge
                         db_proc_queue_ptr const& trg,
                         std::string const& path,
                         fn_change_file_name fn_change)
-                : name_(name)
+                : db_task(data_sections_ptr())
+                , name_(name)
                 , path_(path)
                 , kvdb_(trg)
                 , fn_change_(fn_change)
@@ -114,7 +117,6 @@ namespace sql_bridge
             db_proc_queue_weak_ptr kvdb_;
             std::string name_;
             std::string path_;
-            data_sections_ptr section_;
             fn_change_file_name fn_change_;
         };
         
