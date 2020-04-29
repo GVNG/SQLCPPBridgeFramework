@@ -1,8 +1,8 @@
 //
-//  t_case34.cpp
+//  t_case35.cpp
 //  Tests
 //
-//  Created by Roman Makhnenko on 27/04/2020.
+//  Created by Roman Makhnenko on 29/04/2020.
 //  Copyright © 2020 DataArt.
 //  All rights reserved.
 //
@@ -29,21 +29,16 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "t_db_fixture.h"
-#include "example34.h"
+#include "example35.h"
 
-TEST_F(DBFixture, Case34)
+TEST_F(DBFixture, Case35)
 {
-    sql_bridge::context cont(storage()["case34"]);
-    Case34Container dst,src
-    {
-        Case34(1),
-        Case34(2),
-        Case34(3),
-        Case34(4),
-        Case34(5),
-        Case34(6),
-    };
-    cont.replace(src);
-    cont.load(dst);
+    sql_bridge::context cont(storage()["case35"]);
+    Case35 dst,src(1,10000);
+    cont.save(src);
+    cont.load(5000,dst);
+    cont.load(3000,dst);
+    ASSERT_NE(src,dst);
+    cont.load(3000,dst);
     ASSERT_EQ(src,dst);
 }

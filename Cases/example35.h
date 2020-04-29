@@ -1,8 +1,8 @@
 //
-//  t_case34.cpp
-//  Tests
+//  example35.h
+//  SQLCPPBridgeFramework
 //
-//  Created by Roman Makhnenko on 27/04/2020.
+//  Created by Roman Makhnenko on 28/04/2020.
 //  Copyright © 2020 DataArt.
 //  All rights reserved.
 //
@@ -28,22 +28,52 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "t_db_fixture.h"
-#include "example34.h"
+#pragma once
+#ifndef example35_h
+#define example35_h
 
-TEST_F(DBFixture, Case34)
+#include "sqlcppbridge.h"
+
+class Case35;
+class Case35Log;
+typedef std::vector<Case35Log> Case35LogContainer;
+
+class Case35Log
 {
-    sql_bridge::context cont(storage()["case34"]);
-    Case34Container dst,src
+    DECLARE_SQL_ACCESS(Case35Log);
+public:
+    Case35Log()
+        : db_id_(0)
+        {};
+    Case35Log(long t)
+        : value_(sql_bridge::to_string() << "log_str_" << t)
+        , db_id_(0)
+        {}
+    inline bool operator < (Case35Log const& rv) const {return db_id_<rv.db_id_;}
+    inline bool operator == (Case35Log const& rv) const {return value_==rv.value_;}
+private:
+    std::string value_;
+    long long db_id_;
+};
+
+class Case35
+{
+    DECLARE_SQL_ACCESS(Case35);
+public:
+    Case35()
+        : key_(0)
+        {}
+    Case35(long k, long cnt)
+        : key_(k)
     {
-        Case34(1),
-        Case34(2),
-        Case34(3),
-        Case34(4),
-        Case34(5),
-        Case34(6),
+        for(long i=0; i<cnt; ++i)
+            log_container_.push_back(i);
     };
-    cont.replace(src);
-    cont.load(dst);
-    ASSERT_EQ(src,dst);
-}
+    inline bool operator == (Case35 const& rv) const {return key_==rv.key_ && log_container_==rv.log_container_;}
+    inline bool operator != (Case35 const& rv) const {return key_!=rv.key_ || log_container_!=rv.log_container_;}
+private:
+    long key_;
+    Case35LogContainer log_container_;
+};
+
+#endif /* example35_h */

@@ -60,10 +60,15 @@ namespace sql_bridge
     {
         friend class context_bare;
     public:
-        db_task() : std::packaged_task<void(db_task*)>(execute) {}
+        db_task(data_sections_ptr sc)
+            : std::packaged_task<void(db_task*)>(execute)
+            , section_(sc)
+            {}
         virtual ~db_task() {};
         virtual void run_task() = 0;
         virtual bool out_of_band() const {return false;}
+    protected:
+        data_sections_ptr section_;
     private:
         static void execute(db_task* trg);
         virtual void ready() {}
