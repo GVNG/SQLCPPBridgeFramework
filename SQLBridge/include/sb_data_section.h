@@ -528,7 +528,7 @@ namespace sql_bridge
             : data_update_context(desc,lnk,pgsz)
             , file_(fl)
             , hierarhy_(hr)
-            , reader_(fl,to_string() << lnk.statements().select_ << " " << (flt.empty()?lnk.statements().select_app_:flt), extkey)
+            , reader_(fl, build_statement(lnk,flt,pgsz), extkey)
             , last_key_(0)
             , use_ext_primary_key_(lnk.index_ref().type()==e_db_key_mode::ExternalPrimaryKey)
         {
@@ -602,12 +602,22 @@ namespace sql_bridge
         }
         
     private:
+        // data
         typename TStrategy::sql_file const& file_;
         data_section_descriptors_ptr hierarhy_;
         class_descriptors_ptr member_for_id_;
         typename TStrategy::sql_reader reader_;
         int64_t last_key_;
         bool use_ext_primary_key_;
+        // methods
+        static std::string build_statement(class_link const& lnk,std::string const& flt, range const& page)
+        {
+            to_string ret;
+            ret << lnk.statements().select_ << " " << (flt.empty()?lnk.statements().select_app_:flt);
+            if (!page.empty() && !lnk.ref_field_name().empty())
+                ret << " " << TStrategy::sql_limit(page.length_) << " " << TStrategy::sql_limit_offset(page.position_);
+            return ret;
+        }
     };
 
     template<typename TStrategy, typename TTransactionLock> class _t_data_update_context

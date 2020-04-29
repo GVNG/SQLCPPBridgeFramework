@@ -70,6 +70,7 @@ public:
             log_container_.push_back(i);
     };
     inline bool operator == (Case35 const& rv) const {return key_==rv.key_ && log_container_==rv.log_container_;}
+    inline bool operator != (Case35 const& rv) const {return key_!=rv.key_ || log_container_!=rv.log_container_;}
 private:
     long key_;
     Case35LogContainer log_container_;

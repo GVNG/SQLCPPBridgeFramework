@@ -488,8 +488,12 @@ namespace sql_bridge
         {
             typedef typename TFn::value_type type;
             size_t elemt = types_selector<TFn>::destination_id();
-            _clear(dst.*member_);
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
+            range pg;
+            if (cont.use_pages())
+                pg = range((dst.*member_).size(),cont.page().length_);
+            else
+                _clear(dst.*member_);
+            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),pg));
             while(ncnt->is_ok())
             {
                 type var;
