@@ -50,6 +50,6 @@ TEST_F(DBFixture, Case3)
         .load(std::vector<Case3>(),"", [](std::vector<Case3>&& rv,size_t num)
     {
         ASSERT_EQ(rv.size(),69);
-//        ASSERT_EQ(num,69);
+        ASSERT_EQ(num,69);
     });
 }
