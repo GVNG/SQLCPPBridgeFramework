@@ -451,6 +451,23 @@ namespace sql_bridge
         if (dp.index_ref().type()==e_db_key_mode::PrimaryKey ||
             dp.index_ref().type()==e_db_key_mode::ExternalPrimaryKey)
                 selapp << " ORDER BY " << dp.index_ref().name();
+        
+        if (selapp.str().empty())
+            for(auto const& pr : dp.should_create_indexes())
+        {
+            if (pr.first==e_db_index_type::OrderAsc)
+            {
+                selapp << " ORDER BY " << pr.second << " ASC";
+                break;
+            }
+            else
+            if (pr.first==e_db_index_type::OrderDesc)
+            {
+                selapp << " ORDER BY " << pr.second << " DESC";
+                break;
+            }
+        }
+            
         dp.update_for_select_statement(selsts,selapp);
         
         for(auto& trg : dp.target())

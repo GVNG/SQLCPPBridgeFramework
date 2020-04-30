@@ -58,7 +58,7 @@ namespace sql_bridge
     static std::string const g_expand_static_recommendation("You should expand used static container or change it to dynamic.");
     static std::string const g_replace_static_recommendation("Some part of elements haven't been initialized. Use dynamic container instead.");
 
-    enum class e_db_index_type {None, Basic, Unique, PrimaryKey};
+    enum class e_db_index_type {None, OrderAsc, OrderDesc, Basic, Unique, PrimaryKey};
     enum class e_db_key_mode {None, Unique, PrimaryKey, ExternalPrimaryKey};
 
     using size_t_set = std::set<size_t>;

@@ -47,13 +47,13 @@ public:
         {};
     Case35Log(long t)
         : value_(sql_bridge::to_string() << "log_str_" << t)
-        , db_id_(0)
+        , db_id_(t)
         {}
     inline bool operator < (Case35Log const& rv) const {return db_id_<rv.db_id_;}
-    inline bool operator == (Case35Log const& rv) const {return value_==rv.value_;}
+    inline bool operator == (Case35Log const& rv) const {return value_==rv.value_ && db_id_==rv.db_id_;}
 private:
     std::string value_;
-    long long db_id_;
+    long db_id_;
 };
 
 class Case35
@@ -71,6 +71,11 @@ public:
     };
     inline bool operator == (Case35 const& rv) const {return key_==rv.key_ && log_container_==rv.log_container_;}
     inline bool operator != (Case35 const& rv) const {return key_!=rv.key_ || log_container_!=rv.log_container_;}
+    
+    inline void reorder()
+    {
+        std::sort(log_container_.rbegin(),log_container_.rend());
+    }
 private:
     long key_;
     Case35LogContainer log_container_;
