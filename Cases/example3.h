@@ -57,8 +57,8 @@ public:
                 field3_==rv.field3_ &&
                 field4_==rv.field4_;
     }
-private:
     long id_;
+private:
     float field1_;
     double field2_;
     std::string field3_;

@@ -236,7 +236,7 @@ namespace sql_bridge
         , valid_(false)
     {
         if (keep_order)
-            txt_statement_ = to_string() << "SELECT VAL FROM " << table << " ORDER BY KEY";
+            txt_statement_ = to_string() << "SELECT VAL FROM " << table << " " << sqlite_adapter::sql_order_by("") << "KEY";
         else
             txt_statement_ = to_string() << "SELECT * FROM " << table;
         state_ = db[txt_statement_];
@@ -365,9 +365,9 @@ namespace sql_bridge
             uptr << " BEFORE UPDATE ON " << dp.table_name() << " BEGIN ";
             for(auto const& tr : dp.target())
             {
-                trsts << "DELETE FROM " << tr.table_name() << " WHERE " << dp.table_name() << "_" << dp.index_ref().name();
+                trsts << "DELETE FROM " << tr.table_name() << sql_where() << dp.table_name() << "_" << dp.index_ref().name();
                 trsts << "=old." << dp.index_ref().name() << ";";
-                uptr << "DELETE FROM " << tr.table_name() << " WHERE " << dp.table_name() << "_" << dp.index_ref().name();
+                uptr << "DELETE FROM " << tr.table_name() << sql_where() << dp.table_name() << "_" << dp.index_ref().name();
                 uptr << "=old." << dp.index_ref().name() << ";";
             }
             trsts << "END";
@@ -415,9 +415,9 @@ namespace sql_bridge
                     updsts << fn.name_ << "=" << fn.name_ << ",";
             updsts.remove_from_tail(1);
             if (dp.is_trivial_key())
-                updsts << " WHERE " << dp.fields().front().name_ << "=?";
+                updsts << sql_where() << dp.fields().front().name_ << "=?";
             else
-                updsts << " WHERE " << dp.index_ref().name() << "=?";
+                updsts << sql_where() << dp.index_ref().name() << "=?";
             dp.update_for_update_statement(updsts);
         }
         
@@ -425,9 +425,9 @@ namespace sql_bridge
         {
             to_string delsts;
             if (dp.is_trivial_key())
-                delsts << "DELETE FROM " << dp.table_name() << " WHERE " << dp.fields().front().name_ << "=?";
+                delsts << "DELETE FROM " << dp.table_name() << sql_where() << dp.fields().front().name_ << "=?";
             else
-                delsts << "DELETE FROM " << dp.table_name() << " WHERE " << dp.index_ref().name() << "=?";
+                delsts << "DELETE FROM " << dp.table_name() << sql_where() << dp.index_ref().name() << "=?";
             dp.update_for_remove_statement(delsts);
         }
         if (relfrom.empty())
@@ -446,24 +446,24 @@ namespace sql_bridge
         selsts.remove_from_tail(1);
         selsts << " FROM " << dp.table_name();
         if (!relfrom.empty())
-            selsts << " WHERE " << relfrom << "=?";
+            selsts << sql_where() << relfrom << "=?";
         to_string selapp;
         if (dp.index_ref().type()==e_db_key_mode::PrimaryKey ||
             dp.index_ref().type()==e_db_key_mode::ExternalPrimaryKey)
-                selapp << " ORDER BY " << dp.index_ref().name();
+                selapp << sql_order_by("") << sql_order_asc(dp.index_ref().name());
         
         if (selapp.str().empty())
             for(auto const& pr : dp.should_create_indexes())
         {
             if (pr.first==e_db_index_type::OrderAsc)
             {
-                selapp << " ORDER BY " << pr.second << " ASC";
+                selapp << sql_order_by("") << sql_order_asc(pr.second);
                 break;
             }
             else
             if (pr.first==e_db_index_type::OrderDesc)
             {
-                selapp << " ORDER BY " << pr.second << " DESC";
+                selapp << sql_order_by("") << sql_order_desc(pr.second);
                 break;
             }
         }

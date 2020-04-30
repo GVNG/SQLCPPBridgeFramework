@@ -184,9 +184,11 @@ int main(int argc, char** argv)
             cont.load(dst3);
             cont.load(dstmap);
             assert(src3==dst3);
-            cont.load(std::vector<Case3>(),"WHERE ID>30", [](std::vector<Case3>&& rv)
+            cont.where(&Case3::id_, ">", 30l)
+                .load(std::vector<Case3>(),"", [](std::vector<Case3>&& rv,size_t num)
             {
-                std::cout << std::endl << rv.size() << " element(s) have been loaded asynchroniously for the Case 3." << std::endl;
+                std::cout << std::endl << rv.size() << " element(s) have been loaded asynchroniously for the Case 3." << std::endl
+                          << num << " item(s) counted." << std::endl;
             });
             std::cout << "is ok. ";
         }
@@ -698,11 +700,14 @@ int main(int argc, char** argv)
             Case35 dst,src(1,10000);
             cont.save(src);
             cont.load(5000,dst);
-            cont.load(5000,dst);
+            size_t cnt;
+            cont.load(5000,dst,"",&cnt);
             src.reorder();
             assert(src==dst);
+            assert(cnt==5001); // 5000 elements (Case35Log) + 1 root (Case35)
             std::cout << "is ok. ";
         }
+
 #endif
 
     }

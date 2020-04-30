@@ -293,7 +293,7 @@ namespace sql_bridge
         if (stm.select_app_.empty())
             std::cerr << std::endl;
         else
-            std::cerr << "  // optional:" << stm.select_app_ << std::endl;
+            std::cerr << "  // optional: " << stm.select_app_ << std::endl;
 
         std::cerr << pref << std::endl;
         for(size_t i=0; i<src.target().size(); ++i)

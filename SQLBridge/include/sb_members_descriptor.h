@@ -381,6 +381,7 @@ namespace sql_bridge
                     elmcnt->read_comp(&(*var), sql_value());
                     sql_value kv = elmcnt->id_for_members(&(*var));
                     add_to_map(dst.*member_, ids_container.find(kv)->second.value<k_type>(), std::move(var));
+                    cont.read_counter_inc();
                 }
             }
             else
@@ -391,6 +392,7 @@ namespace sql_bridge
                     ncnt->read(key);
                     ncnt->read_comp(&(*var), extkey);
                     add_to_map(dst.*member_, key.value<k_type>(), std::move(var));
+                    cont.read_counter_inc();
                 }
             }
         }
@@ -409,6 +411,7 @@ namespace sql_bridge
                 ncnt->read(key);
                 ncnt->read_comp(&var, extkey);
                 add_to_map(dst.*member_, key.value<k_type>(), std::move(var));
+                cont.read_counter_inc();
             }
         }
 
@@ -470,6 +473,7 @@ namespace sql_bridge
                     obj_type var(allocate_object<type>());
                     elmcnt->read_comp(&(*var), sql_value());
                     add_to_container(dst.*member_, std::move(var));
+                    cont.read_counter_inc();
                 }
             }
             else
@@ -499,6 +503,7 @@ namespace sql_bridge
                 type var;
                 ncnt->read_comp(&var, extkey);
                 add_to_container(dst.*member_, std::move(var));
+                cont.read_counter_inc();
             }
         }
 

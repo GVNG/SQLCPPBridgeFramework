@@ -286,14 +286,14 @@ namespace sql_bridge
         std::string create_section(sql_file const& db,std::string const& name, std::string const& path, fn_change_file_name fnch);
 
         static void create_statements(class_links_container&);
-        static std::string sql_order_by(std::string const&) {return "ORDER BY";}
+        static std::string sql_order_by(std::string const&) {return "ORDER BY ";}
         static std::string sql_order_asc(std::string const& fld) {return to_string() << fld << " ASC";}
         static std::string sql_order_desc(std::string const& fld) {return to_string() << fld << " DESC";}
 
         static std::string sql_limit(size_t lim) {return to_string() << "LIMIT " << lim;}
         static std::string sql_limit_offset(size_t ofs) {return to_string() << "OFFSET " << ofs;}
 
-        static std::string sql_where() {return "WHERE ";}
+        static std::string sql_where() {return " WHERE ";}
         static std::string sql_where(std::string const& fld, std::string const& cond) {return to_string() << fld << cond;}
 
         static std::string sql_operator_or() {return "OR";}
