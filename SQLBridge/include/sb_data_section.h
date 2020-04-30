@@ -305,6 +305,7 @@ namespace sql_bridge
             size_t tid = typeid(T).hash_code();
             data_update_context_ptr cont(create_reader(tid, flt, range(0,pgsz)));
             cont->read(&dst);
+            num = cont->read_counter();
         }
         
         template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _load_page(size_t pgsz, T& dst, std::string const& flt, size_t& num)
@@ -312,6 +313,7 @@ namespace sql_bridge
             size_t tid = types_selector<T>::destination_id();
             data_update_context_ptr cont(create_reader(tid, flt, range(0,pgsz)));
             cont->read(&(*dst));
+            num = cont->read_counter();
         }
         template<typename T> inline typename std::enable_if<is_trivial_container<T>::value ||
                                                             is_trivial_map<T>::value ||
@@ -334,6 +336,7 @@ namespace sql_bridge
             size_t tid = types_selector<T>::destination_id();
             data_update_context_ptr cont(create_reader(tid, flt, range()));
             cont->read(&(*dst));
+            num = cont->read_counter();
         }
         template<typename T> inline typename std::enable_if<!is_pointer<T>::value &&
                                                             !is_container<T>::value &&
@@ -342,6 +345,7 @@ namespace sql_bridge
             size_t tid = typeid(T).hash_code();
             data_update_context_ptr cont(create_reader(tid, flt, range()));
             cont->read(&dst);
+            num = cont->read_counter();
         }
         template<typename T> inline typename std::enable_if<is_trivial_container<T>::value ||
                                                             is_trivial_map<T>::value ||
@@ -350,6 +354,7 @@ namespace sql_bridge
             size_t tid = typeid(T).hash_code();
             data_update_context_ptr cont(create_reader(tid, flt, range()));
             cont->read(&dst);
+            num = cont->read_counter();
         }
         template<typename T> inline typename std::enable_if<is_container<T>::value &&
                                                             !is_trivial_container<T>::value &&
@@ -365,6 +370,7 @@ namespace sql_bridge
                 size_t tid = typeid(T).hash_code();
                 data_update_context_ptr cont(create_reader(tid, flt, pgsz));
                 cont->read(&dst);
+                num = cont->read_counter();
             }
             else
             {
@@ -379,6 +385,7 @@ namespace sql_bridge
                     cont->read(&(*val));
                     add_to_container(dst, std::move(val));
                 }
+                num = cont->read_counter();
             }
         }
         template<typename T> inline typename std::enable_if<!is_pointer<typename T::value_type>::value>::type _load_cont(T& dst, std::string const& flt, range const& pgsz, size_t& num)
@@ -388,6 +395,7 @@ namespace sql_bridge
                 size_t tid = typeid(T).hash_code();
                 data_update_context_ptr cont(create_reader(tid, flt, pgsz));
                 cont->read(&dst);
+                num = cont->read_counter();
             }
             else
             {
@@ -401,6 +409,7 @@ namespace sql_bridge
                     cont->read(&val);
                     add_to_container(dst, std::move(val));
                 }
+                num = cont->read_counter();
             }
         }
         template<typename T> inline typename std::enable_if<is_pointer<typename T::mapped_type>::value>::type _load_map(T& dst, std::string const& flt, range const& pgsz, size_t& num)
@@ -410,6 +419,7 @@ namespace sql_bridge
                 size_t tid = typeid(T).hash_code();
                 data_update_context_ptr cont(create_reader(tid, flt, pgsz));
                 cont->read(&dst);
+                num = cont->read_counter();
             }
             else
             {
@@ -428,6 +438,7 @@ namespace sql_bridge
                         throw sql_bridge_error(to_string() << "Section: " << descriptor_->section_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
                     add_to_map(dst,key.value<k_type>(),std::move(val));
                 }
+                num = cont->read_counter();
             }
         }
         template<typename T> inline typename std::enable_if<!is_pointer<typename T::mapped_type>::value>::type _load_map(T& dst, std::string const& flt, range const& pgsz, size_t& num)
@@ -454,6 +465,7 @@ namespace sql_bridge
                         throw sql_bridge_error(to_string() << "Section: " << descriptor_->section_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
                     add_to_map(dst,key.value<k_type>(),std::move(val));
                 }
+                num = cont->read_counter();
             }
         }
         

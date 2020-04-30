@@ -700,11 +700,14 @@ int main(int argc, char** argv)
             Case35 dst,src(1,10000);
             cont.save(src);
             cont.load(5000,dst);
-            cont.load(5000,dst);
+            size_t cnt;
+            cont.load(5000,dst,"",&cnt);
             src.reorder();
             assert(src==dst);
+            assert(cnt==5001); // 5000 elements (Case35Log) + 1 root (Case35)
             std::cout << "is ok. ";
         }
+
 #endif
 
     }
