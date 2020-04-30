@@ -143,7 +143,9 @@ namespace sql_bridge
                 chld_index_ref = fields_definition{to_string() << dp.table_name() << "_" << mb->field_name(),mb->sql_type(),false,true};
             }
             else
-            if (mb->index_type()==e_db_index_type::Basic)
+            if (mb->index_type()==e_db_index_type::Basic ||
+                mb->index_type()==e_db_index_type::OrderAsc ||
+                mb->index_type()==e_db_index_type::OrderDesc)
             {
                 if (ret.empty())
                     ret = member_for_index_ref(mb->field_name());
