@@ -699,6 +699,7 @@ int main(int argc, char** argv)
             cont.save(src);
             cont.load(5000,dst);
             cont.load(5000,dst);
+            src.reorder();
             assert(src==dst);
             std::cout << "is ok. ";
         }

@@ -33,7 +33,7 @@
 DEFINE_SQL_TABLE(extra, Case35Log)
 {
     bind("Val",     &Case35Log::value_),
-    bind("ID",      &Case35Log::db_id_,     e_db_index_type::PrimaryKey),
+    bind("ID",      &Case35Log::db_id_,     e_db_index_type::OrderDesc),
 };
 
 DEFINE_SQL_TABLE(main, Case35)

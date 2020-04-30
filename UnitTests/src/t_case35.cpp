@@ -36,6 +36,7 @@ TEST_F(DBFixture, Case35)
     sql_bridge::context cont(storage()["case35"]);
     Case35 dst,src(1,10000);
     cont.save(src);
+    src.reorder();
     cont.load(5000,dst);
     cont.load(3000,dst);
     ASSERT_NE(src,dst);
