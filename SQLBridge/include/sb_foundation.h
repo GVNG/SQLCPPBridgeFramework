@@ -186,6 +186,8 @@ namespace sql_bridge
         inline std::string const& table_name() const {return link_.table_name();}
         inline range const& page() const {return page_;}
         inline bool use_pages() const {return !page_.empty();}
+        inline size_t read_counter() const {return read_counter_;}
+        inline void read_counter_inc() {read_counter_++;}
 
         virtual bool is_ok() = 0;
         virtual void add(sql_value const&) = 0;
@@ -204,11 +206,13 @@ namespace sql_bridge
             : descriptor_(desc)
             , link_(lnk)
             , page_(pgsz)
+            , read_counter_(0)
             , remove_all_used_(false)
             {}
         class_descriptors_ptr descriptor_;
         class_link const& link_;
         range page_;
+        size_t read_counter_;
         bool remove_all_used_;
     };
 
