@@ -68,6 +68,7 @@
 #include "example33.h"
 #include "example34.h"
 #include "example35.h"
+#include "example36.h"
 
 int main(int argc, char** argv)
 {
@@ -708,8 +709,23 @@ int main(int argc, char** argv)
             std::cout << "is ok. ";
         }
 
+        {
+            time_tracker trk;
+            sql_bridge::context cont(storage["case36"]);
+            std::cout << "Case 36 ";
+            Case36 dst,src(1,100);
+            cont.save(src);
+            src.insert(50);
+            cont.save(50,src);
+            size_t cnt;
+            cont.load(200,dst,"",&cnt);
+            assert(src==dst);
+            assert(cnt==151); // 150 elements (Case36Item) + 1 root (Case36)
+            std::cout << "is ok. ";
+        }
 #endif
 
+        
     }
     catch (std::exception& ex)
     {

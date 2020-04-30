@@ -45,6 +45,7 @@ namespace sql_bridge
     {
     public:
         template<typename T> inline void save(T const& src) {_save<T>(src);}
+        template<typename T> inline void save_page(size_t pgsz, T const& src) {_save_page<T>(pgsz,src);}
         template<typename T> inline void load(T& dst, std::string const& flt, size_t& num) {_load<T>(dst,flt,num);};
         template<typename T> inline void load_page(size_t pgsz, T& dst, std::string const& flt, size_t& num) {_load_page<T>(pgsz,dst,flt,num);};
         template<typename T> inline void remove(T const& src) {_remove<T>(src);}
@@ -83,25 +84,131 @@ namespace sql_bridge
             : descriptor_(data_section_descriptors::instance()[sn])
             {};
         
-        virtual data_update_context_ptr create_context(size_t,std::string const& = std::string()) const = 0;
+        virtual data_update_context_ptr create_context(size_t,std::string const&,range const&) const = 0;
         virtual data_update_context_ptr create_reader(size_t,std::string const&,range const&) const = 0; // tid,filter,page
 
         data_section_descriptors_ptr descriptor_;
     private:
+
+#pragma mark - save page
         
+        template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _save_page(size_t pgsz, T const& src)
+        {
+            size_t tid = types_selector<T>::destination_id();
+            data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+            cont->bind_comp(&(*src), sql_value());
+        }
+
+        template<typename T> inline typename std::enable_if<!is_pointer<T>::value &&
+                                                            !is_container<T>::value &&
+                                                            !is_any_map<T>::value>::type _save_page(size_t pgsz, T const& src)
+        {
+            size_t tid = typeid(T).hash_code();
+            data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+            cont->bind_comp(&src, sql_value());
+        }
+        template<typename T> inline typename std::enable_if<is_trivial_container<T>::value ||
+                                                            is_trivial_map<T>::value ||
+                                                            is_container_of_containers<T>::value>::type _save_page(size_t, T const&)
+        {
+            throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
+        }
+        template<typename T> inline typename std::enable_if<is_container<T>::value &&
+                                                            !is_trivial_container<T>::value &&
+                                                            !is_container_of_containers<T>::value>::type _save_page(size_t pgsz, T const& src) {_save_page_cont<T>(pgsz,src);}
+        template<typename T> inline typename std::enable_if<is_any_map<T>::value &&
+                                                            !is_trivial_map<T>::value &&
+                                                            !is_container_of_containers<T>::value>::type _save_page(size_t pgsz, T const& src) {_save_page_map<T>(pgsz,src);}
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::value_type>::value>::type _save_page_cont(size_t pgsz, T const& src)
+        {
+            if (descriptor_->has_description<T>())
+            {
+                size_t tid(typeid(T).hash_code());
+                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                cont->bind_comp(&src,sql_value());
+            }
+            else
+            {
+                typedef typename types_selector<T>::type type;
+                size_t tid = typeid(type).hash_code();
+                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                for(auto const& el : src)
+                    cont->bind_comp(&(*el),sql_value());
+            }
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::value_type>::value>::type _save_page_cont(size_t pgsz, T const& src)
+        {
+            if (descriptor_->has_description<T>())
+            {
+                size_t tid(typeid(T).hash_code());
+                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                cont->bind_comp(&src,sql_value());
+            }
+            else
+            {
+                typedef typename types_selector<T>::type type;
+                size_t tid = typeid(type).hash_code();
+                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                for(auto const& el : src)
+                    cont->bind_comp(&el,sql_value());
+            }
+        }
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::mapped_type>::value>::type _save_page_map(size_t pgsz, T const& src)
+        {
+            if (descriptor_->has_description<T>())
+            {
+                size_t tid(typeid(T).hash_code());
+                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                if (is_map<T>::value)
+                    for(auto const& el : src)
+                        cont->remove_by_key(sql_value(el.first));
+                cont->bind_comp(&src,sql_value());
+            }
+            else
+            {
+                typedef typename types_selector<T>::type type;
+                size_t tid = typeid(type).hash_code();
+                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                for(auto const& el : src)
+                    cont->bind_comp(&(*el.second),sql_value());
+            }
+        }
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::mapped_type>::value>::type _save_page_map(size_t pgsz, T const& src)
+        {
+            if (descriptor_->has_description<T>())
+            {
+                size_t tid(typeid(T).hash_code());
+                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                if (is_map<T>::value)
+                    for(auto const& el : src)
+                        cont->remove_by_key(sql_value(el.first));
+                cont->bind_comp(&src,sql_value());
+            }
+            else
+            {
+                typedef typename types_selector<T>::type type;
+                size_t tid = typeid(type).hash_code();
+                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                for(auto const& el : src)
+                    cont->bind_comp(&el.second,sql_value());
+            }
+        }
+
 #pragma mark - save
 
         template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _save(T const& src)
         {
             size_t tid = types_selector<T>::destination_id();
-            data_update_context_ptr cont(create_context(tid));
+            data_update_context_ptr cont(create_context(tid,"",range()));
             cont->bind_comp(&(*src), sql_value());
         }
 
-        template<typename T> inline typename std::enable_if<!is_pointer<T>::value && !is_container<T>::value && !is_any_map<T>::value>::type _save(T const& src)
+        template<typename T> inline typename std::enable_if<!is_pointer<T>::value &&
+                                                            !is_container<T>::value &&
+                                                            !is_any_map<T>::value>::type _save(T const& src)
         {
             size_t tid = typeid(T).hash_code();
-            data_update_context_ptr cont(create_context(tid));
+            data_update_context_ptr cont(create_context(tid,"",range()));
             cont->bind_comp(&src, sql_value());
         }
         template<typename T> inline typename std::enable_if<is_trivial_container<T>::value ||
@@ -109,25 +216,28 @@ namespace sql_bridge
                                                             is_container_of_containers<T>::value>::type _save(T const& src)
         {
             size_t tid = typeid(T).hash_code();
-            data_update_context_ptr cont(create_context(tid));
+            data_update_context_ptr cont(create_context(tid,"",range()));
             cont->bind_comp(&src,sql_value());
         }
         template<typename T> inline typename std::enable_if<is_container<T>::value &&
                                                             !is_trivial_container<T>::value &&
                                                             !is_container_of_containers<T>::value>::type _save(T const& src) {_save_cont<T>(src);}
+        template<typename T> inline typename std::enable_if<is_any_map<T>::value &&
+                                                            !is_trivial_map<T>::value &&
+                                                            !is_container_of_containers<T>::value>::type _save(T const& src) {_save_map<T>(src);}
         template<typename T> inline typename std::enable_if<is_pointer<typename T::value_type>::value>::type _save_cont(T const& src)
         {
             if (descriptor_->has_description<T>())
             {
                 size_t tid(typeid(T).hash_code());
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 cont->bind_comp(&src,sql_value());
             }
             else
             {
                 typedef typename types_selector<T>::type type;
                 size_t tid = typeid(type).hash_code();
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 for(auto const& el : src)
                     cont->bind_comp(&(*el),sql_value());
             }
@@ -137,28 +247,24 @@ namespace sql_bridge
             if (descriptor_->has_description<T>())
             {
                 size_t tid(typeid(T).hash_code());
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 cont->bind_comp(&src,sql_value());
             }
             else
             {
                 typedef typename types_selector<T>::type type;
                 size_t tid = typeid(type).hash_code();
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 for(auto const& el : src)
                     cont->bind_comp(&el,sql_value());
             }
         }
-        template<typename T> inline typename std::enable_if<is_any_map<T>::value &&
-                                                            !is_trivial_map<T>::value &&
-                                                            !is_container_of_containers<T>::value>::type _save(T const& src) {_save_map<T>(src);}
-
         template<typename T> inline typename std::enable_if<is_pointer<typename T::mapped_type>::value>::type _save_map(T const& src)
         {
             if (descriptor_->has_description<T>())
             {
                 size_t tid(typeid(T).hash_code());
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 if (is_map<T>::value)
                     for(auto const& el : src)
                         cont->remove_by_key(sql_value(el.first));
@@ -168,18 +274,17 @@ namespace sql_bridge
             {
                 typedef typename types_selector<T>::type type;
                 size_t tid = typeid(type).hash_code();
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 for(auto const& el : src)
                     cont->bind_comp(&(*el.second),sql_value());
             }
         }
-
         template<typename T> inline typename std::enable_if<!is_pointer<typename T::mapped_type>::value>::type _save_map(T const& src)
         {
             if (descriptor_->has_description<T>())
             {
                 size_t tid(typeid(T).hash_code());
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 if (is_map<T>::value)
                     for(auto const& el : src)
                         cont->remove_by_key(sql_value(el.first));
@@ -189,7 +294,7 @@ namespace sql_bridge
             {
                 typedef typename types_selector<T>::type type;
                 size_t tid = typeid(type).hash_code();
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 for(auto const& el : src)
                     cont->bind_comp(&el.second,sql_value());
             }
@@ -200,7 +305,7 @@ namespace sql_bridge
         template<typename T> inline typename std::enable_if<!is_container<T>::value && !is_any_map<T>::value>::type _replace(T const& src)
         {
             size_t tid = typeid(T).hash_code();
-            data_update_context_ptr cont(create_context(tid));
+            data_update_context_ptr cont(create_context(tid,"",range()));
             cont->remove_all();
             cont->bind_comp(&src, sql_value());
         }
@@ -209,7 +314,7 @@ namespace sql_bridge
                                                             is_container_of_containers<T>::value>::type _replace(T const& src)
         {
             size_t tid = typeid(T).hash_code();
-            data_update_context_ptr cont(create_context(tid));
+            data_update_context_ptr cont(create_context(tid,"",range()));
             cont->remove_all();
             cont->bind_comp(&src,sql_value());
         }
@@ -221,7 +326,7 @@ namespace sql_bridge
             if (descriptor_->has_description<T>())
             {
                 size_t tid(typeid(T).hash_code());
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 cont->remove_all();
                 cont->bind_comp(&src,sql_value());
             }
@@ -229,7 +334,7 @@ namespace sql_bridge
             {
                 typedef typename types_selector<T>::type type;
                 size_t tid = typeid(type).hash_code();
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 cont->remove_all();
                 for(auto const& el : src)
                     cont->bind_comp(&(*el),sql_value());
@@ -240,7 +345,7 @@ namespace sql_bridge
             if (descriptor_->has_description<T>())
             {
                 size_t tid(typeid(T).hash_code());
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 cont->remove_all();
                 cont->bind_comp(&src,sql_value());
             }
@@ -248,7 +353,7 @@ namespace sql_bridge
             {
                 typedef typename types_selector<T>::type type;
                 size_t tid = typeid(type).hash_code();
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 cont->remove_all();
                 for(auto const& el : src)
                     cont->bind_comp(&el,sql_value());
@@ -262,7 +367,7 @@ namespace sql_bridge
             if (descriptor_->has_description<T>())
             {
                 size_t tid(typeid(T).hash_code());
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 cont->remove_all();
                 cont->bind_comp(&src,sql_value());
             }
@@ -270,7 +375,7 @@ namespace sql_bridge
             {
                 typedef typename types_selector<T>::type type;
                 size_t tid = typeid(type).hash_code();
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 cont->remove_all();
                 for(auto const& el : src)
                     cont->bind_comp(&(*el.second),sql_value());
@@ -281,7 +386,7 @@ namespace sql_bridge
             if (descriptor_->has_description<T>())
             {
                 size_t tid(typeid(T).hash_code());
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 cont->remove_all();
                 cont->bind_comp(&src,sql_value());
             }
@@ -289,7 +394,7 @@ namespace sql_bridge
             {
                 typedef typename types_selector<T>::type type;
                 size_t tid = typeid(type).hash_code();
-                data_update_context_ptr cont(create_context(tid));
+                data_update_context_ptr cont(create_context(tid,"",range()));
                 cont->remove_all();
                 for(auto const& el : src)
                     cont->bind_comp(&el.second,sql_value());
@@ -486,7 +591,7 @@ namespace sql_bridge
         template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _remove(T const& src)
         {
             size_t tid = types_selector<T>::destination_id();
-            data_update_context_ptr cont(create_context(tid));
+            data_update_context_ptr cont(create_context(tid,"",range()));
             cont->remove_if_possible(&(*src));
         }
         template<typename T> inline typename std::enable_if<!is_pointer<T>::value &&
@@ -494,7 +599,7 @@ namespace sql_bridge
                                                             !is_any_map<T>::value>::type _remove(T const& src)
         {
             size_t tid = typeid(T).hash_code();
-            data_update_context_ptr cont(create_context(tid));
+            data_update_context_ptr cont(create_context(tid,"",range()));
             cont->remove_if_possible(&src);
         }
 
@@ -505,7 +610,7 @@ namespace sql_bridge
         template<typename T> inline typename std::enable_if<is_pointer<typename T::value_type>::value>::type _remove_cont(T const& src)
         {
             size_t tid = types_selector<T>::destination_id();
-            data_update_context_ptr cont(create_context(tid));
+            data_update_context_ptr cont(create_context(tid,"",range()));
             for(auto const& el : src)
                 cont->remove_if_possible(&(*el));
         }
@@ -513,7 +618,7 @@ namespace sql_bridge
         template<typename T> inline typename std::enable_if<!is_pointer<typename T::value_type>::value>::type _remove_cont(T const& src)
         {
             size_t tid = types_selector<T>::destination_id();
-            data_update_context_ptr cont(create_context(tid));
+            data_update_context_ptr cont(create_context(tid,"",range()));
             for(auto const& el : src)
                 cont->remove_if_possible(&el);
         }
@@ -523,7 +628,7 @@ namespace sql_bridge
         template<typename T> inline typename std::enable_if<is_any_map<T>::value>::type _remove_by_key(typename T::key_type const& val)
         {
             size_t tid = typeid(T).hash_code();
-            data_update_context_ptr cont(create_context(tid));
+            data_update_context_ptr cont(create_context(tid,"",range()));
             cont->remove_by_key(sql_value(val));
         }
         
@@ -533,7 +638,7 @@ namespace sql_bridge
                                                             !is_any_map<T>::value>::type _remove_if(std::string const& flt)
         {
             size_t tid = typeid(T).hash_code();
-            data_update_context_ptr cont(create_context(tid,flt));
+            data_update_context_ptr cont(create_context(tid,flt,range()));
             cont->remove_all();
         }
 
@@ -656,8 +761,13 @@ namespace sql_bridge
         , private TTransactionLock
     {
     public:
-        _t_data_update_context(typename TStrategy::sql_file const& fl, class_descriptors_ptr desc, class_link const& lnk, data_section_descriptors_ptr hr, std::string const& flt)
-            : data_update_context(desc,lnk,range())
+        _t_data_update_context(typename TStrategy::sql_file const& fl,
+                               class_descriptors_ptr desc,
+                               class_link const& lnk,
+                               data_section_descriptors_ptr hr,
+                               std::string const& flt,
+                               range const& pgsz)
+            : data_update_context(desc,lnk,pgsz)
             , TTransactionLock(fl)
             , file_(fl)
             , inserter_(fl,link_.statements().insert_)
@@ -692,18 +802,18 @@ namespace sql_bridge
                 inserter_.bind(var);
         }
         void read(sql_value&) override {}
-        data_update_context_ptr context_for_member(size_t etid, sql_value const&, std::string const& ref, range const&) override
+        data_update_context_ptr context_for_member(size_t etid, sql_value const&, std::string const& ref, range const& pgsz) override
         {
             for(auto const& tl : link_.target())
                 if (tl.source_id()==etid && ref==tl.ref_field_name())
-                    return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::no_transactions_lock>(file_,(*hierarhy_)[etid],tl,hierarhy_,""));
+                    return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::no_transactions_lock>(file_,(*hierarhy_)[etid],tl,hierarhy_,"",pgsz));
             throw sql_bridge_error(to_string() << "Table: " << table_name() <<". " << g_internal_error_text, g_architecture_error_text);
         }
-        data_update_context_ptr context_from_root(size_t etid,std::string const& flt, range const&) override
+        data_update_context_ptr context_from_root(size_t etid,std::string const& flt, range const& pgsz) override
         {
             class_descriptors_ptr desc((*hierarhy_)[etid]);
             class_link const& tl(desc->depends());
-            return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::no_transactions_lock>(file_,desc,tl,hierarhy_,flt));
+            return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::no_transactions_lock>(file_,desc,tl,hierarhy_,flt,pgsz));
         }
         bool next(void const* dat) override
         {
@@ -788,10 +898,10 @@ namespace sql_bridge
             , TStrategy::sql_file(fname)
             {};
     private:
-        data_update_context_ptr create_context(size_t tid, std::string const& flt) const override
+        data_update_context_ptr create_context(size_t tid, std::string const& flt, range const& pgsz) const override
         {
             class_descriptors_ptr desc = (*descriptor_)[tid];
-            return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::transactions_lock>(*this,desc,desc->depends(),descriptor_,flt));
+            return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::transactions_lock>(*this,desc,desc->depends(),descriptor_,flt,pgsz));
         }
         data_update_context_ptr create_reader(size_t tid, std::string const& flt, range const& pgsz) const override
         {
