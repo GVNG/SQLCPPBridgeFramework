@@ -207,18 +207,36 @@ namespace sql_bridge
             }
             else
             {
-                for(auto const& ve : el)
-                    ncnt->bind_comp(&(*ve), extkey);
+                if (dst.use_pages())
+                {
+                    typedef typename TFn::const_iterator iterator;
+                    iterator ve = el.begin();
+                    for(size_t i=0; i!=dst.page().length_ && ve!=el.end(); ++i,ve++)
+                        ncnt->bind_comp(&(*(*ve)), extkey);
+                }
+                else
+                {
+                    for(auto const& ve : el)
+                        ncnt->bind_comp(&(*ve), extkey);
+                }
             }
         }
         
         template<typename TFn> inline typename std::enable_if<!is_container_of_containers<TFn>::value && !is_pointer<typename TFn::value_type>::value>::type _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             typedef typename TFn::value_type type;
+            typedef typename TFn::const_iterator iterator;
             size_t elemt = typeid(type).hash_code();
             data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
-            for(auto const& ve : el)
-                ncnt->bind_comp(&ve, extkey);
+            if (dst.use_pages())
+            {
+                iterator ve = el.begin();
+                for(size_t i=0; i!=dst.page().length_ && ve!=el.end(); ++i,ve++)
+                    ncnt->bind_comp(&(*ve), extkey);
+            }
+            else
+                for(auto const& ve : el)
+                    ncnt->bind_comp(&ve, extkey);
         }
 
         template<typename TFn> inline typename std::enable_if<is_container_of_containers<TFn>::value>::type _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
