@@ -236,7 +236,7 @@ namespace sql_bridge
         , valid_(false)
     {
         if (keep_order)
-            txt_statement_ = to_string() << "SELECT VAL FROM " << table << " ORDER BY KEY";
+            txt_statement_ = to_string() << "SELECT VAL FROM " << table << " " << sqlite_adapter::sql_order_by("") << "KEY";
         else
             txt_statement_ = to_string() << "SELECT * FROM " << table;
         state_ = db[txt_statement_];

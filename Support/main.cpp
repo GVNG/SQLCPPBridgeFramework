@@ -184,7 +184,7 @@ int main(int argc, char** argv)
             cont.load(dst3);
             cont.load(dstmap);
             assert(src3==dst3);
-            cont.load(std::vector<Case3>(),"WHERE ID>30", [](std::vector<Case3>&& rv)
+            cont.load(std::vector<Case3>(),"WHERE ID>30", [](std::vector<Case3>&& rv,size_t)
             {
                 std::cout << std::endl << rv.size() << " element(s) have been loaded asynchroniously for the Case 3." << std::endl;
             });

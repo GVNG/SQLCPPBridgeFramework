@@ -46,8 +46,9 @@ TEST_F(DBFixture, Case3)
     cont.load(dst3);
     cont.load(dstmap);
     ASSERT_EQ(src3,dst3);
-    cont.load(std::vector<Case3>(),"WHERE ID>30", [](std::vector<Case3>&& rv)
+    cont.load(std::vector<Case3>(),"WHERE ID>30", [](std::vector<Case3>&& rv,size_t num)
     {
         ASSERT_EQ(rv.size(),69);
+//        ASSERT_EQ(num,69);
     });
 }
