@@ -452,8 +452,7 @@ namespace sql_bridge
             dp.index_ref().type()==e_db_key_mode::ExternalPrimaryKey)
                 selapp << sql_order_by("") << sql_order_asc(dp.index_ref().name());
         
-        if (selapp.str().empty())
-            for(auto const& pr : dp.should_create_indexes())
+        for(auto const& pr : dp.should_create_indexes())
         {
             if (pr.first==e_db_index_type::OrderAsc)
             {
