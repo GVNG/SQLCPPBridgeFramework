@@ -34,14 +34,17 @@
 TEST_F(DBFixture, Case35)
 {
     sql_bridge::context cont(storage()["case35"]);
-    Case35 dst,src(1,10000);
+    Case35Container dst,src =
+    {
+        Case35(1,100),
+        Case35(2,100),
+        Case35(3,100),
+    };
     cont.save(src);
-    src.reorder();
-    cont.load(5000,dst);
-    cont.load(3000,dst);
-    ASSERT_NE(src,dst);
-    size_t num;
-    cont.load(3000,dst,"",&num);
+    cont.load(50,dst);
+    size_t cnt;
+    cont.load(100,dst,"",&cnt);
+    for(auto& s : src) s.reorder();
     ASSERT_EQ(src,dst);
-    ASSERT_EQ(num,2001); // 2000 elements + 1 root
+    ASSERT_EQ(cnt,303); // 300 elements + 3 root
 }

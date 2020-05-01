@@ -78,7 +78,7 @@ int main(int argc, char** argv)
         mkdir("./DB", 0777);
         sql_bridge::local_storage<sql_bridge::sqlite_adapter> storage("./DB");
         
-#if 0
+#if 1
         {
             std::cout << "Case KVDB ";
             time_tracker trk;
@@ -698,14 +698,20 @@ int main(int argc, char** argv)
             time_tracker trk;
             sql_bridge::context cont(storage["case35"]);
             std::cout << "Case 35 ";
-            Case35 dst,src(1,10000);
+            Case35Container dst,src =
+            {
+                Case35(1,100),
+                Case35(2,100),
+                Case35(3,100),
+            };
             cont.save(src);
-            cont.load(5000,dst);
+            cont.load(50,dst);
             size_t cnt;
-            cont.load(5000,dst,"",&cnt);
-            src.reorder();
+            cont.load(100,dst,"",&cnt);
+            for(auto& s : src) s.reorder();
+            
             assert(src==dst);
-            assert(cnt==5001); // 5000 elements (Case35Log) + 1 root (Case35)
+            assert(cnt==303); // 300 elements (Case35Log) + 3 root (Case35)
             std::cout << "is ok. ";
         }
 
@@ -724,7 +730,6 @@ int main(int argc, char** argv)
             std::cout << "is ok. ";
         }
 #endif
-
         
     }
     catch (std::exception& ex)

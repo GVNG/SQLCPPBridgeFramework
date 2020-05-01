@@ -429,10 +429,10 @@ namespace sql_bridge
         
         template<typename T> inline typename std::enable_if<is_container<T>::value &&
                                                             !is_trivial_container<T>::value &&
-                                                            !is_container_of_containers<T>::value>::type _load_page(size_t pgsz, T& dst, std::string const& flt, size_t& num){_load_cont(pgsz,dst,flt,range(0,pgsz),num);}
+                                                            !is_container_of_containers<T>::value>::type _load_page(size_t pgsz, T& dst, std::string const& flt, size_t& num){_load_cont<T>(dst,flt,range(0,pgsz),num);}
         template<typename T> inline typename std::enable_if<is_any_map<T>::value &&
                                                             !is_trivial_map<T>::value &&
-                                                            !is_container_of_containers<T>::value>::type _load_page(size_t pgsz, T& dst, std::string const& flt, size_t& num){_load_map<T>(pgsz,dst,flt,range(0,pgsz),num);}
+                                                            !is_container_of_containers<T>::value>::type _load_page(size_t pgsz, T& dst, std::string const& flt, size_t& num){_load_map<T>(dst,flt,range(0,pgsz),num);}
 
 #pragma mark - load
 
@@ -507,10 +507,10 @@ namespace sql_bridge
                 typedef typename T::value_type type;
                 size_t tid = types_selector<T>::destination_id();
                 data_update_context_ptr cont(create_reader(tid, flt, pgsz));
-                type val;
                 dst.clear();
                 while(cont->is_ok())
                 {
+                    type val;
                     cont->read(&val);
                     add_to_container(dst, std::move(val));
                 }
