@@ -41,5 +41,5 @@ TEST_F(DBFixture, Case36)
     size_t cnt;
     cont.load(200,dst,"",&cnt);
     ASSERT_EQ(src,dst);
-    ASSERT_EQ(cnt,151);
+    ASSERT_EQ(cnt,1151);
 }

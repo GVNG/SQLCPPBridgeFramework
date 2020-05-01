@@ -37,6 +37,7 @@
 class Case36;
 class Case36Item;
 typedef std::deque<Case36Item> Case36ItemsContainer;
+typedef std::vector<Case36Item> Case36ItemsAltContainer;
 
 class Case36Item
 {
@@ -69,9 +70,11 @@ public:
     {
         for(long i=0; i<cnt; ++i)
             items_.push_front(i);
+        for(long i=0; i<cnt*10; ++i)
+            unpaged_.insert(unpaged_.begin(),i);
     };
-    inline bool operator == (Case36 const& rv) const {return key_==rv.key_ && items_==rv.items_;}
-    inline bool operator != (Case36 const& rv) const {return key_!=rv.key_ || items_!=rv.items_;}
+    inline bool operator == (Case36 const& rv) const {return key_==rv.key_ && items_==rv.items_ && unpaged_==rv.unpaged_;}
+    inline bool operator != (Case36 const& rv) const {return key_!=rv.key_ || items_!=rv.items_ || unpaged_!=rv.unpaged_;}
 
     inline void insert(long cnt)
     {
@@ -82,6 +85,7 @@ public:
 private:
     long key_;
     Case36ItemsContainer items_;
+    Case36ItemsAltContainer unpaged_;
 };
 
 

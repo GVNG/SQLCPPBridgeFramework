@@ -189,6 +189,7 @@ namespace sql_bridge
                 for(auto const& md : cont.members())
                     if (md->index_type()!=e_db_index_type::PrimaryKey)
                         md->bind_comp(&el, cont, uid);
+                cont.page().enable();
                 return;
             }
             cont.check_for_update_ability(&el);

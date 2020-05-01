@@ -83,7 +83,8 @@ namespace sql_bridge
             , active_(ln>0)
             {};
         inline range next() const {return range(position_+length_,length_);}
-        inline bool empty() const {return length_==0 || !active_;}
+        inline bool empty() const {return length_==0;}
+        inline bool is_active() const {return active_;}
         inline void enable() const {active_=true;}
         inline void disable() const {active_=false;}
         inline size_t position() const {return position_;}
