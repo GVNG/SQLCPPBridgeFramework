@@ -69,20 +69,29 @@ namespace sql_bridge
     using index_to_field_pair = std::pair<e_db_index_type,std::string>;
     using index_to_field_pairs_container = std::vector<index_to_field_pair>;
 
-    struct range
+    class range
     {
+    public:
         range()
             : position_(0)
             , length_(0)
+            , active_(false)
             {};
         range(size_t p, size_t ln)
             : position_(p)
             , length_(ln)
+            , active_(ln>0)
             {};
         inline range next() const {return range(position_+length_,length_);}
-        inline bool empty() const {return length_==0;}
+        inline bool empty() const {return length_==0 || !active_;}
+        inline void enable() const {active_=true;}
+        inline void disable() const {active_=false;}
+        inline size_t position() const {return position_;}
+        inline size_t length() const {return length_;}
+    private:
         size_t position_;
         size_t length_;
+        mutable bool active_;
     };
     
     class member_for_index_ref

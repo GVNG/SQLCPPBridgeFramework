@@ -211,7 +211,7 @@ namespace sql_bridge
                 {
                     typedef typename TFn::const_iterator iterator;
                     iterator ve = el.begin();
-                    for(size_t i=0; i!=dst.page().length_ && ve!=el.end(); ++i,ve++)
+                    for(size_t i=0; i!=dst.page().length() && ve!=el.end(); ++i,ve++)
                         ncnt->bind_comp(&(*(*ve)), extkey);
                 }
                 else
@@ -231,7 +231,7 @@ namespace sql_bridge
             if (dst.use_pages())
             {
                 iterator ve = el.begin();
-                for(size_t i=0; i!=dst.page().length_ && ve!=el.end(); ++i,ve++)
+                for(size_t i=0; i!=dst.page().length() && ve!=el.end(); ++i,ve++)
                     ncnt->bind_comp(&(*ve), extkey);
             }
             else
@@ -512,7 +512,10 @@ namespace sql_bridge
             size_t elemt = types_selector<TFn>::destination_id();
             range pg;
             if (cont.use_pages())
-                pg = range((dst.*member_).size(),cont.page().length_);
+            {
+                pg = range((dst.*member_).size(),cont.page().length());
+                cont.page().disable();
+            }
             else
                 _clear(dst.*member_);
             data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),pg));

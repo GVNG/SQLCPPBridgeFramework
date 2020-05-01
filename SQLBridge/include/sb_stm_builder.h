@@ -85,8 +85,8 @@ namespace sql_bridge
             : suffix_bare("",e_weight::LIMIT)
             , range(rng)
             {}
-        std::string general(data_sections_ptr data) const override {return data->limit(length_);}
-        std::string build(data_sections_ptr data) const override {return position_?data->limit_offset(position_):"";}
+        std::string general(data_sections_ptr data) const override {return data->limit(length());}
+        std::string build(data_sections_ptr data) const override {return position()?data->limit_offset(position()):"";}
     };
     
     class suffix_where : public suffix_bare
