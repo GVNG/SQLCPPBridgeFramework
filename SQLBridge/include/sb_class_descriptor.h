@@ -189,6 +189,7 @@ namespace sql_bridge
                 for(auto const& md : cont.members())
                     if (md->index_type()!=e_db_index_type::PrimaryKey)
                         md->bind_comp(&el, cont, uid);
+                cont.page().enable();
                 return;
             }
             cont.check_for_update_ability(&el);
@@ -216,6 +217,7 @@ namespace sql_bridge
         template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             cont.read_counter_inc();
+            cont.page().enable();
             if (!cont.use_pages() || !has_not_empty_members(&dst))
             {
                 for(auto const& md : cont.members())

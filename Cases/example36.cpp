@@ -40,6 +40,7 @@ DEFINE_SQL_TABLE(main, Case36)
 {
     bind("Key",     &Case36::key_,          e_db_index_type::Unique),
     bind("Msg",     &Case36::items_),
+    bind("Unp",     &Case36::unpaged_),
 };
 
 DEFINE_SQL_DATABASE(case36, 1, Case36, Case36Item)::upgrade_structure(size_t from, size_t to)
