@@ -78,7 +78,7 @@ int main(int argc, char** argv)
         mkdir("./DB", 0777);
         sql_bridge::local_storage<sql_bridge::sqlite_adapter> storage("./DB");
         
-#if 1
+#if 0
         {
             std::cout << "Case KVDB ";
             time_tracker trk;
@@ -720,7 +720,7 @@ int main(int argc, char** argv)
             size_t cnt;
             cont.load(200,dst,"",&cnt);
             assert(src==dst);
-            assert(cnt==151); // 150 elements (Case36Item) + 1 root (Case36)
+            assert(cnt==1151); // 150 elements (Case36Item) + 1 root (Case36) + 1000 unpaged (Case36Item)
             std::cout << "is ok. ";
         }
 #endif

@@ -751,7 +751,7 @@ namespace sql_bridge
             to_string ret;
             ret << lnk.statements().select_ << " " << (flt.empty()?lnk.statements().select_app_:flt);
             if (!page.empty() && !lnk.ref_field_name().empty())
-                ret << " " << TStrategy::sql_limit(page.length_) << " " << TStrategy::sql_limit_offset(page.position_);
+                ret << " " << TStrategy::sql_limit(page.length()) << " " << TStrategy::sql_limit_offset(page.position());
             return ret;
         }
     };

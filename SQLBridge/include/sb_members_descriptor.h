@@ -211,8 +211,9 @@ namespace sql_bridge
                 {
                     typedef typename TFn::const_iterator iterator;
                     iterator ve = el.begin();
-                    for(size_t i=0; i!=dst.page().length_ && ve!=el.end(); ++i,ve++)
+                    for(size_t i=0; i!=dst.page().length() && ve!=el.end(); ++i,ve++)
                         ncnt->bind_comp(&(*(*ve)), extkey);
+                    dst.page().disable();
                 }
                 else
                 {
@@ -227,16 +228,23 @@ namespace sql_bridge
             typedef typename TFn::value_type type;
             typedef typename TFn::const_iterator iterator;
             size_t elemt = typeid(type).hash_code();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
             if (dst.use_pages())
             {
-                iterator ve = el.begin();
-                for(size_t i=0; i!=dst.page().length_ && ve!=el.end(); ++i,ve++)
-                    ncnt->bind_comp(&(*ve), extkey);
+                if (dst.page().is_active())
+                {
+                    data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
+                    iterator ve = el.begin();
+                    for(size_t i=0; i!=dst.page().length() && ve!=el.end(); ++i,ve++)
+                        ncnt->bind_comp(&(*ve), extkey);
+                    dst.page().disable();
+                }
             }
             else
+            {
+                data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
                 for(auto const& ve : el)
                     ncnt->bind_comp(&ve, extkey);
+            }
         }
 
         template<typename TFn> inline typename std::enable_if<is_container_of_containers<TFn>::value>::type _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
@@ -511,8 +519,11 @@ namespace sql_bridge
             typedef typename TFn::value_type type;
             size_t elemt = types_selector<TFn>::destination_id();
             range pg;
-            if (cont.use_pages())
-                pg = range((dst.*member_).size(),cont.page().length_);
+            if (cont.use_pages() && cont.page().is_active())
+            {
+                pg = range((dst.*member_).size(),cont.page().length());
+                cont.page().disable();
+            }
             else
                 _clear(dst.*member_);
             data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),pg));
