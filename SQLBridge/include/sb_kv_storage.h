@@ -48,6 +48,7 @@ namespace sql_bridge
             {}
         
         template<typename T> inline void save(std::string const& key, T const& val) {_save(key,val);}
+        template<typename T, typename TKey> inline void remove(TKey const& key, std::string const& tab) {_remove<T>(key,tab);}
         template<typename T> inline void load(std::string const& key, T& trg) const {_load(key,trg);}
         inline void load(std::string const& key, std::string& trg) const {_load(key, trg);}
         
@@ -58,6 +59,8 @@ namespace sql_bridge
         }
     private:
 
+#pragma mark - load
+        
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load(std::string const& key, T& trg) const {typename TStrategy::sql_reader_kv rd(*this,to_string() << TStrategy::template sql_types<T>::type_name() << "_VAL", key); if (rd.is_valid()) rd.read_value(trg, 0);}
         template<typename T> inline typename std::enable_if<is_trivial_container<T>::value || is_trivial_map<T>::value>::type _load(std::string const& key, T& trg) const {_load_container(key,trg);}
         template<typename T> inline typename std::enable_if<is_back_pushable_container<T>::value>::type _load_container(std::string const& key, T& trg) const {typedef typename T::value_type TV;TV val;typename TStrategy::sql_reader_kv rd(*this, to_string() << key << TStrategy::template sql_types<T>::table_name(),true);if (!rd.is_valid()) return; trg.clear(); do {rd.read_value(val, 0);trg.push_back(val);} while(rd.next());}
@@ -65,9 +68,17 @@ namespace sql_bridge
         template<typename T> inline typename std::enable_if<is_trivial_map<T>::value>::type _load_container(std::string const& key, T& trg) const {typedef typename T::key_type _TKey;typedef typename T::mapped_type _TValue;_TKey kv;_TValue val;typename TStrategy::sql_reader_kv rd(*this,to_string() << key << TStrategy::template sql_types<T>::table_name(), false);if (!rd.is_valid()) return;trg.clear();do {rd.read_value(kv,0);rd.read_value(val,1);trg.insert({kv,val});}while(rd.next());}
         template<typename T> inline typename std::enable_if<is_kind_of_array<T>::value>::type _load_container(std::string const& key, T& trg) const {typedef typename T::value_type TV;typedef typename T::iterator TPos;TV val;typename TStrategy::sql_reader_kv rd(*this, to_string() << key << TStrategy::template sql_types<T>::table_name(),true); if (!rd.is_valid()) return; for(TPos pos = trg.begin(); pos!=trg.end(); ++pos) {rd.read_value(val, 0);*pos = val;if (!rd.next()) break;}}
 
+#pragma mark - save
+        
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _save(std::string const& key, T const& val) {typename TStrategy::sql_file::transactions_lock trk(*this);try{TStrategy::create_table(*this,TStrategy::template sql_types<T>::type_name()).bind_key(key).bind_value(val);} catch (std::exception&) {trk.rollback();throw;}}
         template<typename T> inline typename std::enable_if<is_trivial_container<T>::value>::type _save(std::string const& key, T const& val) {typename TStrategy::sql_file::transactions_lock trk(*this);try{typename TStrategy::sql_inserter_kv dst(TStrategy::create_table_for_array(*this,to_string() << key << TStrategy::template sql_types<T>::table_name(), TStrategy::template sql_types<typename T::value_type>::type_name()));for(auto const& vt : val) {dst.bind_value(vt); dst.next();}} catch(std::exception&) {trk.rollback();throw;}}
         template<typename T> inline typename std::enable_if<is_trivial_map<T>::value>::type _save(std::string const& key, T const& val) {typedef typename T::key_type _TKey;typedef typename T::mapped_type _TValue;typename TStrategy::sql_file::transactions_lock trk(*this);try{typename TStrategy::sql_inserter_kv dst(TStrategy::create_table_for_map(*this, to_string() << key << TStrategy::template sql_types<T>::table_name(), TStrategy::template sql_types<_TKey>::type_name(),TStrategy::template sql_types<_TValue>::type_name())); for(auto const& nv : val) {dst.bind_value(nv.first,1);dst.bind_value(nv.second,2);dst.next();}} catch (std::exception&) {trk.rollback();throw;}}
+        
+#pragma mark - remove
+
+        template<typename T, typename TKey> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _remove(TKey const& key, std::string const&) {typename TStrategy::sql_file::transactions_lock trk(*this);try{TStrategy::create_statement_for_remove_value(*this,TStrategy::template sql_types<T>::type_name()).bind_key(key);}catch (std::exception&){trk.rollback();throw;}}
+        template<typename T, typename TKey> inline typename std::enable_if<is_trivial_map<T>::value>::type _remove(TKey const& key, std::string const& tab) {typename TStrategy::sql_file::transactions_lock trk(*this); try{TStrategy::create_statement_for_remove_in_map(*this,tab,TStrategy::template sql_types<TKey>::type_name(),TStrategy::template sql_types<typename T::mapped_type>::type_name()).bind_key(key);}catch (std::exception&){trk.rollback();throw;}}
+
     };
 };
 

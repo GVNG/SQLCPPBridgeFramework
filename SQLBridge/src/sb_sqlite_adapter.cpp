@@ -176,6 +176,35 @@ namespace sql_bridge
             sqlite3_step(state_);
     }
 
+#pragma mark - sqlite_adapter::sql_remove_kv
+    
+    sqlite_adapter::sql_remove_kv::sql_remove_kv(sql_file const& db, std::string const& table)
+        : state_(nullptr)
+        , need_step_(false)
+    {
+        txt_statement_ = to_string() << "DELETE FROM " << table << " WHERE key=?";
+        state_ = db[txt_statement_];
+        if (!state_)
+            throw sql_error(g_err_cantupdate,txt_statement_,db.err_code());
+    }
+
+    bool sqlite_adapter::sql_remove_kv::next()
+    {
+        if (!state_ || !need_step_) return false;
+        int code(SQLITE_OK);
+        need_step_ = false;
+        if ((code=sqlite3_step(state_))!=SQLITE_DONE)
+            throw sql_error(g_err_cantupdate,txt_statement_,code);
+        return sqlite3_reset(state_)==SQLITE_OK;
+    }
+    
+    sqlite_adapter::sql_remove_kv::~sql_remove_kv()
+    {
+        if (!state_) return;
+        if (need_step_)
+            sqlite3_step(state_);
+    }
+
 #pragma mark - sqlite_adapter::sql_reader
 
     sqlite_adapter::sql_reader::sql_reader(sql_file const& db,
@@ -264,7 +293,24 @@ namespace sql_bridge
         }
         return sql_inserter_kv(db,to_string() << type << "_VAL",true);
     }
+
+    sqlite_adapter::sql_remove_kv sqlite_adapter::create_statement_for_remove_value(sql_file const& db,
+                                                                                    std::string const& type)
+    {
+        if (created_tables_.find(type)==created_tables_.end())
+        {
+            db.execute(to_string() << "CREATE TABLE IF NOT EXISTS " << type << "_VAL (key TEXT, val " << type << ")");
+            db.execute(to_string() << "CREATE UNIQUE INDEX IF NOT EXISTS ix_KEY_" << type << " ON " << type << "_VAL (key)");
+            created_tables_.insert(type);
+        }
+        return sql_remove_kv(db,to_string() << type << "_VAL");
+    }
     
+    sqlite_adapter::sql_remove_kv sqlite_adapter::create_statement_for_remove_in_map(sql_file const& db,std::string const& table, std::string const& typekey, std::string const& typeval)
+    {
+        return sql_remove_kv(db,to_string() << table << "_" << typekey << "_to_" << typeval << "_table");
+    }
+
     sqlite_adapter::sql_inserter_kv sqlite_adapter::create_table_for_array(sql_file const& db,std::string const& table, std::string const& type)
     {
         db.execute(to_string() << "DROP TABLE IF EXISTS " << table);

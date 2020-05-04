@@ -46,6 +46,7 @@ namespace sql_bridge
         typedef std::weak_ptr<db_queue_entry> db_proc_queue_weak_ptr;
         typedef std::map<std::string,sections_keeper> sections_cache;
     private:
+        
         template<typename T> class load_task : public db_task
         {
             typedef typename std::decay<T>::type _t_base;
@@ -92,6 +93,28 @@ namespace sql_bridge
             std::string key_;
         };
 
+        template<typename T,typename TKey> class remove_task : public db_task
+        {
+            typedef typename std::decay<T>::type _t_proc_type;
+        public:
+            remove_task(std::string const& tab, TKey const& key, db_proc_queue_ptr const& trg)
+                : db_task(data_sections_ptr())
+                , kvdb_(trg)
+                , table_name_(tab)
+                , key_(key)
+                {};
+            void run_task()
+            {
+                db_proc_queue_ptr db(kvdb_.lock());
+                if (db)
+                    db->template remove<_t_proc_type>(key_,table_name_);
+            };
+        private:
+            db_proc_queue_weak_ptr kvdb_;
+            std::string table_name_;
+            TKey key_;
+        };
+        
         class create_task : public db_task
         {
         public:
@@ -151,8 +174,15 @@ namespace sql_bridge
             shutdown_.fire();
             proc_flush_thread_.join();
         }
+#pragma mark - save
         
-        template<typename T> inline void save(std::string const& key, T const& val) const {proc_queue_->add(std::make_shared< save_task<T> >(val,key,proc_queue_));}
+        template<typename T> inline void save(std::string const& key, T const& val) const
+        {
+            proc_queue_->add(std::make_shared< save_task<T> >(val,key,proc_queue_));
+        }
+        
+#pragma mark - load
+        
         template<typename T> inline T load(std::string const& key, T const& def) const
         {
             db_task_ptr task(std::make_shared< load_task<T> >(def,key,proc_queue_));
@@ -163,6 +193,20 @@ namespace sql_bridge
             return static_cast<load_task<T>*>(task.get())->data();
         }
         inline std::string load(std::string const& key) const {return load(key,std::string());}
+
+#pragma mark - remove
+        
+        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type remove(std::string const& key) const
+        {
+            proc_queue_->add(std::make_shared< remove_task<T,std::string> >("",key,proc_queue_));
+        }
+        template<typename T> inline typename std::enable_if<is_trivial_map<T>::value>::type remove(typename T::key_type const& key, std::string const& tab) const
+        {
+            proc_queue_->add(std::make_shared< remove_task<T,typename T::key_type> >(tab,key,proc_queue_));
+        }
+
+#pragma mark - contexts load
+        
         inline context operator[](std::string const& nm) {return context_with_alt_file(nm,nullptr);}
 
         context context_with_alt_file(std::string const& nm, fn_change_file_name fn)

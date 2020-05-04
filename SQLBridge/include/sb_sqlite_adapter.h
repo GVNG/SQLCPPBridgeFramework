@@ -117,6 +117,43 @@ namespace sql_bridge
             bool valid_;
             std::string txt_statement_;
         };
+
+#pragma mark - sql_remove_kv
+
+        class sql_remove_kv
+        {
+        public:
+            sql_remove_kv(sql_file const& db,std::string const& table);
+            sql_remove_kv(sql_remove_kv const&) = delete;
+            sql_remove_kv(sql_remove_kv&& src)
+                : state_(src.state_)
+                , need_step_(src.need_step_)
+                , txt_statement_(src.txt_statement_)
+            {
+                src.state_ = nullptr;
+                src.need_step_ = false;
+                src.txt_statement_.clear();
+            }
+            ~sql_remove_kv();
+            bool next();
+            template<typename T> inline void bind_key(T const& key) {_bind_key(key,1);}
+        private:
+            // data
+            sqlite3_stmt* state_;
+            bool need_step_;
+            std::string txt_statement_;
+            // methods
+            template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value>::type _bind_key(T const& val, int fld) {need_step_=true;sqlite3_bind_double(state_, fld, val);}
+            template<typename T> inline typename std::enable_if<is_convertible_to_int<T>::value>::type _bind_key(T const& val, int fld) {need_step_=true;sqlite3_bind_int64(state_, fld, static_cast<sqlite3_int64>(val));}
+            template<typename T> inline typename std::enable_if<is_convertible_to_text<T>::value>::type _bind_key(T const& val, int fld) {need_step_=true;sqlite3_bind_text(state_, fld, val.c_str(), (int)val.size(), SQLITE_STATIC);}
+            template<typename T> inline typename std::enable_if<is_chrono<T>::value>::type _bind_key(T const& val, int fld)
+            {
+                need_step_=true;
+                double tv = static_cast<double>(val.time_since_epoch().count()) / T::period::den * T::period::num;
+                sqlite3_bind_double(state_, fld, tv);
+            }
+
+        };
         
 #pragma mark - sql_inserter_kv
         
@@ -283,6 +320,8 @@ namespace sql_bridge
         sql_inserter_kv create_table(sql_file const& db,std::string const& type);
         sql_inserter_kv create_table_for_array(sql_file const& db,std::string const&, std::string const& typeval);
         sql_inserter_kv create_table_for_map(sql_file const& db,std::string const&, std::string const& typekey, std::string const& typeval);
+        sql_remove_kv create_statement_for_remove_value(sql_file const& db,std::string const& type);
+        sql_remove_kv create_statement_for_remove_in_map(sql_file const& db,std::string const&, std::string const& typekey, std::string const& typeval);
         std::string create_section(sql_file const& db,std::string const& name, std::string const& path, fn_change_file_name fnch);
 
         static void create_statements(class_links_container&);

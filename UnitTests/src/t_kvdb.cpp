@@ -33,13 +33,18 @@
 TEST_F(DBFixture, SimpleValues)
 {
     double src_rl(M_PI),dst_rl;
-    std::string src_str("aaa"),dst_str;
+    std::string src_str("aaa"),src_str2("bbb"),dst_str,dst_str2;
     int src_int(100500),dst_int;
     
     storage().save("test", src_rl);
     storage().save("test", src_str);
     storage().save("test", src_int);
+    storage().save("to_remove",src_str2);
     
+    storage().remove<std::string>("to_remove");
+    
+    dst_str2 = storage().load("to_remove", std::string("def"));
+
     dst_rl = storage().load("test",0.0);
     dst_str = storage().load("test",std::string());
     dst_int = storage().load("test",0);
@@ -47,6 +52,8 @@ TEST_F(DBFixture, SimpleValues)
     ASSERT_EQ(src_rl, dst_rl);
     ASSERT_EQ(src_str, dst_str);
     ASSERT_EQ(src_int, dst_int);
+    ASSERT_NE(src_str2, dst_str2);
+    ASSERT_EQ(dst_str2, "def");
 }
 
 TEST_F(DBFixture, StringVector)
@@ -84,6 +91,8 @@ TEST_F(DBFixture, IntStringMap)
     for(int i=0; i<1000; i++)
         mapstr1_src[i] = sql_bridge::to_string() << "Map: " << i+1;
     storage().save("IntStringMap",mapstr1_src);
+    storage().remove< std::map<int,std::string> >(200,"IntStringMap");
+    mapstr1_src.erase(200);
     mapstr1_dst = storage().load("IntStringMap",std::map<int,std::string>());
     ASSERT_EQ(mapstr1_src,mapstr1_dst);
 }
