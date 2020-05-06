@@ -298,6 +298,7 @@ namespace sql_bridge
         template<typename T> inline context& load(T const& dst, std::string const& flt, typename async_load_task<T>::_fn_success_load fs) {_load<T>(dst,build_suffix(flt),nullptr,fs);return *this;}
 
         template<typename T> inline context& load(size_t pgsz, T& dst, std::string const& flt = "", size_t* num = nullptr) {_load_page<T>(pgsz,dst,build_suffix(flt),num);return *this;}
+        template<typename T> inline context& load(size_t pgsz, T* dst, std::string const& flt = "", size_t* num = nullptr) {_load_page<T>(pgsz,*dst,build_suffix(flt),num);return *this;}
         template<typename T> inline context& load(size_t pgsz, T const& dst, std::string const& flt, typename async_load_page_task<T>::_fn_failed fl, typename async_load_page_task<T>::_fn_success_load fs) {_load_page<T>(pgsz,dst,build_suffix(flt),fl,fs);return *this;}
         template<typename T> inline context& load(size_t pgsz, T const& dst, std::string const& flt, typename async_load_page_task<T>::_fn_success_load fs) {_load_page<T>(pgsz,dst,build_suffix(flt),nullptr,fs);return *this;}
 
