@@ -735,9 +735,9 @@ int main(int argc, char** argv)
             size_t cnt = dst.load(100, cont);
             assert(cnt==1101); // 100 elements (Case36Item) + 1 root (Case36) + 1000 unpaged (Case36Item)
             cnt = dst.load(100, cont);
-            assert(cnt==1051); // 50 elements (Case36Item) + 1 root (Case36) + 1000 unpaged (Case36Item)
+            assert(cnt==51); // 50 elements (Case36Item) + 1 root (Case36)
             cnt = dst.load(100, cont);
-            assert(cnt==1001); // 0 elements (Case36Item) + 1 root (Case36) + 1000 unpaged (Case36Item)
+            assert(cnt==1); // 0 elements (Case36Item) + 1 root (Case36)
             assert(src==dst);
             std::cout << "is ok. ";
         }

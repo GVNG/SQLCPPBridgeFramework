@@ -525,7 +525,10 @@ namespace sql_bridge
                 cont.page().disable();
             }
             else
+            {
+                if (cont.use_pages() && !(dst.*member_).empty()) return;
                 _clear(dst.*member_);
+            }
             data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),pg));
             while(ncnt->is_ok())
             {

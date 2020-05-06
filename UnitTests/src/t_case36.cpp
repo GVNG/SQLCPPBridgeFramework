@@ -38,8 +38,11 @@ TEST_F(DBFixture, Case36)
     cont.save(src);
     src.insert(50);
     cont.save(50,src);
-    size_t cnt;
-    cont.load(200,dst,"",&cnt);
+    size_t cnt = dst.load(100, cont);
+    ASSERT_EQ(cnt,1101); // 100 elements (Case36Item) + 1 root (Case36) + 1000 unpaged (Case36Item)
+    cnt = dst.load(100, cont);
+    ASSERT_EQ(cnt,51); // 50 elements (Case36Item) + 1 root (Case36)
+    cnt = dst.load(100, cont);
+    ASSERT_EQ(cnt,1); // 0 elements (Case36Item) + 1 root (Case36)
     ASSERT_EQ(src,dst);
-    ASSERT_EQ(cnt,1151);
 }
