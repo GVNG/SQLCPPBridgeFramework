@@ -53,3 +53,10 @@ DEFINE_SQL_DATABASE(case36, 1, Case36, Case36Item)::upgrade_structure(size_t fro
     //    execute("CREATE INDEX IF NOT EXISTS BLAH_BLAH_INDEX ON MY_TABLE (BLAH_BLAH_ID)");
     // ------------------------------------------------------------------------------------
 };
+
+size_t Case36::load(size_t page, sql_bridge::context &cont)
+{
+    size_t ret;
+    cont.load(page, *this, "", &ret);
+    return ret;
+}

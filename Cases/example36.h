@@ -82,6 +82,8 @@ public:
         for(long i=0; i<cnt; ++i)
             items_.push_front(offs+i);
     }
+    
+    size_t load(size_t,sql_bridge::context&);
 private:
     long key_;
     Case36ItemsContainer items_;

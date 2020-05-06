@@ -732,14 +732,15 @@ int main(int argc, char** argv)
             cont.save(src);
             src.insert(50);
             cont.save(50,src);
-            size_t cnt;
-            cont.load(200,dst,"",&cnt);
+            size_t cnt = dst.load(100, cont);
+            assert(cnt==1101); // 100 elements (Case36Item) + 1 root (Case36) + 1000 unpaged (Case36Item)
+            cnt = dst.load(100, cont);
             assert(src==dst);
-            assert(cnt==1151); // 150 elements (Case36Item) + 1 root (Case36) + 1000 unpaged (Case36Item)
+            assert(cnt==1051); // 50 elements (Case36Item) + 1 root (Case36) + 1000 unpaged (Case36Item)
             std::cout << "is ok. ";
         }
 #endif
-        
+
     }
     catch (std::exception& ex)
     {
