@@ -428,6 +428,7 @@ namespace sql_bridge
             typedef typename TFn::key_type k_type;
             typedef typename TFn::mapped_type m_type;
             size_t elemt = types_selector<TFn>::destination_id();
+            if (cont.use_pages() && !(dst.*member_).empty()) return;
             (dst.*member_).clear();
             data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
             sql_value key((k_type()));
