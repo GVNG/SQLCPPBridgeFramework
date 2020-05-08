@@ -334,9 +334,9 @@ namespace sql_bridge
         template<typename T> inline context& save(T& src) {_save<T>(0,src);return *this;}
         template<typename T> inline context& save(T&& src) {_save_m<T>(0,std::move(src));return *this;}
 
-        template<typename T> inline context& save(size_t pgsz, T const& src) {_save<T>(pgsz,src);return *this;}
+        template<typename T> inline context& save(size_t pgsz, T const& src) {_save_sync<T>(pgsz,src);return *this;}
         template<typename T> inline context& save(size_t pgsz, T const* src) {_save_sync<T>(pgsz,*src);return *this;}
-        template<typename T> inline context& save(size_t pgsz, T& src) {_save<T>(pgsz,src);return *this;}
+        template<typename T> inline context& save(size_t pgsz, T& src) {_save_sync<T>(pgsz,src);return *this;}
         template<typename T> inline context& save(size_t pgsz, T&& src) {_save_m<T>(pgsz,std::move(src));return *this;}
 
         template<typename T> inline context& load(T& dst, std::string const& flt = "", size_t* num = nullptr) {_load<T>(dst,build_suffix(flt),num);return *this;}
