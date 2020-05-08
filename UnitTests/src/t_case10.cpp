@@ -37,6 +37,9 @@ TEST_F(DBFixture, Case10)
     Case10 src10,dst10;
     for(int i=0; i<10; ++i)
         src10.push_back(Case10Element(20,i*5));
+    Case10 chk(src10);
+    cont.save(std::move(chk));
+    ASSERT_EQ(chk.empty(),true);
     cont.replace(src10);
     cont.load(dst10);
     ASSERT_EQ(src10,dst10);

@@ -301,6 +301,9 @@ int main(int argc, char** argv)
             Case10 src10,dst10;
             for(int i=0; i<10; ++i)
                 src10.push_back(Case10Element(20,i*5));
+            Case10 chk(src10);
+            cont.replace(std::move(chk));
+            assert(chk.empty());
             cont.replace(src10);
             cont.load(dst10);
             assert(src10==dst10);
