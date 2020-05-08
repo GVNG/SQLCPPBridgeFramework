@@ -60,3 +60,8 @@ size_t Case36::load(size_t page, sql_bridge::context &cont)
     cont.load(page, this, "", &ret);
     return ret;
 }
+
+void Case36::save(size_t page, sql_bridge::context &cont)
+{
+    cont.save(page,this);
+}

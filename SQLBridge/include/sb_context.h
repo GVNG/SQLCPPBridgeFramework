@@ -331,11 +331,13 @@ namespace sql_bridge
 
         template<typename T> inline context& save(T const& src) {_save<T>(0,src);return *this;}
         template<typename T> inline context& save(T const* src) {_save_sync<T>(0,*src);return *this;}
+        template<typename T> inline context& save(T* src) {_save_sync<T>(0,*src);return *this;}
         template<typename T> inline context& save(T& src) {_save<T>(0,src);return *this;}
         template<typename T> inline context& save(T&& src) {_save_m<T>(0,std::move(src));return *this;}
 
         template<typename T> inline context& save(size_t pgsz, T const& src) {_save_sync<T>(pgsz,src);return *this;}
         template<typename T> inline context& save(size_t pgsz, T const* src) {_save_sync<T>(pgsz,*src);return *this;}
+        template<typename T> inline context& save(size_t pgsz, T* src) {_save_sync<T>(pgsz,*src);return *this;}
         template<typename T> inline context& save(size_t pgsz, T& src) {_save_sync<T>(pgsz,src);return *this;}
         template<typename T> inline context& save(size_t pgsz, T&& src) {_save_m<T>(pgsz,std::move(src));return *this;}
 
@@ -351,6 +353,7 @@ namespace sql_bridge
 
         template<typename T> inline context& remove(T const& src) {_remove<T>(src);return *this;}
         template<typename T> inline context& remove(T const* src) {_remove_sync<T>(*src);return *this;}
+        template<typename T> inline context& remove(T* src) {_remove_sync<T>(*src);return *this;}
         template<typename T> inline context& remove(T& src) {_remove<T>(src);return *this;}
         template<typename T> inline context& remove(T&& src) {_remove_m<T>(std::move(src));return *this;}
 
@@ -360,6 +363,7 @@ namespace sql_bridge
 
         template<typename T> inline context& replace(T const& src) {_replace<T>(src);return *this;}
         template<typename T> inline context& replace(T const* src) {_replace_sync<T>(*src);return *this;}
+        template<typename T> inline context& replace(T* src) {_replace_sync<T>(*src);return *this;}
         template<typename T> inline context& replace(T& src) {_replace<T>(src);return *this;}
         template<typename T> inline context& replace(T&& src) {_replace_m<T>(std::move(src));return *this;}
         

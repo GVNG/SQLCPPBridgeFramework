@@ -84,6 +84,7 @@ public:
     }
     
     size_t load(size_t,sql_bridge::context&);
+    void save(size_t,sql_bridge::context&);
 private:
     long key_;
     Case36ItemsContainer items_;
