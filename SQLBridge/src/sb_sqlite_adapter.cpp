@@ -494,10 +494,6 @@ namespace sql_bridge
         if (!relfrom.empty())
             selsts << sql_where() << relfrom << "=?";
         to_string selapp;
-        if (dp.index_ref().type()==e_db_key_mode::PrimaryKey ||
-            dp.index_ref().type()==e_db_key_mode::ExternalPrimaryKey)
-                selapp << sql_order_by("") << sql_order_asc(dp.index_ref().name());
-        
         for(auto const& pr : dp.should_create_indexes())
         {
             if (pr.first==e_db_index_type::OrderAsc)
@@ -512,7 +508,11 @@ namespace sql_bridge
                 break;
             }
         }
-            
+        if (selapp.str().empty())
+            if (dp.index_ref().type()==e_db_key_mode::PrimaryKey ||
+                dp.index_ref().type()==e_db_key_mode::ExternalPrimaryKey)
+                    selapp << sql_order_by("") << sql_order_asc(dp.index_ref().name());
+
         dp.update_for_select_statement(selsts,selapp);
         
         for(auto& trg : dp.target())

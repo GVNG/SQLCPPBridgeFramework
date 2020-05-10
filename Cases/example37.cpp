@@ -32,7 +32,7 @@
 
 DEFINE_SQL_TABLE(root,Case37)
 {
-    bind("ID",      &Case37::id_,          e_db_index_type::Unique),
+    bind("ID",      &Case37::id_,           e_db_index_type::Unique),
     bind("NAME",    &Case37::name_),
     bind("VALUE",   &Case37::value_),
     bind("MEMBERS", &Case37::members_),
@@ -40,7 +40,7 @@ DEFINE_SQL_TABLE(root,Case37)
 
 DEFINE_SQL_TABLE(member,MemberCase37)
 {
-    bind("VAL",     &MemberCase37::val_),
+    bind("VAL",     &MemberCase37::val_,    e_db_index_type::OrderDesc),
 };
 
 DEFINE_SQL_TABLE(par1,Parent1Case37)

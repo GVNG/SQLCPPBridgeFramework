@@ -45,7 +45,9 @@ namespace sql_bridge
     {
     public:
         template<typename T> inline void save(T const& src) {_save<T>(src);}
+        template<typename T> inline void save(T const& src,sql_context_references_container const& ref) {}
         template<typename T> inline void save_page(size_t pgsz, T const& src) {_save_page<T>(pgsz,src);}
+        template<typename T> inline void save_page(size_t pgsz, T const& src, sql_context_references_container const& ref) {}
         template<typename T> inline void load(T& dst, std::string const& flt, size_t& num) {_load<T>(dst,flt,num);};
         template<typename T> inline void load_page(size_t pgsz, T& dst, std::string const& flt, size_t& num) {_load_page<T>(pgsz,dst,flt,num);};
         template<typename T> inline void remove(T const& src) {_remove<T>(src);}
