@@ -35,18 +35,23 @@
 
 namespace sql_bridge
 {
-    struct sql_value;
+    class sql_value;
     typedef std::vector<sql_value> sql_values_container;
     typedef std::map<sql_value,sql_value> sql_values_map;
+    typedef std::pair<size_t,sql_value> sql_context_reference;
+    typedef std::deque<sql_context_reference> sql_context_references_container;
     
-    struct sql_value
+    class sql_value
     {
         template<bool> struct _t_optional_adapter{};
         template<bool> struct _t_real_adapter {};
         template<bool> struct _t_integral_adapter {};
         template<bool> struct _t_chrono_adapter {};
+    public:
         enum class e_key_type {Empty,Integer,Real,String};
+        
         inline bool empty() const {return type_==e_key_type::Empty;}
+        inline e_key_type type() const {return type_;}
         
         inline bool operator < (sql_value const& rv) const
         {
@@ -128,7 +133,7 @@ namespace sql_bridge
             typename T::clock::duration ret(static_cast<typename T::clock::rep>(rValue_ / T::clock::period::num * T::clock::period::den));
             return T(ret);
         }
-        
+    private:
         // data
         e_key_type type_;
         int64_t iValue_;

@@ -214,16 +214,16 @@ namespace sql_bridge
             template<typename T> inline void bind(T const& val) {bind_value(val,++fld_num_);}
             inline void bind(sql_value const& val)
             {
-                switch(val.type_)
+                switch(val.type())
                 {
                     case sql_value::e_key_type::Integer:
-                        bind(val.iValue_);
+                        bind(val.value<int64_t>());
                         break;
                     case sql_value::e_key_type::Real:
-                        bind(val.rValue_);
+                        bind(val.value<double>());
                         break;
                     case sql_value::e_key_type::String:
-                        bind(val.tValue_);
+                        bind(val.value<std::string>());
                         break;
                     case sql_value::e_key_type::Empty:
                         break;
@@ -268,16 +268,16 @@ namespace sql_bridge
             template<typename T> inline void bind(T const& val) {bind_value(val,fld_num_++);}
             inline void bind(sql_value const& val)
             {
-                switch(val.type_)
+                switch(val.type())
                 {
                     case sql_value::e_key_type::Integer:
-                        bind(val.iValue_);
+                        bind(val.value<int64_t>());
                         break;
                     case sql_value::e_key_type::Real:
-                        bind(val.rValue_);
+                        bind(val.value<double>());
                         break;
                     case sql_value::e_key_type::String:
-                        bind(val.tValue_);
+                        bind(val.value<std::string>());
                         break;
                     case sql_value::e_key_type::Empty:
                         bind_null(fld_num_++);

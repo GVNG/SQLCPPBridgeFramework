@@ -52,6 +52,7 @@ namespace sql_bridge
         template<typename T> inline void remove_if(std::string const& src) {_remove_if<T>(src);}
         template<typename T> inline typename std::enable_if<is_any_map<T>::value>::type remove_by_key(typename T::key_type const& src) {_remove_by_key<T>(src);}
         template<typename T> inline void replace(T const& src) {_replace<T>(src);}
+        template<typename T> inline sql_context_reference resolve_link(T const& src) {return _resolve_link<T>(src);}
         template<typename T, typename TMem> inline std::string field_name(TMem const T::*mem_offs) const
         {
             size_t tid = typeid(T).hash_code();
@@ -90,6 +91,35 @@ namespace sql_bridge
         data_section_descriptors_ptr descriptor_;
     private:
 
+        
+#pragma mark - resolve link
+        
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value &&
+                                                            !is_container<T>::value &&
+                                                            !is_any_map<T>::value &&
+                                                            !is_pointer<T>::value,sql_context_reference>::type _resolve_link(T const& src)
+        {
+            size_t tid = typeid(T).hash_code();
+            data_update_context_ptr cont(create_reader(tid, "", range()));
+            sql_value key = cont->id_for_members(&src,true);
+            if (key.empty())
+                throw sql_bridge_error(g_internal_error_text, g_without_reference_err_text);
+            return sql_context_reference(tid,key);
+        }
+
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value &&
+                                                            !is_container<T>::value &&
+                                                            !is_any_map<T>::value &&
+                                                            is_pointer<T>::value,sql_context_reference>::type _resolve_link(T const& src)
+        {
+            size_t tid = types_selector<T>::destination_id();
+            data_update_context_ptr cont(create_reader(tid, "", range()));
+            sql_value key = cont->id_for_members(&(*src),true);
+            if (key.empty())
+                throw sql_bridge_error(g_internal_error_text, g_without_reference_err_text);
+            return sql_context_reference(tid,key);
+        }
+        
 #pragma mark - save page
         
         template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _save_page(size_t pgsz, T const& src)
@@ -699,25 +729,37 @@ namespace sql_bridge
             if (reader_.is_null())
                 dst = sql_value();
             else
-            switch (dst.type_)
+            switch (dst.type())
             {
                 case sql_value::e_key_type::Integer:
-                    reader_.read_value(dst.iValue_);
+                    {
+                        int64_t v;
+                        reader_.read_value(v);
+                        dst = sql_value(v);
+                    }
                     break;
                 case sql_value::e_key_type::Real:
-                    reader_.read_value(dst.rValue_);
+                    {
+                        double v;
+                        reader_.read_value(v);
+                        dst = sql_value(v);
+                    }
                     break;
                 case sql_value::e_key_type::String:
-                    reader_.read_value(dst.tValue_);
+                    {
+                        std::string v;
+                        reader_.read_value(v);
+                        dst = sql_value(v);
+                    }
                     break;
                 default:
                     throw sql_bridge_error(to_string() << "Table: " << table_name() <<". " << g_internal_error_text, g_architecture_error_text);
             }
         }
         
-        sql_value id_for_members(void const* dat) const override
+        sql_value id_for_members(void const* dat, bool wo_pk) const override
         {
-            if (use_ext_primary_key_)
+            if (use_ext_primary_key_ && !wo_pk)
                 return sql_value(last_key_);
             return member_for_id_?member_for_id_->expand(dat):sql_value();
         }
@@ -834,7 +876,7 @@ namespace sql_bridge
             }
         }
         
-        sql_value id_for_members(void const* dat) const override
+        sql_value id_for_members(void const* dat, bool) const override
         {
             if (update_mode_)
                 return member_for_id_->expand(dat);
