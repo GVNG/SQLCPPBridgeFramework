@@ -757,7 +757,7 @@ int main(int argc, char** argv)
             for(int i=0; i<100; ++i)
                 src.push_back(Case37(i*3));
             cont.save(src);
-            src[10].save(50,cont);
+            src[10].inflate(50,cont);
             cont.load(dst);
             assert(src==dst);
             std::cout << "is ok. ";

@@ -59,7 +59,9 @@ DEFINE_SQL_DATABASE(case37,1,Case37,MemberCase37,Parent1Case37)::upgrade_structu
     // ------------------------------------------------------------------------------------
 }
 
-void Case37::save(size_t sz, sql_bridge::context& cont)
+void Case37::inflate(size_t sz, sql_bridge::context& cont)
 {
-    cont.at(this);
+    for(int i=0; i!=10; ++i)
+        members_.insert(members_.begin(), MemberCase37(id_));
+    cont.at(this).save(10,members_);
 }

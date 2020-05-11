@@ -36,9 +36,9 @@
 namespace sql_bridge
 {
     class sql_value;
+    struct sql_context_reference;
     typedef std::vector<sql_value> sql_values_container;
     typedef std::map<sql_value,sql_value> sql_values_map;
-    typedef std::pair<size_t,sql_value> sql_context_reference;
     typedef std::deque<sql_context_reference> sql_context_references_container;
     
     class sql_value
@@ -131,7 +131,7 @@ namespace sql_bridge
             if (type_!=e_key_type::Real)
                 throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
             typename T::clock::duration ret(static_cast<typename T::clock::rep>(rValue_ / T::clock::period::num * T::clock::period::den));
-            return T(ret);
+            return static_cast<T>(ret);
         }
     private:
         // data
@@ -139,6 +139,13 @@ namespace sql_bridge
         int64_t iValue_;
         double rValue_;
         std::string tValue_;
+    };
+    
+    struct sql_context_reference
+    {
+        size_t class_id_;
+        std::string mem_ref_;
+        sql_value key_;
     };
 
 };

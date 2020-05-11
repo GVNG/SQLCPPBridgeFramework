@@ -48,18 +48,17 @@ private:
     long long val_;
 };
 
-class MemberCase37 : public Parent1Case37
+class MemberCase37
 {
     DECLARE_SQL_ACCESS(MemberCase37);
 public:
     MemberCase37() {};
     MemberCase37(long long i)
-        : Parent1Case37(i*7)
-        , val_(i*M_LOG2E)
+        : val_(i*M_LOG2E)
         {};
     inline bool operator == (MemberCase37 const& rv) const
     {
-        return val_==rv.val_ && static_cast<Parent1Case37 const&>(*this) == rv;
+        return val_==rv.val_;
     }
 private:
     double val_;
@@ -87,7 +86,7 @@ public:
                 static_cast<Parent1Case37 const&>(*this) == rv;
     }
     
-    void save(size_t,sql_bridge::context&);
+    void inflate(size_t,sql_bridge::context&);
 private:
     long long id_;
     std::string name_;
