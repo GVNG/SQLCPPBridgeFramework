@@ -406,9 +406,10 @@ namespace sql_bridge
 
         template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value &&
                                                             !is_container<T>::value &&
-                                                            !is_map<T>::value,ref_context>::type _at(T const& src) const
+                                                            !is_map<T>::value &&
+                                                            !is_pointer<T>::value,ref_context>::type _at(T const& src) const
         {
-            struct s_proxy : ref_context {s_proxy(db_tasks_queue_interface_ptr q, data_sections_ptr ds, sql_context_references_container const& ref) : ref_context(q,ds,ref) {}};
+            struct s_proxy : ref_context {s_proxy(db_tasks_queue_interface_ptr q, data_sections_ptr ds, sql_context_references_container const& ref,void const* src) : ref_context(q,ds,ref,src) {}};
             db_task_ptr task(std::make_shared< resolve_link_task<T> >(src,data_,sql_context_references_container()));
             std::future<void> ret(task->get_future());
             db_tasks_queue_interface_ptr qp = queue_.lock();
@@ -416,10 +417,10 @@ namespace sql_bridge
             {
                 qp->add( task );
                 ret.get();
-                return s_proxy(qp,data_,static_cast<resolve_link_task<T>*>(task.get())->references());
+                return s_proxy(qp,data_,static_cast<resolve_link_task<T>*>(task.get())->references(),&src);
             }
             else
-                return s_proxy(qp,data_,sql_context_references_container());
+                return s_proxy(qp,data_,sql_context_references_container(),&src);
         }
         
 #pragma mark - save sync

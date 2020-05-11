@@ -144,7 +144,6 @@ namespace sql_bridge
     struct sql_context_reference
     {
         size_t class_id_;
-        std::string mem_ref_;
         sql_value key_;
     };
 

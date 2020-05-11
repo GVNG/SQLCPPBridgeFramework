@@ -45,9 +45,9 @@ namespace sql_bridge
     {
     public:
         template<typename T> inline void save(T const& src) {_save<T>(src);}
-        template<typename T> inline void save(T const& src,sql_context_references_container const& ref) {}
+        template<typename T> inline void save(T const* src,sql_context_references_container const& ref, void const*) {}
         template<typename T> inline void save_page(size_t pgsz, T const& src) {_save_page<T>(pgsz,src);}
-        template<typename T> inline void save_page(size_t pgsz, T const& src, sql_context_references_container const& ref) {_save_page_at<T>(pgsz,src,ref);}
+        template<typename T> inline void save_page(size_t pgsz, T const* src, sql_context_references_container const& ref, void const* rd) {_save_page_at<T>(pgsz,src,ref,rd);}
         template<typename T> inline void load(T& dst, std::string const& flt, size_t& num) {_load<T>(dst,flt,num);};
         template<typename T> inline void load_page(size_t pgsz, T& dst, std::string const& flt, size_t& num) {_load_page<T>(pgsz,dst,flt,num);};
         template<typename T> inline void remove(T const& src) {_remove<T>(src);}
@@ -106,7 +106,7 @@ namespace sql_bridge
             sql_value key = cont->id_for_members(&src,true);
             if (key.empty())
                 throw sql_bridge_error(g_internal_error_text, g_without_reference_err_text);
-            return sql_context_reference({tid,cont->forward_ref(),key});
+            return sql_context_reference({tid,key});
         }
 
         template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value &&
@@ -119,33 +119,33 @@ namespace sql_bridge
             sql_value key = cont->id_for_members(&(*src),true);
             if (key.empty())
                 throw sql_bridge_error(g_internal_error_text, g_without_reference_err_text);
-            return sql_context_reference({tid,cont->forward_ref(),key});
+            return sql_context_reference({tid,key});
         }
 
 #pragma mark - save page at
         
-        template<typename T> inline typename std::enable_if<is_container<T>::value>::type _save_page_at(size_t pgsz, T const& src, sql_context_references_container const& ref)
+        template<typename T> inline typename std::enable_if<is_container<T>::value>::type _save_page_at(size_t pgsz, T const* src, sql_context_references_container const& ref, void const* root)
         {
             if (ref.empty())
                 throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
             data_update_context_ptr cur_context;
             sql_value key;
-            for(auto const& r : ref)
-                if (!cur_context)
-            {
-                cur_context = create_context(r.class_id_, "", range());
-                key = r.key_;
-            }
-            else
-            {
-                cur_context = cur_context->context_for_member(r.class_id_, key, r.mem_ref_, range());
-                key = r.key_;
-            }
-            size_t tid = types_selector<T>::destination_id();
-            cur_context = cur_context->context_for_member(tid, key, ref.back().mem_ref_, range());
-            typename  T::const_iterator pos = src.begin();
-            for(size_t i=0; i!=pgsz && pos!=src.end(); i++,pos++)
-                cur_context->bind_comp(&(*pos), key);
+//            for(auto const& r : ref)
+//                if (!cur_context)
+//            {
+//                cur_context = create_context(r.class_id_, "", range());
+//                key = r.key_;
+//            }
+//            else
+//            {
+//                cur_context = cur_context->context_for_member(r.class_id_, key, r.mem_ref_, range());
+//                key = r.key_;
+//            }
+//            size_t tid = types_selector<T>::destination_id();
+//            cur_context = cur_context->context_for_member(tid, key, ref.back().mem_ref_, range());
+//            typename  T::const_iterator pos = src.begin();
+//            for(size_t i=0; i!=pgsz && pos!=src.end(); i++,pos++)
+//                cur_context->bind_comp(&(*pos), key);
         }
 
 #pragma mark - save page
