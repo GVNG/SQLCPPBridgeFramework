@@ -56,7 +56,7 @@ namespace sql_bridge
                 , root_data_(rd)
                 {};
             inline void run_task() override {if (page_size_) section_->save_page(page_size_,data_,references_,root_data_); else section_->save(data_,references_,root_data_);}
-            void error(base_sql_error const& err) override {std::cerr << err.what() << std::endl;}
+            void error(base_sql_error const& err) override {throw err;}
         private:
             size_t page_size_;
             _t_base const* data_;

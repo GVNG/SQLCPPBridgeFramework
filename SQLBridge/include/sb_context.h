@@ -51,7 +51,7 @@ namespace sql_bridge
                 , ref_(cn)
                 {};
             inline void run_task() override {ref_.push_back(section_->resolve_link(data_));}
-            void error(base_sql_error const& err) override {std::cerr << err.what() << std::endl;}
+            void error(base_sql_error const& err) override {throw err;}
             inline sql_context_references_container const& references() const {return ref_;}
         private:
             _t_base const& data_;
@@ -90,7 +90,7 @@ namespace sql_bridge
                 , data_(src)
                 {};
             inline void run_task() override {if (page_size_) section_->save_page(page_size_,data_); else section_->save(data_);}
-            void error(base_sql_error const& err) override {std::cerr << err.what() << std::endl;}
+            void error(base_sql_error const& err) override {throw err;}
         private:
             size_t page_size_;
             _t_base const& data_;
@@ -123,7 +123,7 @@ namespace sql_bridge
                 , data_(src)
                 {};
             inline void run_task() override {section_->replace(data_);}
-            void error(base_sql_error const& err) override {std::cerr << err.what() << std::endl;}
+            void error(base_sql_error const& err) override {throw err;}
         private:
             _t_base const& data_;
         };
@@ -295,7 +295,7 @@ namespace sql_bridge
                 , data_(src)
                 {};
             inline void run_task() override {section_->remove(data_);}
-            void error(base_sql_error const& err) override {std::cerr << err.what() << std::endl;}
+            void error(base_sql_error const& err) override {throw err;}
         private:
             _t_base const& data_;
         };
@@ -310,6 +310,7 @@ namespace sql_bridge
                 , value_(val)
                 {};
             inline void run_task() override {section_->remove_by_key<T>(value_);}
+            void error(base_sql_error const& err) override {std::cerr << err.what() << std::endl;}
         private:
             _t_key const value_;
         };
@@ -323,6 +324,7 @@ namespace sql_bridge
                 , condition_(flt)
                 {};
             inline void run_task() override {section_->remove_if<T>(condition_);}
+            void error(base_sql_error const& err) override {std::cerr << err.what() << std::endl;}
         private:
             std::string const condition_;
         };
