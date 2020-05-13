@@ -41,5 +41,7 @@ TEST_F(DBFixture, Case37)
     cont.save(src);
     src[10].inflate(50,cont);
     cont.load(dst);
+    ASSERT_GT(dst.size(),50);
+    dst[20].reload(cont);
     ASSERT_EQ(src,dst);
 }

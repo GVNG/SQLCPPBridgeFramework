@@ -59,6 +59,8 @@ namespace sql_bridge
         sql_value try_cast() const override {return sql_value(TMb());}
         void read(void* dst, data_update_context& cnt) override {_read<TMb>(*static_cast<T*>(dst),cnt);}
         void read_comp(void* dst, data_update_context& cnt, sql_value const& extkey) override {_read_comp<TMb>(*static_cast<T*>(dst),cnt,extkey);}
+        void read_at(void* dst,void* root,data_update_context& cont,sql_value const& extkey) override {};
+        void read_inheritance(size_t tid,void* root,data_update_context& cont,sql_value const& extkey) override {};
         bool is_this_mem_ptr(void const* base, void const* memptr) const override
         {
             T const* chk = static_cast<T const*>(base);

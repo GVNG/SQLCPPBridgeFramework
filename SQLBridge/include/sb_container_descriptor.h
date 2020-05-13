@@ -70,6 +70,8 @@ namespace sql_bridge
         sql_value try_cast() const override {return sql_value();}
         void read(void* dst,data_update_context& cont) override {read_comp(dst,cont,sql_value());}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {_read_comp<T>(*static_cast<T*>(dst),cont,extkey);};
+        void read_at(void* dst,void* root,data_update_context& cont,sql_value const& extkey) override {};
+        void read_inheritance(size_t tid,void* root,data_update_context& cont,sql_value const& extkey) override {};
         bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
         bool is_target_map() const override {return is_map<T>::value;}
         bool is_not_empty_container(void const* src) const override {return !static_cast<T const*>(src)->empty();}

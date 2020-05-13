@@ -63,9 +63,66 @@ namespace sql_bridge
             void const* root_data_;
             sql_context_references_container const& references_;
         };
+
+        template<typename T> class load_page_task : public db_task
+        {
+            typedef typename std::decay<T>::type _t_base;
+        public:
+            load_page_task(_t_base* src,
+                           data_sections_ptr section,
+                           std::string const& fl,
+                           size_t pg,
+                           sql_context_references_container const& ref,
+                           void* rd)
+                : db_task(section)
+                , filter_(fl)
+                , page_size_(pg)
+                , data_(src)
+                , references_(ref)
+                , root_data_(rd)
+                , items_load_(0)
+                {};
+            inline void run_task() override {section_->load_page(page_size_,data_,filter_,items_load_,references_,root_data_);}
+            void error(base_sql_error const& err) override {throw err;}
+            size_t items_load() const {return items_load_;}
+        private:
+            std::string filter_;
+            size_t page_size_;
+            _t_base* data_;
+            void* root_data_;
+            sql_context_references_container const& references_;
+            size_t items_load_;
+        };
         
+        template<typename T> class load_task : public db_task
+        {
+            typedef typename std::decay<T>::type _t_base;
+        public:
+            load_task(_t_base* src,
+                      data_sections_ptr section,
+                      std::string const& fl,
+                      sql_context_references_container const& ref,
+                      void* rd)
+                : db_task(section)
+                , filter_(fl)
+                , data_(src)
+                , references_(ref)
+                , root_data_(rd)
+                , items_load_(0)
+                {};
+            inline void run_task() override {section_->load(data_,filter_,items_load_,references_,root_data_);}
+            void error(base_sql_error const& err) override {throw err;}
+            size_t items_load() const {return items_load_;}
+        private:
+            std::string filter_;
+            _t_base* data_;
+            void* root_data_;
+            sql_context_references_container const& references_;
+            size_t items_load_;
+        };
+
         sql_context_references_container references_;
-        void const* root_data_;
+        void* root_data_;
         
     protected:
         ref_context(db_tasks_queue_interface_ptr q,
@@ -74,7 +131,7 @@ namespace sql_bridge
                     void const* rd)
             : context_engine(q,ds)
             , references_(ref)
-            , root_data_(rd)
+            , root_data_(const_cast<void*>(rd))
             {}
         ref_context() = delete;
         ref_context(ref_context const&) = delete;
@@ -88,18 +145,24 @@ namespace sql_bridge
             std::swap(root_data_,src.root_data_);
         }
 #pragma mark - public methods
-        template<typename T> inline ref_context& save() {_save_sync<T>(0,nullptr);return *this;}
-        template<typename T> inline ref_context& save(T const& src) {_save_sync<T>(0,&src);return *this;}
-        template<typename T> inline ref_context& save(T const* src) {_save_sync<T>(0,src);return *this;}
-        template<typename T> inline ref_context& save(T* src) {_save_sync<T>(0,src);return *this;}
-        template<typename T> inline ref_context& save(T& src) {_save_sync<T>(0,&src);return *this;}
+        template<typename T> inline ref_context& save() {_save<T>(0,nullptr);return *this;}
+        template<typename T> inline ref_context& save(T const& src) {_save<T>(0,&src);return *this;}
+        template<typename T> inline ref_context& save(T const* src) {_save<T>(0,src);return *this;}
+        template<typename T> inline ref_context& save(T* src) {_save<T>(0,src);return *this;}
+        template<typename T> inline ref_context& save(T& src) {_save<T>(0,&src);return *this;}
+        template<typename T> inline ref_context& save(size_t pgsz, T const& src) {_save<T>(pgsz,&src);return *this;}
+        template<typename T> inline ref_context& save(size_t pgsz, T const* src) {_save<T>(pgsz,src);return *this;}
+        template<typename T> inline ref_context& save(size_t pgsz, T& src) {_save<T>(pgsz,&src);return *this;}
+        template<typename T> inline ref_context& save(size_t pgsz, T* src) {_save<T>(pgsz,src);return *this;}
 
-        template<typename T> inline ref_context& save(size_t pgsz, T const& src) {_save_sync<T>(pgsz,&src);return *this;}
-        template<typename T> inline ref_context& save(size_t pgsz, T const* src) {_save_sync<T>(pgsz,src);return *this;}
-        template<typename T> inline ref_context& save(size_t pgsz, T& src) {_save_sync<T>(pgsz,&src);return *this;}
-        template<typename T> inline ref_context& save(size_t pgsz, T* src) {_save_sync<T>(pgsz,src);return *this;}
+        template<typename T> inline ref_context& load() {_load<T>(nullptr,"",nullptr);return *this;}
+        template<typename T> inline ref_context& load(T& dst, std::string const& flt = "", size_t* num = nullptr) {_load<T>(&dst,build_suffix(flt),num);return *this;}
+        template<typename T> inline ref_context& load(T* dst, std::string const& flt = "", size_t* num = nullptr) {_load<T>(dst,build_suffix(flt),num);return *this;}
+        template<typename T> inline ref_context& load(size_t pgsz, T& dst, std::string const& flt = "", size_t* num = nullptr) {_load_page<T>(pgsz,&dst,build_suffix(flt),num);return *this;}
+        template<typename T> inline ref_context& load(size_t pgsz, T* dst, std::string const& flt = "", size_t* num = nullptr) {_load_page<T>(pgsz,dst,build_suffix(flt),num);return *this;}
 
-
+        
+        
         
         inline ref_context& limit(size_t count, size_t offset = 0) {context_engine::limit(offset,count);return *this;}
         inline ref_context& sql_or() {context_engine::sql_or();return *this;}
@@ -117,13 +180,49 @@ namespace sql_bridge
         template<typename T, typename TFn, typename TCont> inline ref_context& where_not_in(TFn const T::*mem_ptr, TCont const& cnt) {context_engine::where_not_in<T,TFn,TCont>(mem_ptr,cnt); return *this;}
 
     private:
-#pragma mark - save sync
-        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _save_sync(size_t, T const*) const
+#pragma mark - load
+        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load(T*, std::string const& flt, size_t* num) const
+        {
+            throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);
+        }
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load(T* dst, std::string const& flt, size_t* num) const
+        {
+            db_task_ptr task(std::make_shared< load_task<T> >(dst,data_,flt,references_,root_data_));
+            std::future<void> ret(task->get_future());
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr)
+            {
+                qp->add( task );
+                ret.get();
+                if (num)
+                    *num = static_cast<load_task<T>*>(task.get())->items_load();
+            }
+        }
+#pragma mark - load page
+        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load_page(size_t, T*, std::string const& flt, size_t* num) const
+        {
+            throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);
+        }
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load_page(size_t pg, T* dst, std::string const& flt, size_t* num) const
+        {
+            db_task_ptr task(std::make_shared< load_page_task<T> >(dst,data_,flt,pg,references_,root_data_));
+            std::future<void> ret(task->get_future());
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr)
+            {
+                qp->add( task );
+                ret.get();
+                if (num)
+                    *num = static_cast<load_page_task<T>*>(task.get())->items_load();
+            }
+        }
+#pragma mark - save
+        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _save(size_t, T const*) const
         {
             throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);
         }
 
-        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _save_sync(size_t pg, T const* src) const
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _save(size_t pg, T const* src) const
         {
             db_task_ptr task(std::make_shared< save_task<T> >(src,data_,pg,references_,root_data_));
             std::future<void> ret(task->get_future());

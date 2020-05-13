@@ -87,6 +87,7 @@ public:
     }
     
     void inflate(size_t,sql_bridge::context&);
+    void reload(sql_bridge::context&);
 private:
     long long id_;
     std::string name_;

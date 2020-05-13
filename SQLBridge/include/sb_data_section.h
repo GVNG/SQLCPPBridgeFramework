@@ -48,8 +48,12 @@ namespace sql_bridge
         template<typename T> inline void save(T const* src,sql_context_references_container const& ref, void const* rd) {_save_page_at<T>(0, src, ref, rd);}
         template<typename T> inline void save_page(size_t pgsz, T const& src) {_save_page<T>(pgsz,src);}
         template<typename T> inline void save_page(size_t pgsz, T const* src, sql_context_references_container const& ref, void const* rd) {_save_page_at<T>(pgsz,src,ref,rd);}
+        
         template<typename T> inline void load(T& dst, std::string const& flt, size_t& num) {_load<T>(dst,flt,num);};
+        template<typename T> inline void load(T* dst, std::string const& flt, size_t& num,sql_context_references_container const& ref, void* rd) {_load_at<T>(dst,flt,num,ref,rd);};
         template<typename T> inline void load_page(size_t pgsz, T& dst, std::string const& flt, size_t& num) {_load_page<T>(pgsz,dst,flt,num);};
+        template<typename T> inline void load_page(size_t pgsz, T* dst, std::string const& flt, size_t& num,sql_context_references_container const& ref, void* rd) {_load_page_at<T>(pgsz,dst,flt,num,ref,rd);};
+
         template<typename T> inline void remove(T const& src) {_remove<T>(src);}
         template<typename T> inline void remove_if(std::string const& src) {_remove_if<T>(src);}
         template<typename T> inline typename std::enable_if<is_any_map<T>::value>::type remove_by_key(typename T::key_type const& src) {_remove_by_key<T>(src);}
@@ -123,13 +127,11 @@ namespace sql_bridge
         }
 
 #pragma mark - save page at
-        
-        template<typename T> inline typename std::enable_if<is_container<T>::value>::type _save_page_at(size_t pgsz, T const* src, sql_context_references_container const& ref, void const* root)
+
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _save_page_at(size_t pgsz, T const* src, sql_context_references_container const& ref, void const* root)
         {
             if (ref.empty())
                 throw sql_bridge_error(g_internal_error_text, g_without_reference_err_text);
-            data_update_context_ptr cur_context;
-            sql_value key;
             if (src)
                 create_context(ref.front().class_id_, "", range(0,pgsz))->bind_at(src, root, ref.front().key_);
             else
@@ -447,6 +449,34 @@ namespace sql_bridge
             }
         }
 
+#pragma mark - load page at
+        
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load_page_at(size_t pgsz, T& dst, std::string const& flt, size_t& num, sql_context_references_container const& ref, void* root)
+        {
+            if (ref.empty())
+                throw sql_bridge_error(g_internal_error_text, g_without_reference_err_text);
+            data_update_context_ptr rdr = create_reader(ref.front().class_id_, flt, range(0,pgsz));
+            if (dst)
+                rdr->read_at(dst, root, ref.front().key_);
+            else
+                rdr->read_inheritance(types_selector<T>::destination_id(), root, ref.front().key_);
+            num = rdr->read_counter();
+        }
+
+#pragma mark - load at
+        
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load_at(T* dst, std::string const& flt, size_t& num, sql_context_references_container const& ref, void* root)
+        {
+            if (ref.empty())
+                throw sql_bridge_error(g_internal_error_text, g_without_reference_err_text);
+            data_update_context_ptr rdr = create_reader(ref.front().class_id_, flt, range());
+            if (dst)
+                rdr->read_at(dst, root, ref.front().key_);
+            else
+                rdr->read_inheritance(types_selector<T>::destination_id(), root, ref.front().key_);
+            num = rdr->read_counter();
+        }
+        
 #pragma mark - load page
 
         template<typename T> inline typename std::enable_if<!is_pointer<T>::value &&

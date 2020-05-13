@@ -65,3 +65,9 @@ void Case37::inflate(size_t sz, sql_bridge::context& cont)
         members_.insert(members_.begin(), MemberCase37(id_));
     cont.at(this).save(10,members_);
 }
+
+void Case37::reload(sql_bridge::context& cont)
+{
+    members_.clear();
+    cont.at(this).load(members_);
+}

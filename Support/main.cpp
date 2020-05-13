@@ -758,6 +758,8 @@ int main(int argc, char** argv)
             cont.save(src);
             src[10].inflate(50,cont);
             cont.load(dst);
+            if (dst.size()>20)
+                dst[20].reload(cont);
             assert(src==dst);
             std::cout << "is ok. ";
         }

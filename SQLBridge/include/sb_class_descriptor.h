@@ -68,6 +68,8 @@ namespace sql_bridge
         sql_value try_cast() const override {return _try_cast<T>();}
         void read(void* dst,data_update_context& cont) override {_read<T>(*static_cast<T*>(dst),cont);}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {_read_comp<T>(*static_cast<T*>(dst),cont,extkey);}
+        void read_at(void* dst,void* root,data_update_context& cont,sql_value const& extkey) override {_read_at<T>(*static_cast<T*>(root),dst,cont,extkey);};
+        void read_inheritance(size_t tid,void* root,data_update_context& cont,sql_value const& extkey) override {_read_inheritance<T>(*static_cast<T*>(root),tid,cont,extkey);};
         bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
         bool is_target_map() const override {return is_map<T>::value;}
         bool is_not_empty_container(void const* src) const override {return _is_not_empty_container<T>(*static_cast<T const*>(src));}
@@ -229,6 +231,26 @@ namespace sql_bridge
             for(auto const& md : cont.members())
                 if (md->index_type()!=e_db_index_type::PrimaryKey)
                     md->bind_comp(&el, cont, uid);
+        }
+
+#pragma mark - read inheritance
+
+        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _read_inheritance(T& dst, size_t tid, data_update_context& cont, sql_value const& extkey) {}
+        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _read_inheritance(T& dst, size_t tid, data_update_context& cont, sql_value const& extkey)
+        {
+            for(auto const& inh : cont.inheritances())
+                if (inh->type_id()==tid)
+                    inh->read_comp(&dst, cont, extkey);
+        }
+
+#pragma mark - read at
+
+        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _read_at(T& dst, void* memb, data_update_context& cont, sql_value const& extkey) {}
+        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _read_at(T& dst, void* memb, data_update_context& cont, sql_value const& extkey)
+        {
+            for(auto const& md : cont.members())
+                if (md->is_this_mem_ptr(&dst, memb))
+                    md->read_comp(&dst, cont, extkey);
         }
         
 #pragma mark - read
