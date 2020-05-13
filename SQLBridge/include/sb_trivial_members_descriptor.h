@@ -51,6 +51,8 @@ namespace sql_bridge
         std::string const& sql_type() const override {static std::string const def;return def;}
         void bind(void const*,data_update_context&) override {};
         void bind_comp(void const*,data_update_context&,sql_value const&) override {};
+        void bind_at(void const*,void const*,data_update_context&,sql_value const&) override {};
+        void bind_inheritance(size_t,void const*,data_update_context&,sql_value const&) override {};
         sql_value expand(void const*) override {return sql_value();}
         sql_value try_cast() const override {return sql_value();}
         void read(void*,data_update_context&) override {}
@@ -76,6 +78,8 @@ namespace sql_bridge
         std::string const& sql_type() const override {return _sql_type<T>();}
         void bind(void const*,data_update_context&) override {};
         void bind_comp(void const*,data_update_context&,sql_value const&) override {};
+        void bind_at(void const*,void const*,data_update_context&,sql_value const&) override {};
+        void bind_inheritance(size_t,void const*,data_update_context&,sql_value const&) override {};
         sql_value expand(void const*) override {return sql_value();}
         sql_value try_cast() const override {return sql_value();}
         void read(void*,data_update_context&) override {}

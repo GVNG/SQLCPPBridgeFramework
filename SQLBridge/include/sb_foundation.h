@@ -106,6 +106,8 @@ namespace sql_bridge
         virtual std::string const& sql_type() const = 0;
         virtual void bind(void const*,data_update_context&) = 0;
         virtual void bind_comp(void const*,data_update_context&,sql_value const&) = 0;
+        virtual void bind_at(void const*,void const*,data_update_context&,sql_value const&) = 0;
+        virtual void bind_inheritance(size_t,void const*,data_update_context&,sql_value const&) = 0;
         virtual sql_value expand(void const*) = 0;
         virtual sql_value try_cast() const = 0;
         virtual void read(void*,data_update_context&) = 0;
@@ -180,6 +182,8 @@ namespace sql_bridge
         class_descriptors_container const& inheritances() const {return descriptor_->inheritances();}
         inline void bind(void const* dat) {descriptor_->bind(dat, *this);}
         inline void bind_comp(void const* dat,sql_value const& extid) {descriptor_->bind_comp(dat,*this,extid);}
+        inline void bind_at(void const* dat,void const* root,sql_value const& extid) {descriptor_->bind_at(dat,root,*this,extid);}
+        inline void bind_inheritance(size_t dat,void const* root,sql_value const& extid) {descriptor_->bind_inheritance(dat,root,*this,extid);}
         inline void read(void* dat) {return descriptor_->read(dat,*this);}
         inline void read_comp(void* dat,sql_value const& extid) {return descriptor_->read_comp(dat,*this,extid);}
         inline std::string const& forward_ref() const {return link_.target().front().ref_field_name();}

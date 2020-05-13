@@ -45,7 +45,7 @@ namespace sql_bridge
     {
     public:
         template<typename T> inline void save(T const& src) {_save<T>(src);}
-        template<typename T> inline void save(T const* src,sql_context_references_container const& ref, void const*) {}
+        template<typename T> inline void save(T const* src,sql_context_references_container const& ref, void const* rd) {_save_page_at<T>(0, src, ref, rd);}
         template<typename T> inline void save_page(size_t pgsz, T const& src) {_save_page<T>(pgsz,src);}
         template<typename T> inline void save_page(size_t pgsz, T const* src, sql_context_references_container const& ref, void const* rd) {_save_page_at<T>(pgsz,src,ref,rd);}
         template<typename T> inline void load(T& dst, std::string const& flt, size_t& num) {_load<T>(dst,flt,num);};
@@ -127,25 +127,13 @@ namespace sql_bridge
         template<typename T> inline typename std::enable_if<is_container<T>::value>::type _save_page_at(size_t pgsz, T const* src, sql_context_references_container const& ref, void const* root)
         {
             if (ref.empty())
-                throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
+                throw sql_bridge_error(g_internal_error_text, g_without_reference_err_text);
             data_update_context_ptr cur_context;
             sql_value key;
-//            for(auto const& r : ref)
-//                if (!cur_context)
-//            {
-//                cur_context = create_context(r.class_id_, "", range());
-//                key = r.key_;
-//            }
-//            else
-//            {
-//                cur_context = cur_context->context_for_member(r.class_id_, key, r.mem_ref_, range());
-//                key = r.key_;
-//            }
-//            size_t tid = types_selector<T>::destination_id();
-//            cur_context = cur_context->context_for_member(tid, key, ref.back().mem_ref_, range());
-//            typename  T::const_iterator pos = src.begin();
-//            for(size_t i=0; i!=pgsz && pos!=src.end(); i++,pos++)
-//                cur_context->bind_comp(&(*pos), key);
+            if (src)
+                create_context(ref.front().class_id_, "", range(0,pgsz))->bind_at(src, root, ref.front().key_);
+            else
+                create_context(ref.front().class_id_, "", range(0,pgsz))->bind_inheritance(types_selector<T>::destination_id(), root, ref.front().key_);
         }
 
 #pragma mark - save page

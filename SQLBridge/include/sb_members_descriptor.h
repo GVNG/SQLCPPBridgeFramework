@@ -53,6 +53,8 @@ namespace sql_bridge
         std::string const& sql_type() const override {return _sql_type<TMb>();}
         void bind(void const* src, data_update_context& cnt) override {_bind_elem<TMb>(*static_cast<T const*>(src),cnt);};
         void bind_comp(void const* src, data_update_context& cnt, sql_value const& extkey) override {_bind_comp_elem<TMb>(*static_cast<T const*>(src),cnt,extkey);};
+        void bind_at(void const*,void const*,data_update_context&,sql_value const&) override {};
+        void bind_inheritance(size_t,void const*,data_update_context&,sql_value const&) override {};
         sql_value expand(void const* src) override {return _expand<TMb>(*static_cast<T const*>(src));}
         sql_value try_cast() const override {return sql_value(TMb());}
         void read(void* dst, data_update_context& cnt) override {_read<TMb>(*static_cast<T*>(dst),cnt);}

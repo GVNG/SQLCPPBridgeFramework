@@ -62,6 +62,8 @@ namespace sql_bridge
         std::string const& sql_type() const override {static std::string const def; return def;}
         void bind(void const* val, data_update_context& cont) override {}
         void bind_comp(void const* val, data_update_context& cont, sql_value const& extkey) override {_bind_comp<T>(*static_cast<T const*>(val),cont,extkey);}
+        void bind_at(void const* memb,void const* root,data_update_context& cont,sql_value const& extkey) override {_bind_at<T>(*static_cast<T const*>(root),memb,cont,extkey);}
+        void bind_inheritance(size_t tid,void const* root,data_update_context& cont,sql_value const& extkey) override {_bind_inheritance<T>(*static_cast<T const*>(root),tid,cont,extkey);}
         sql_value expand(void const*) override {return sql_value();}
         sql_value try_cast() const override {return _try_cast<T>();}
         void read(void* dst,data_update_context& cont) override {_read<T>(*static_cast<T*>(dst),cont);}
@@ -176,7 +178,27 @@ namespace sql_bridge
             typedef _t_class_descriptor<TStrategy,mapped> type;
             return std::make_shared<type>();
         }
+
+#pragma mark - bind inheritance
+
+        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _bind_inheritance(TFn const&,size_t,data_update_context&,sql_value const&) {}
+        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _bind_inheritance(TFn const& el,size_t tid,data_update_context& cont,sql_value const& extkey)
+        {
+            for(auto const& inh : cont.inheritances())
+                if (inh->type_id()==tid)
+                    inh->bind_comp(&el, cont, extkey);
+        }
+
+#pragma mark - bind at
         
+        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _bind_at(TFn const&,void const*,data_update_context&,sql_value const&) {}
+        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _bind_at(TFn const& el,void const* memb,data_update_context& cont,sql_value const& extkey)
+        {
+            for(auto const& md : cont.members())
+                if (md->is_this_mem_ptr(&el, memb))
+                    md->bind_comp(&el, cont, extkey);
+        }
+
 #pragma mark - bind
         
         template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _bind_comp(TFn const&,data_update_context&,sql_value const&) {}

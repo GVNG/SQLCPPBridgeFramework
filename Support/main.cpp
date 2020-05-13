@@ -79,7 +79,7 @@ int main(int argc, char** argv)
         mkdir("./DB", 0777);
         sql_bridge::local_storage<sql_bridge::sqlite_adapter> storage("./DB");
         
-#if 0
+#if 1
 
         {
             std::cout << "Case KVDB ";
@@ -745,7 +745,6 @@ int main(int argc, char** argv)
             assert(src==dst);
             std::cout << "is ok. ";
         }
-#endif
 
         {
             time_tracker trk;
@@ -762,7 +761,8 @@ int main(int argc, char** argv)
             assert(src==dst);
             std::cout << "is ok. ";
         }
-        
+#endif
+
     }
     catch (std::exception& ex)
     {
