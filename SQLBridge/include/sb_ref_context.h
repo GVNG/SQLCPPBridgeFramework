@@ -191,7 +191,7 @@ namespace sql_bridge
 
         
         
-        inline ref_context& limit(size_t count, size_t offset = 0) {context_engine::limit(offset,count);return *this;}
+        inline ref_context& limit(size_t count, size_t offset = 0) {context_engine::limit(count,offset);return *this;}
         inline ref_context& sql_or() {context_engine::sql_or();return *this;}
         inline ref_context& sql_and() {context_engine::sql_and();return *this;}
 

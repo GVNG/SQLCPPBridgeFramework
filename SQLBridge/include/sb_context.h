@@ -386,7 +386,7 @@ namespace sql_bridge
         template<typename T> inline ref_context at(T& src) {return _at<T>(src);};
         template<typename T> inline ref_context at(T* src) {return _at<T>(*src);};
 
-        inline context& limit(size_t count, size_t offset = 0) {context_engine::limit(offset,count);return *this;}
+        inline context& limit(size_t count, size_t offset = 0) {context_engine::limit(count,offset);return *this;}
         inline context& sql_or() {context_engine::sql_or();return *this;}
         inline context& sql_and() {context_engine::sql_and();return *this;}
 
