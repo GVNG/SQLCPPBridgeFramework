@@ -57,8 +57,8 @@ namespace sql_bridge
         template<typename T, typename TFn> inline void where_not_between(TFn const& val, TFn const T::*mem_ptr_from, TFn const T::*mem_ptr_to) {_where_not_between<T>(val,mem_ptr_from,mem_ptr_to);}
         template<typename T, typename TFn, typename TCont> inline void where_in(TFn const T::*mem_ptr, TCont const& cnt) {_where_in<T,TCont,TFn>(mem_ptr,cnt);}
         template<typename T, typename TFn, typename TCont> inline void where_not_in(TFn const T::*mem_ptr, TCont const& cnt) {_where_not_in<T,TCont,TFn>(mem_ptr,cnt);}
-        template<typename T> inline void where_like(std::string const T::*mem_ptr, std::string const& val) {_where_like<T>(mem_ptr,val);}
-        template<typename T> inline void where_not_like(std::string const T::*mem_ptr, std::string const& val) {_where_not_like<T>(mem_ptr,val);}
+//        template<typename T> inline void where_like(std::string const T::*mem_ptr, std::string const& val) {_where_like<T>(mem_ptr,val);}
+//        template<typename T> inline void where_not_like(std::string const T::*mem_ptr, std::string const& val) {_where_not_like<T>(mem_ptr,val);}
 
     private:
 #pragma mark - order
