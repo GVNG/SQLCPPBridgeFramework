@@ -57,6 +57,8 @@ namespace sql_bridge
         template<typename T, typename TFn> inline void where_not_between(TFn const& val, TFn const T::*mem_ptr_from, TFn const T::*mem_ptr_to) {_where_not_between<T>(val,mem_ptr_from,mem_ptr_to);}
         template<typename T, typename TFn, typename TCont> inline void where_in(TFn const T::*mem_ptr, TCont const& cnt) {_where_in<T,TCont,TFn>(mem_ptr,cnt);}
         template<typename T, typename TFn, typename TCont> inline void where_not_in(TFn const T::*mem_ptr, TCont const& cnt) {_where_not_in<T,TCont,TFn>(mem_ptr,cnt);}
+        template<typename T> inline void where_like(std::string const T::*mem_ptr, std::string const& val) {_where_like<T>(mem_ptr,val);}
+        template<typename T> inline void where_not_like(std::string const T::*mem_ptr, std::string const& val) {_where_not_like<T>(mem_ptr,val);}
 
     private:
 #pragma mark - order
@@ -147,7 +149,6 @@ namespace sql_bridge
             static std::string const field2 = data_->field_name(mem_ptr_to);
             suffixes_.push_back(std::make_shared<suffix_between_rev>(field,field2,to_string() << val, true));
         }
-
         template<typename T, typename TCont, typename TFn> inline typename std::enable_if<is_convertible_to_text<typename types_selector<TCont>::type>::value>::type _where_in_def(TFn const T::*mem_ptr, TCont const& from)
         {
             to_string ts;
@@ -187,6 +188,16 @@ namespace sql_bridge
             ts.remove_from_tail(1);
             ts << " ";
             suffixes_.push_back(std::make_shared<suffix_where_in>(field,ts,false));
+        }
+        template<typename T> inline void _where_like(std::string const T::*mem_ptr, std::string const& substr)
+        {
+            static std::string const field = data_->field_name(mem_ptr);
+            suffixes_.push_back(std::make_shared<suffix_where_like>(field,substr,false));
+        }
+        template<typename T> inline void _where_not_like(std::string const T::*mem_ptr, std::string const& substr)
+        {
+            static std::string const field = data_->field_name(mem_ptr);
+            suffixes_.push_back(std::make_shared<suffix_where_like>(field,substr,true));
         }
 
 #pragma mark - and/or

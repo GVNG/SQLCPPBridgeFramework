@@ -85,6 +85,8 @@ namespace sql_bridge
         virtual std::string where_not_between(std::string const&,std::string const&,std::string const&) = 0;
         virtual std::string where_in(std::string const&,std::string const&) = 0;
         virtual std::string where_not_in(std::string const&,std::string const&) = 0;
+        virtual std::string where_not_like(std::string const&,std::string const&) = 0;
+        virtual std::string where_like(std::string const&,std::string const&) = 0;
 
         virtual ~data_section() {};
     protected:
@@ -1041,6 +1043,8 @@ namespace sql_bridge
         std::string where_not_between(std::string const& fld,std::string const& from,std::string const& to) override {return TStrategy::sql_where_not_between(fld,from,to);}
         std::string where_in(std::string const& fld,std::string const& val) override {return TStrategy::sql_where_in(fld,val);}
         std::string where_not_in(std::string const& fld,std::string const& val) override {return TStrategy::sql_where_not_in(fld,val);}
+        std::string where_like(std::string const& fld,std::string const& val) override {return TStrategy::sql_where_like(fld,val);}
+        std::string where_not_like(std::string const& fld,std::string const& val) override {return TStrategy::sql_where_not_like(fld,val);}
 
     };
     

@@ -185,6 +185,25 @@ namespace sql_bridge
         bool flag_not_;
     };
 
+    class suffix_where_like : public suffix_bare
+    {
+    public:
+        suffix_where_like(std::string const& fld, std::string const& pat, bool nf)
+            : suffix_bare(fld,e_weight::WHERE)
+            , pattern_(pat)
+            , flag_not_(nf)
+            {}
+        std::string general(data_sections_ptr data) const override {return data->where();}
+        std::string build(data_sections_ptr data) const override
+        {
+            return flag_not_
+                ? data->where_not_like(field_,pattern_)
+                : data->where_like(field_,pattern_);
+        }
+    private:
+        std::string pattern_;
+        bool flag_not_;
+    };
 };
 
 #endif /* sb_stm_builder_h */
