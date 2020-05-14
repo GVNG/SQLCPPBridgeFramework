@@ -61,6 +61,8 @@ namespace sql_bridge
         void read_comp(void* dst, data_update_context& cnt, sql_value const& extkey) override {_read_comp<TMb>(*static_cast<T*>(dst),cnt,extkey);}
         void read_at(void* dst,void* root,data_update_context& cont,sql_value const& extkey) override {};
         void read_inheritance(size_t tid,void* root,data_update_context& cont,sql_value const& extkey) override {};
+        void remove_at(void const* memb,void const* src,data_update_context& cont,sql_value const& extkey) override {_remove_at<TMb>(*static_cast<T const*>(src),memb,cont,extkey);};
+        void remove_inheritance(size_t,void const*,data_update_context&,sql_value const&) override {};
         bool is_this_mem_ptr(void const* base, void const* memptr) const override
         {
             T const* chk = static_cast<T const*>(base);
@@ -174,6 +176,16 @@ namespace sql_bridge
             static std::string const def;
             return def;
         };
+        
+#pragma mark - remove at
+
+        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _remove_at(T const&, void const*, data_update_context&,sql_value const&) {};
+        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _remove_at(T const& el, void const* memb, data_update_context& dst,sql_value const& extkey)
+        {
+            size_t elemt = types_selector<TFn>::destination_id();
+            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
+            ncnt->remove_rel_by_key(extkey);
+        }
         
 #pragma mark - bind
         

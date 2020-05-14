@@ -64,6 +64,27 @@ namespace sql_bridge
             sql_context_references_container const& references_;
         };
 
+        template<typename T> class replace_task : public db_task
+        {
+            typedef typename std::decay<T>::type _t_base;
+        public:
+            replace_task(_t_base const* src,
+                         data_sections_ptr section,
+                         sql_context_references_container const& ref,
+                         void const* rd)
+                : db_task(section)
+                , data_(src)
+                , references_(ref)
+                , root_data_(rd)
+                {};
+            inline void run_task() override {section_->replace(data_,references_,root_data_);}
+            void error(base_sql_error const& err) override {throw err;}
+        private:
+            _t_base const* data_;
+            void const* root_data_;
+            sql_context_references_container const& references_;
+        };
+
         template<typename T> class load_page_task : public db_task
         {
             typedef typename std::decay<T>::type _t_base;
@@ -161,7 +182,13 @@ namespace sql_bridge
         template<typename T> inline ref_context& load(size_t pgsz, T& dst, std::string const& flt = "", size_t* num = nullptr) {_load_page<T>(pgsz,&dst,build_suffix(flt),num);return *this;}
         template<typename T> inline ref_context& load(size_t pgsz, T* dst, std::string const& flt = "", size_t* num = nullptr) {_load_page<T>(pgsz,dst,build_suffix(flt),num);return *this;}
 
-        
+        template<typename T> inline ref_context& replace() {_replace<T>(nullptr);return *this;}
+        template<typename T> inline ref_context& replace(T const& src) {_replace<T>(&src);return *this;}
+        template<typename T> inline ref_context& replace(T const* src) {_replace<T>(src);return *this;}
+        template<typename T> inline ref_context& replace(T* src) {_replace<T>(src);return *this;}
+        template<typename T> inline ref_context& replace(T& src) {_replace<T>(&src);return *this;}
+
+
         
         
         inline ref_context& limit(size_t count, size_t offset = 0) {context_engine::limit(offset,count);return *this;}
@@ -233,8 +260,23 @@ namespace sql_bridge
                 ret.get();
             }
         }
+#pragma mark - replace
+        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _replace(T const*) const
+        {
+            throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);
+        }
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _replace(T const* src) const
+        {
+            db_task_ptr task(std::make_shared< replace_task<T> >(src,data_,references_,root_data_));
+            std::future<void> ret(task->get_future());
+            db_tasks_queue_interface_ptr qp = queue_.lock();
+            if (qp!=nullptr)
+            {
+                qp->add( task );
+                ret.get();
+            }
+        }
 
-        
         
         
     };

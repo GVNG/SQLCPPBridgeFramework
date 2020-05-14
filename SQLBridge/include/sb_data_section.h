@@ -58,6 +58,7 @@ namespace sql_bridge
         template<typename T> inline void remove_if(std::string const& src) {_remove_if<T>(src);}
         template<typename T> inline typename std::enable_if<is_any_map<T>::value>::type remove_by_key(typename T::key_type const& src) {_remove_by_key<T>(src);}
         template<typename T> inline void replace(T const& src) {_replace<T>(src);}
+        template<typename T> inline void replace(T const* src,sql_context_references_container const& ref, void const* rd) {_replace_at<T>(src,ref,rd);}
         template<typename T> inline sql_context_reference resolve_link(T const& src) {return _resolve_link<T>(src);}
         template<typename T, typename TMem> inline std::string field_name(TMem const T::*mem_offs) const
         {
@@ -132,10 +133,11 @@ namespace sql_bridge
         {
             if (ref.empty())
                 throw sql_bridge_error(g_internal_error_text, g_without_reference_err_text);
+            data_update_context_ptr cont = create_context(ref.front().class_id_, "", range(0,pgsz));
             if (src)
-                create_context(ref.front().class_id_, "", range(0,pgsz))->bind_at(src, root, ref.front().key_);
+                cont->bind_at(src, root, ref.front().key_);
             else
-                create_context(ref.front().class_id_, "", range(0,pgsz))->bind_inheritance(types_selector<T>::destination_id(), root, ref.front().key_);
+                cont->bind_inheritance(types_selector<T>::destination_id(), root, ref.front().key_);
         }
 
 #pragma mark - save page
@@ -347,7 +349,26 @@ namespace sql_bridge
                     cont->bind_comp(&el.second,sql_value());
             }
         }
+
+#pragma mark - replace at
         
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _replace_at(T const* src, sql_context_references_container const& ref, void const* root)
+        {
+            if (ref.empty())
+                throw sql_bridge_error(g_internal_error_text, g_without_reference_err_text);
+            data_update_context_ptr cont = create_context(ref.front().class_id_, "", range());
+            if (src)
+            {
+                cont->remove_at(src, root, ref.front().key_);
+                cont->bind_at(src, root, ref.front().key_);
+            }
+            else
+            {
+                cont->remove_inheritance(types_selector<T>::destination_id(), root, ref.front().key_);
+                cont->bind_inheritance(types_selector<T>::destination_id(), root, ref.front().key_);
+            }
+        }
+
 #pragma mark - replace
         
         template<typename T> inline typename std::enable_if<!is_container<T>::value && !is_any_map<T>::value>::type _replace(T const& src)
@@ -767,6 +788,7 @@ namespace sql_bridge
         void remove_if_possible(void const*) override {}
         void remove_all() override {}
         void remove_by_key(sql_value const&) override {}
+        void remove_rel_by_key(sql_value const&) override {}
         bool is_ok() override {return reader_.is_valid();}
         void check_for_update_ability(void const*) override {}
         
@@ -860,6 +882,7 @@ namespace sql_bridge
             , file_(fl)
             , inserter_(fl,link_.statements().insert_)
             , remover_(fl,link_.statements().remove_)
+            , remover_rel_(fl,link_.statements().remove_rel_)
             , remover_for_all_(fl,link_.statements().remove_all_.empty()?std::string():(to_string() << link_.statements().remove_all_ << " " << flt))
             , updater_(fl,link_.statements().update_)
             , hierarhy_(hr)
@@ -956,6 +979,13 @@ namespace sql_bridge
             remover_.next();
         }
 
+        void remove_rel_by_key(sql_value const& mid) override
+        {
+            if (remover_rel_.empty()) return;
+            remover_rel_.bind(mid);
+            remover_rel_.next();
+        }
+
         void remove_all() override
         {
             remove_all_used_ = true;
@@ -968,6 +998,7 @@ namespace sql_bridge
         typename TStrategy::sql_file const& file_;
         typename TStrategy::sql_updater inserter_;
         typename TStrategy::sql_updater remover_;
+        typename TStrategy::sql_updater remover_rel_;
         typename TStrategy::sql_updater remover_for_all_;
         typename TStrategy::sql_updater updater_;
         data_section_descriptors_ptr hierarhy_;

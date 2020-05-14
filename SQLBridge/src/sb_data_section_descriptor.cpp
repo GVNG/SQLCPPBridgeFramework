@@ -289,6 +289,8 @@ namespace sql_bridge
             std::cerr << pref << "     remove: " << stm.remove_ << std::endl;
         if (!stm.remove_all_.empty())
             std::cerr << pref << " remove all: " << stm.remove_all_ << std::endl;
+        if (!stm.remove_rel_.empty())
+            std::cerr << pref << " remove rel: " << stm.remove_rel_ << std::endl;
         std::cerr << pref << "     select: " << stm.select_;
         if (stm.select_app_.empty())
             std::cerr << std::endl;

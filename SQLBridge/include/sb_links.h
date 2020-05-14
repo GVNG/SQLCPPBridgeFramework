@@ -58,6 +58,7 @@ namespace sql_bridge
         std::string update_;
         std::string remove_;
         std::string remove_all_;
+        std::string remove_rel_;
         std::string select_;
         std::string select_app_;
     };
@@ -91,6 +92,7 @@ namespace sql_bridge
         inline void update_for_trigger_statement(std::string const& stm) {statements_.trigger_.push_back(stm);}
         inline void update_for_insert_statement(std::string const& stm) {statements_.insert_ = stm;}
         inline void update_for_remove_statement(std::string const& stm) {statements_.remove_ = stm;}
+        inline void update_for_remove_rel_statement(std::string const& stm) {statements_.remove_rel_ = stm;}
         inline void update_for_remove_all_statement(std::string const& stm) {statements_.remove_all_ = stm;}
         inline void update_for_select_statement(std::string const& stm, std::string const& app) {statements_.select_ = stm; statements_.select_app_=app;}
         inline void update_for_update_statement(std::string const& stm) {statements_.update_ = stm;}

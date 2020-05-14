@@ -55,6 +55,8 @@ namespace sql_bridge
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {_read_comp<TParent>(*static_cast<TChild*>(dst),cont,extkey);}
         void read_at(void* dst,void* root,data_update_context& cont,sql_value const& extkey) override {};
         void read_inheritance(size_t tid,void* root,data_update_context& cont,sql_value const& extkey) override {};
+        void remove_at(void const*,void const*,data_update_context&,sql_value const&) override {};
+        void remove_inheritance(size_t tid,void const* root,data_update_context& cont,sql_value const& extkey) override {_remove_inheritance<TParent>(*static_cast<TChild const*>(root),tid,cont,extkey);};
         bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
         bool is_target_map() const override {return is_map<TChild>::value;}
         bool is_not_empty_container(void const*) const override {return false;}
@@ -82,6 +84,14 @@ namespace sql_bridge
             if(ncnt->is_ok())
                 ncnt->read_comp(&dst, extkey);
         };
+#pragma mark - remove inheritance
+        template<typename TFn> inline void _remove_inheritance(TParent const& el, size_t tid, data_update_context& cont, sql_value const& extkey)
+        {
+            size_t elemt = typeid(TParent).hash_code();
+            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,std::string(),range()));
+            ncnt->remove_rel_by_key(extkey);
+        }
+        
 
         // data
         class_descriptors_ptr description_;

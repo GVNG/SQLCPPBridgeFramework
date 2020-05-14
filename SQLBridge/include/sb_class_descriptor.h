@@ -70,6 +70,8 @@ namespace sql_bridge
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {_read_comp<T>(*static_cast<T*>(dst),cont,extkey);}
         void read_at(void* dst,void* root,data_update_context& cont,sql_value const& extkey) override {_read_at<T>(*static_cast<T*>(root),dst,cont,extkey);};
         void read_inheritance(size_t tid,void* root,data_update_context& cont,sql_value const& extkey) override {_read_inheritance<T>(*static_cast<T*>(root),tid,cont,extkey);};
+        void remove_at(void const* dst,void const* root,data_update_context& cont,sql_value const& extkey) override {_remove_at<T>(*static_cast<T const*>(root),dst,cont,extkey);};
+        void remove_inheritance(size_t tid,void const* root,data_update_context& cont,sql_value const& extkey) override {_remove_inheritance<T>(*static_cast<T const*>(root),tid,cont,extkey);};
         bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
         bool is_target_map() const override {return is_map<T>::value;}
         bool is_not_empty_container(void const* src) const override {return _is_not_empty_container<T>(*static_cast<T const*>(src));}
@@ -276,6 +278,26 @@ namespace sql_bridge
                 for(auto const& md : cont.members())
                     md->read_comp(&dst, cont, uid);
             }
+        }
+
+#pragma mark - remove at
+        
+        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _remove_at(TFn const&,void const*,data_update_context&,sql_value const&) {}
+        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _remove_at(TFn const& el,void const* memb,data_update_context& cont,sql_value const& extkey)
+        {
+            for(auto const& md : cont.members())
+                if (md->is_this_mem_ptr(&el, memb))
+                    md->remove_at(memb, &el, cont, extkey);
+        }
+
+#pragma mark - remove inheritance
+        
+        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _remove_inheritance(TFn const&,void const*,data_update_context&,sql_value const&) {}
+        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _remove_inheritance(TFn const& el,size_t tid,data_update_context& cont,sql_value const& extkey)
+        {
+            for(auto const& inh : cont.inheritances())
+                if (inh->type_id()==tid)
+                    inh->remove_inheritance(tid, &el, cont, extkey);
         }
 
     };

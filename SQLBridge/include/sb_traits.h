@@ -352,7 +352,7 @@ namespace sql_bridge
         typedef typename std::conditional<container_type_check<is_container<T>::value,T>::value, typename container_type_check<is_container<T>::value, T>::type, T1>::type T2;
         static_assert(!std::is_same<T2, void>::value,"No acceptable type selected");
         typedef typename is_pointer<T2>::type type;
-        static size_t destination_id() {return typeid(type).hash_code();}
+        static constexpr size_t destination_id() {return typeid(type).hash_code();}
     };
     
     template<bool,typename T> struct map_type_check_for_trivial : std::integral_constant<bool, false>{};

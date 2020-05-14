@@ -477,9 +477,10 @@ namespace sql_bridge
             dp.update_for_remove_statement(delsts);
         }
         if (relfrom.empty())
-        {
             dp.update_for_remove_all_statement(to_string() << "DELETE FROM " << dp.table_name());
-        }
+        else
+            dp.update_for_remove_rel_statement(to_string() << "DELETE FROM " << dp.table_name() << sql_where() << relfrom << "=?");
+            
         
         to_string selsts;
         selsts << "SELECT ";

@@ -80,7 +80,7 @@ namespace sql_bridge
         {
             class_descriptors_map::const_iterator pos = classes_map_.find(tid);
             if (pos==classes_map_.end())
-                throw sql_bridge_error(to_string() << "Section: " << section_name() << ". There're incomplete definitions of tables","You should check the set of your DEFINE_SQL_TABLE macroses");
+                throw sql_bridge_error(to_string() << "Section: " << section_name() << ". There're incomplete definitions of tables","You should check the set your DEFINE_SQL_TABLE macroses");
             return pos->second;
         }
     protected:
@@ -114,6 +114,9 @@ namespace sql_bridge
         virtual void read_comp(void*,data_update_context&,sql_value const&) = 0;
         virtual void read_at(void*,void*,data_update_context&,sql_value const&) = 0;
         virtual void read_inheritance(size_t,void*,data_update_context&,sql_value const&) = 0;
+        virtual void remove_at(void const*,void const*,data_update_context&,sql_value const&) = 0;
+        virtual void remove_inheritance(size_t,void const*,data_update_context&,sql_value const&) = 0;
+        
         virtual bool is_this_mem_ptr(void const*,void const*) const = 0;
         virtual bool is_target_map() const = 0;
         virtual bool is_not_empty_container(void const*) const = 0;
@@ -187,9 +190,11 @@ namespace sql_bridge
         inline void bind_at(void const* dat,void const* root,sql_value const& extid) {descriptor_->bind_at(dat,root,*this,extid);}
         inline void bind_inheritance(size_t dat,void const* root,sql_value const& extid) {descriptor_->bind_inheritance(dat,root,*this,extid);}
         inline void read(void* dat) {return descriptor_->read(dat,*this);}
-        inline void read_comp(void* dat,sql_value const& extid) {return descriptor_->read_comp(dat,*this,extid);}
-        inline void read_at(void* dat,void* root,sql_value const& extid) {return descriptor_->read_at(dat,root,*this,extid);}
-        inline void read_inheritance(size_t tid,void* root,sql_value const& extid) {return descriptor_->read_inheritance(tid,root,*this,extid);}
+        inline void read_comp(void* dat,sql_value const& extid) {descriptor_->read_comp(dat,*this,extid);}
+        inline void read_at(void* dat,void* root,sql_value const& extid) {descriptor_->read_at(dat,root,*this,extid);}
+        inline void read_inheritance(size_t tid,void* root,sql_value const& extid) {descriptor_->read_inheritance(tid,root,*this,extid);}
+        inline void remove_at(void const* dat,void const* root,sql_value const& extid) {descriptor_->remove_at(dat, root, *this, extid);}
+        inline void remove_inheritance(size_t tid,void const* root,sql_value const& extid) {descriptor_->remove_inheritance(tid, root, *this, extid);}
         inline std::string const& forward_ref() const {return link_.target().front().ref_field_name();}
         inline std::string const& table_name() const {return link_.table_name();}
         inline range const& page() const {return page_;}
@@ -206,6 +211,7 @@ namespace sql_bridge
         virtual data_update_context_ptr context_from_root(size_t, std::string const&, range const&) = 0;
         virtual void remove_if_possible(void const*) = 0;
         virtual void remove_by_key(sql_value const&) = 0;
+        virtual void remove_rel_by_key(sql_value const&) = 0;
         virtual void remove_all() = 0;
         virtual void check_for_update_ability(void const*) = 0;
         
