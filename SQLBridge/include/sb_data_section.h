@@ -451,7 +451,7 @@ namespace sql_bridge
 
 #pragma mark - load page at
         
-        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load_page_at(size_t pgsz, T& dst, std::string const& flt, size_t& num, sql_context_references_container const& ref, void* root)
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load_page_at(size_t pgsz, T* dst, std::string const& flt, size_t& num, sql_context_references_container const& ref, void* root)
         {
             if (ref.empty())
                 throw sql_bridge_error(g_internal_error_text, g_without_reference_err_text);
