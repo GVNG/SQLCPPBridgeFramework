@@ -166,7 +166,7 @@ namespace sql_bridge
             std::swap(root_data_,src.root_data_);
         }
 #pragma mark - public methods
-        template<typename T> inline ref_context& save() {_save<T>(0,nullptr);return *this;}
+        template<typename T> inline ref_context& save() {_replace<T>(nullptr);return *this;}
         template<typename T> inline ref_context& save(T const& src) {_save<T>(0,&src);return *this;}
         template<typename T> inline ref_context& save(T const* src) {_save<T>(0,src);return *this;}
         template<typename T> inline ref_context& save(T* src) {_save<T>(0,src);return *this;}
