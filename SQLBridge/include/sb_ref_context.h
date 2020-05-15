@@ -55,7 +55,7 @@ namespace sql_bridge
                 , references_(ref)
                 , root_data_(rd)
                 {};
-            inline void run_task() override {if (page_size_.is_active()) section_->save_page(page_size_,data_,references_,root_data_); else section_->save(data_,references_,root_data_);}
+            inline void run_task() override {if (!page_size_.empty()) section_->save_page(page_size_,data_,references_,root_data_); else section_->save(data_,references_,root_data_);}
             void error(base_sql_error const& err) override {throw err;}
         private:
             range page_size_;

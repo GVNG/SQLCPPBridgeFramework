@@ -73,7 +73,7 @@ namespace sql_bridge
                 , data_(std::move(src))
                 {};
             
-            inline void run_task() override {if (page_size_.is_active()) section_->save_page(page_size_,data_); else section_->save(data_);}
+            inline void run_task() override {if (!page_size_.empty()) section_->save_page(page_size_,data_); else section_->save(data_);}
             void error(base_sql_error const& err) override {std::cerr << err.what() << std::endl;}
         private:
             range page_size_;
@@ -89,7 +89,7 @@ namespace sql_bridge
                 , page_size_(pg)
                 , data_(src)
                 {};
-            inline void run_task() override {if (page_size_.is_active()) section_->save_page(page_size_,data_); else section_->save(data_);}
+            inline void run_task() override {if (!page_size_.empty()) section_->save_page(page_size_,data_); else section_->save(data_);}
             void error(base_sql_error const& err) override {throw err;}
         private:
             range page_size_;

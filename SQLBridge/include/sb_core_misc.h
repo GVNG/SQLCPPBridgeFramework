@@ -77,15 +77,17 @@ namespace sql_bridge
         range()
             : position_(0)
             , length_(0)
+            , empty_(true)
             , active_(false)
             {};
         range(size_t p, size_t ln)
             : position_(p)
             , length_(ln)
+            , empty_(false)
             , active_(true)
             {};
         inline range next() const {return range(position_+length_,length_);}
-        inline bool empty() const {return length_==0;}
+        inline bool empty() const {return empty_;}
         inline bool is_active() const {return active_;}
         inline void enable() const {active_=true;}
         inline void disable() const {active_=false;}
@@ -94,6 +96,7 @@ namespace sql_bridge
     private:
         size_t position_;
         size_t length_;
+        bool empty_;
         mutable bool active_;
     };
     
