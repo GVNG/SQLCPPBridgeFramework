@@ -342,8 +342,8 @@ namespace sql_bridge
         static std::string sql_where_not_between(std::string const& fld, std::string const& from, std::string const& to) {return to_string() << fld << " NOT BETWEEN " << from << " AND " << to;}
         static std::string sql_where_in(std::string const& fld, std::string const& val) {return to_string() << fld << " IN ( " << val << " )";}
         static std::string sql_where_not_in(std::string const& fld, std::string const& val) {return to_string() << fld << " NOT IN ( " << val << " )";}
-        static std::string sql_where_like(std::string const& fld, std::string const& val) {return to_string() << "'" << val << "' LIKE " << fld;}
-        static std::string sql_where_not_like(std::string const& fld, std::string const& val) {return to_string() << "'" << val << "' NOT LIKE " << fld;}
+        static std::string sql_where_like(std::string const& fld, std::string const& val) {return to_string() << fld << " LIKE '" << val << "'";}
+        static std::string sql_where_not_like(std::string const& fld, std::string const& val) {return to_string() << fld << " NOT LIKE '" << val << "'";}
 
     private:
         static void create_statements(class_link&, std::string const& relfrom = "");

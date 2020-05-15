@@ -400,6 +400,8 @@ namespace sql_bridge
         template<typename T, typename TFn> inline context& where_not_between(TFn const& val, TFn const T::*mem_ptr_from, TFn const T::*mem_ptr_to) {context_engine::where_not_between<T,TFn>(val,mem_ptr_from,mem_ptr_to);return *this;}
         template<typename T, typename TFn, typename TCont> inline context& where_in(TFn const T::*mem_ptr, TCont const& cnt) {context_engine::where_in<T,TFn,TCont>(mem_ptr,cnt); return *this;}
         template<typename T, typename TFn, typename TCont> inline context& where_not_in(TFn const T::*mem_ptr, TCont const& cnt) {context_engine::where_not_in<T,TFn,TCont>(mem_ptr,cnt); return *this;}
+        template<typename T> inline context& where_like(std::string const T::*mem_ptr, std::string const& val) {context_engine::where_like<T>(mem_ptr,val);return *this;}
+        template<typename T> inline context& where_not_like(std::string const T::*mem_ptr, std::string const& val) {context_engine::where_not_like<T>(mem_ptr,val);return *this;}
 
     private:
         // methods
