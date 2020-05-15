@@ -167,6 +167,16 @@ namespace sql_bridge
         {
             do {std::this_thread::yield();} while(ready_);
         }
+        
+        local_storage(local_storage&& src)
+            : ready_(std::move(src.ready_))
+            , root_path_(std::move(src.root_path_))
+            , proc_queue_(std::move(src.proc_queue_))
+            , proc_thread_(std::move(src.proc_thread_))
+            , proc_flush_thread_(std::move(src.proc_flush_thread_))
+        {
+        }
+        
         ~local_storage()
         {
             proc_queue_->shutdown();
@@ -261,6 +271,8 @@ namespace sql_bridge
         db_proc_queue_ptr proc_queue_;
         std::thread proc_thread_,proc_flush_thread_;
         // methods
+        local_storage(local_storage const&) = delete;
+        
         void proc() {proc_queue_->do_proc(ready_);}
         void proc_flush()
         {

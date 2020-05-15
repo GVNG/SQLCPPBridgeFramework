@@ -146,6 +146,10 @@ namespace sql_bridge
         interlocked(T const& v)
             : val_(v)
             {}
+        interlocked(interlocked&& v)
+            : val_(std::move(v.val_))
+            , mtx_(std::move(v.mtx_))
+            {}
         explicit interlocked(interlocked const& v)
             : val_(v)
             {};
