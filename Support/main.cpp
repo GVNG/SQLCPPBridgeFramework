@@ -71,6 +71,7 @@
 #include "example36.h"
 #include "example37.h"
 #include "example38.h"
+#include "example39.h"
 
 int main(int argc, char** argv)
 {
@@ -783,9 +784,20 @@ int main(int argc, char** argv)
             assert(src==dst);
             std::cout << "is ok. ";
         }
+        {
+            time_tracker trk;
+            sql_bridge::context cont(storage["case39"]);
+            std::cout << "Case 39 ";
+            Case39 dst,src(10);
+            cont.save(src);
+            cont.load(0,dst);
+            dst.search("%1-1%", cont);
+            src.deflate("1-1");
+            assert(src==dst);
+            std::cout << "is ok. ";
+        }
 #endif
 
-        
     }
     catch (std::exception& ex)
     {

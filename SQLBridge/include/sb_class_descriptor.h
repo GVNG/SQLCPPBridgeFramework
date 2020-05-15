@@ -68,7 +68,7 @@ namespace sql_bridge
         sql_value try_cast() const override {return _try_cast<T>();}
         void read(void* dst,data_update_context& cont) override {_read<T>(*static_cast<T*>(dst),cont);}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {_read_comp<T>(*static_cast<T*>(dst),cont,extkey);}
-        void read_at(void* dst,void* root,data_update_context& cont,sql_value const& extkey) override {_read_at<T>(*static_cast<T*>(root),dst,cont,extkey);};
+        void read_at(void* dst,void* root,data_update_context& cont,sql_value const& extkey, std::string const& flt) override {_read_at<T>(*static_cast<T*>(root),dst,cont,extkey,flt);};
         void read_inheritance(size_t tid,void* root,data_update_context& cont,sql_value const& extkey) override {_read_inheritance<T>(*static_cast<T*>(root),tid,cont,extkey);};
         void remove_at(void const* dst,void const* root,data_update_context& cont,sql_value const& extkey) override {_remove_at<T>(*static_cast<T const*>(root),dst,cont,extkey);};
         void remove_inheritance(size_t tid,void const* root,data_update_context& cont,sql_value const& extkey) override {_remove_inheritance<T>(*static_cast<T const*>(root),tid,cont,extkey);};
@@ -247,12 +247,12 @@ namespace sql_bridge
 
 #pragma mark - read at
 
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _read_at(T& dst, void* memb, data_update_context& cont, sql_value const& extkey) {}
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _read_at(T& dst, void* memb, data_update_context& cont, sql_value const& extkey)
+        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _read_at(T& dst, void* memb, data_update_context& cont, sql_value const& extkey, std::string const&) {}
+        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _read_at(T& dst, void* memb, data_update_context& cont, sql_value const& extkey, std::string const& flt)
         {
             for(auto const& md : cont.members())
                 if (md->is_this_mem_ptr(&dst, memb))
-                    md->read_comp(&dst, cont, extkey);
+                    md->read_at(memb, &dst, cont, extkey, flt);
         }
         
 #pragma mark - read

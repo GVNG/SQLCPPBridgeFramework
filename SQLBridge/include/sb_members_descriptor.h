@@ -59,7 +59,7 @@ namespace sql_bridge
         sql_value try_cast() const override {return sql_value(TMb());}
         void read(void* dst, data_update_context& cnt) override {_read<TMb>(*static_cast<T*>(dst),cnt);}
         void read_comp(void* dst, data_update_context& cnt, sql_value const& extkey) override {_read_comp<TMb>(*static_cast<T*>(dst),cnt,extkey);}
-        void read_at(void* dst,void* root,data_update_context& cont,sql_value const& extkey) override {};
+        void read_at(void*,void* root,data_update_context& cont,sql_value const& extkey, std::string const& flt) override {_read_at<TMb>(*static_cast<T*>(root),cont,extkey,flt);}
         void read_inheritance(size_t tid,void* root,data_update_context& cont,sql_value const& extkey) override {};
         void remove_at(void const* memb,void const* src,data_update_context& cont,sql_value const& extkey) override {_remove_at<TMb>(*static_cast<T const*>(src),memb,cont,extkey);};
         void remove_inheritance(size_t,void const*,data_update_context&,sql_value const&) override {};
@@ -333,7 +333,174 @@ namespace sql_bridge
         
         template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value,sql_value>::type _expand(T const& el) {return sql_value(el.*member_);}
         template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value,sql_value>::type _expand(T const& el) {return sql_value();}
-        
+
+#pragma mark - read at
+
+        template<typename TFn> inline typename std::enable_if<!is_container<TFn>::value &&
+                                                              !is_any_map<TFn>::value>::type _read_at(T& dst, data_update_context& cont, sql_value const& extkey, std::string const&) {_read_comp<TFn>(dst,cont,extkey);}
+        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value>::type _read_at(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        {
+            if (flt.empty())
+                _read_comp<TFn>(dst,cont,extkey);
+            else
+                _read_at_cont<TFn>(dst,cont,extkey,flt);
+        }
+        template<typename TFn> inline typename std::enable_if<is_any_map<TFn>::value>::type _read_at(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        {
+            if (flt.empty())
+                _read_comp<TFn>(dst,cont,extkey);
+            else
+                _read_at_map<TFn>(dst,cont,extkey,flt);
+        }
+        template<typename TFn> inline typename std::enable_if<is_trivial_container<TFn>::value>::type _read_at_cont(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        {
+            size_t elemt = typeid(TFn).hash_code();
+            _clear(dst.*member_);
+            data_update_context_ptr ncnt(cont.context_for_filtered_member(elemt,extkey,field_name(),flt));
+            ncnt->read_comp(&(dst.*member_), extkey);
+        }
+        template<typename TFn> inline typename std::enable_if<!is_trivial_container<TFn>::value &&
+                                                              !is_pointer<typename TFn::value_type>::value>::type _read_at_cont(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        {
+            typedef typename TFn::value_type type;
+            size_t elemt = types_selector<TFn>::destination_id();
+            _clear(dst.*member_);
+            data_update_context_ptr ncnt(cont.context_for_filtered_member(elemt,extkey,field_name(),flt));
+            while(ncnt->is_ok())
+            {
+                type var;
+                ncnt->read_comp(&var, extkey);
+                add_to_container(dst.*member_, std::move(var));
+                cont.read_counter_inc();
+            }
+        }
+        template<typename TFn> inline typename std::enable_if<!is_trivial_container<TFn>::value &&
+                                                              is_pointer<typename TFn::value_type>::value>::type _read_at_cont(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        {
+            typedef typename TFn::value_type type;
+            typedef std::conditional_t<std::is_pointer<type>::value, std::unique_ptr<typename is_pointer<type>::type>, type> obj_type;
+            size_t elemt = types_selector<TFn>::destination_id();
+            _clear(dst.*member_);
+            data_update_context_ptr ncnt(cont.context_for_filtered_member(elemt,extkey,field_name(),flt));
+            if (description_->used_pointers() && description_->has_unique_key())
+            {
+                sql_values_container ids_container;
+                sql_value key = description_->sql_value_for_unique_key();
+                to_string fld;
+                while(ncnt->is_ok())
+                {
+                    ncnt->read(key);
+                    ncnt->next(nullptr);
+                    ids_container.push_back(key);
+                    fld << "?,";
+                }
+                if (ids_container.empty()) return;
+                fld.remove_from_tail(1);
+                std::string filter = to_string()
+                    << TStrategy::sql_where()
+                    << TStrategy::sql_where_in(description_->field_name_for_unique_key(),fld);
+                data_update_context_ptr elmcnt(cont.context_from_root(elemt,filter,range()));
+                for(auto const& kv : ids_container)
+                    elmcnt->add(kv);
+                while(elmcnt->is_ok())
+                {
+                    obj_type var(allocate_object<type>());
+                    elmcnt->read_comp(&(*var), sql_value());
+                    add_to_container(dst.*member_, std::move(var));
+                    cont.read_counter_inc();
+                }
+            }
+            else
+            {
+                while(ncnt->is_ok())
+                {
+                    obj_type var(allocate_object<type>());
+                    ncnt->read_comp(&(*var), extkey);
+                    add_to_container(dst.*member_, std::move(var));
+                }
+            }
+        }
+        template<typename TFn> inline typename std::enable_if<is_trivial_map<TFn>::value>::type _read_at_map(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        {
+            size_t elemt = typeid(TFn).hash_code();
+            _clear(dst.*member_);
+            data_update_context_ptr ncnt(cont.context_for_filtered_member(elemt,extkey,field_name(),flt));
+            ncnt->read_comp(&(dst.*member_), extkey);
+        }
+        template<typename TFn> inline typename std::enable_if<!is_trivial_map<TFn>::value &&
+                                                              !is_pointer<typename TFn::mapped_type>::value>::type _read_at_map(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        {
+            typedef typename TFn::key_type k_type;
+            typedef typename TFn::mapped_type m_type;
+            size_t elemt = types_selector<TFn>::destination_id();
+            if (cont.use_pages() && !(dst.*member_).empty()) return;
+            (dst.*member_).clear();
+            data_update_context_ptr ncnt(cont.context_for_filtered_member(elemt,extkey,field_name(),flt));
+            sql_value key((k_type()));
+            while(ncnt->is_ok())
+            {
+                m_type var;
+                ncnt->read(key);
+                ncnt->read_comp(&var, extkey);
+                add_to_map(dst.*member_, key.value<k_type>(), std::move(var));
+                cont.read_counter_inc();
+            }
+        }
+        template<typename TFn> inline typename std::enable_if<!is_trivial_map<TFn>::value &&
+                                                              is_pointer<typename TFn::mapped_type>::value>::type _read_at_map(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        {
+            typedef typename TFn::key_type k_type;
+            typedef typename TFn::mapped_type m_type;
+            typedef std::conditional_t<std::is_pointer<m_type>::value, std::unique_ptr<typename is_pointer<m_type>::type>, m_type> obj_type;
+
+            size_t elemt = types_selector<TFn>::destination_id();
+            (dst.*member_).clear();
+            data_update_context_ptr ncnt(cont.context_for_filtered_member(elemt,extkey,field_name(),flt));
+            sql_value key((k_type()));
+            if (description_->used_pointers() && description_->has_unique_key())
+            {
+                sql_values_map ids_container;
+                sql_value sbkey = description_->sql_value_for_unique_key();
+                to_string fld;
+                while(ncnt->is_ok())
+                {
+                    ncnt->read(key);
+                    ncnt->read(sbkey);
+                    ncnt->next(nullptr);
+                    ids_container.insert({sbkey,key});
+                    fld << "?,";
+                }
+                if (ids_container.empty()) return;
+                fld.remove_from_tail(1);
+                std::string filter = to_string()
+                    << TStrategy::sql_where()
+                    << TStrategy::sql_where_in(description_->field_name_for_unique_key(),fld);
+                data_update_context_ptr elmcnt(cont.context_from_root(elemt,filter,range()));
+                for(auto const& kv : ids_container)
+                    elmcnt->add(kv.first);
+                while(elmcnt->is_ok())
+                {
+                    obj_type var(allocate_object<m_type>());
+                    elmcnt->read_comp(&(*var), sql_value());
+                    sql_value kv = elmcnt->id_for_members(&(*var));
+                    add_to_map(dst.*member_, ids_container.find(kv)->second.value<k_type>(), std::move(var));
+                    cont.read_counter_inc();
+                }
+            }
+            else
+            {
+                while(ncnt->is_ok())
+                {
+                    obj_type var(allocate_object<m_type>());
+                    ncnt->read(key);
+                    ncnt->read_comp(&(*var), extkey);
+                    add_to_map(dst.*member_, key.value<k_type>(), std::move(var));
+                    cont.read_counter_inc();
+                }
+            }
+        }
+
+
 #pragma mark - read
         
         template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value>::type _read(T& dst, data_update_context& cont) {}

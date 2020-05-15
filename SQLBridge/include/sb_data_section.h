@@ -478,9 +478,9 @@ namespace sql_bridge
         {
             if (ref.empty())
                 throw sql_bridge_error(g_internal_error_text, g_without_reference_err_text);
-            data_update_context_ptr rdr = create_reader(ref.front().class_id_, flt, pgsz);
+            data_update_context_ptr rdr = create_reader(ref.front().class_id_, "", pgsz);
             if (dst)
-                rdr->read_at(dst, root, ref.front().key_);
+                rdr->read_at(dst, root, ref.front().key_,flt);
             else
                 rdr->read_inheritance(types_selector<T>::destination_id(), root, ref.front().key_);
             num = rdr->read_counter();
@@ -492,9 +492,9 @@ namespace sql_bridge
         {
             if (ref.empty())
                 throw sql_bridge_error(g_internal_error_text, g_without_reference_err_text);
-            data_update_context_ptr rdr = create_reader(ref.front().class_id_, flt, range());
+            data_update_context_ptr rdr = create_reader(ref.front().class_id_, "", range());
             if (dst)
-                rdr->read_at(dst, root, ref.front().key_);
+                rdr->read_at(dst, root, ref.front().key_,flt);
             else
                 rdr->read_inheritance(types_selector<T>::destination_id(), root, ref.front().key_);
             num = rdr->read_counter();
@@ -841,7 +841,15 @@ namespace sql_bridge
                     return data_update_context_ptr(new _t_data_read_context<TStrategy>(file_,(*hierarhy_)[etid],tl,hierarhy_,"",extkey,pgsz));
             throw sql_bridge_error(to_string() << "Table: " << table_name() <<". " << g_internal_error_text, g_architecture_error_text);
         }
-
+        
+        data_update_context_ptr context_for_filtered_member(size_t etid, sql_value const& extkey, std::string const& ref, std::string const& flt) override
+        {
+            for(auto const& tl : link_.target())
+                if (tl.source_id()==etid && ref==tl.ref_field_name())
+                    return data_update_context_ptr(new _t_data_read_context<TStrategy>(file_,(*hierarhy_)[etid],tl,hierarhy_,flt,extkey,range()));
+            throw sql_bridge_error(to_string() << "Table: " << table_name() <<". " << g_internal_error_text, g_architecture_error_text);
+        }
+        
         data_update_context_ptr context_from_root(size_t etid,std::string const& flt, range const& pgsz) override
         {
             class_descriptors_ptr desc((*hierarhy_)[etid]);
@@ -920,6 +928,13 @@ namespace sql_bridge
             for(auto const& tl : link_.target())
                 if (tl.source_id()==etid && ref==tl.ref_field_name())
                     return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::no_transactions_lock>(file_,(*hierarhy_)[etid],tl,hierarhy_,"",pgsz));
+            throw sql_bridge_error(to_string() << "Table: " << table_name() <<". " << g_internal_error_text, g_architecture_error_text);
+        }
+        data_update_context_ptr context_for_filtered_member(size_t etid, sql_value const&, std::string const& ref, std::string const& flt) override
+        {
+            for(auto const& tl : link_.target())
+                if (tl.source_id()==etid && ref==tl.ref_field_name())
+                    return data_update_context_ptr(new _t_data_update_context<TStrategy,typename TStrategy::sql_file::no_transactions_lock>(file_,(*hierarhy_)[etid],tl,hierarhy_,flt,range()));
             throw sql_bridge_error(to_string() << "Table: " << table_name() <<". " << g_internal_error_text, g_architecture_error_text);
         }
         data_update_context_ptr context_from_root(size_t etid,std::string const& flt, range const& pgsz) override

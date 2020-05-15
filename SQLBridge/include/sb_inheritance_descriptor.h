@@ -53,7 +53,7 @@ namespace sql_bridge
         sql_value try_cast() const override {return sql_value();}
         void read(void* dst,data_update_context& cont) override {}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {_read_comp<TParent>(*static_cast<TChild*>(dst),cont,extkey);}
-        void read_at(void* dst,void* root,data_update_context& cont,sql_value const& extkey) override {};
+        void read_at(void* dst,void* root,data_update_context& cont,sql_value const& extkey, std::string const&) override {};
         void read_inheritance(size_t tid,void* root,data_update_context& cont,sql_value const& extkey) override {};
         void remove_at(void const*,void const*,data_update_context&,sql_value const&) override {};
         void remove_inheritance(size_t tid,void const* root,data_update_context& cont,sql_value const& extkey) override {_remove_inheritance<TParent>(*static_cast<TChild const*>(root),tid,cont,extkey);};

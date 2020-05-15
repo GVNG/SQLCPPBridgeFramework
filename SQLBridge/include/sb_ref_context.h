@@ -177,10 +177,10 @@ namespace sql_bridge
         template<typename T> inline ref_context& save(size_t pgsz, T* src) {_save<T>(range(0,pgsz),src);return *this;}
 
         template<typename T> inline ref_context& load() {_load<T>(nullptr,"",nullptr);return *this;}
-        template<typename T> inline ref_context& load(T& dst, std::string const& flt = "", size_t* num = nullptr) {_load<T>(&dst,build_suffix(flt),num);return *this;}
-        template<typename T> inline ref_context& load(T* dst, std::string const& flt = "", size_t* num = nullptr) {_load<T>(dst,build_suffix(flt),num);return *this;}
-        template<typename T> inline ref_context& load(size_t pgsz, T& dst, std::string const& flt = "", size_t* num = nullptr) {_load_page<T>(range(0,pgsz),&dst,build_suffix(flt),num);return *this;}
-        template<typename T> inline ref_context& load(size_t pgsz, T* dst, std::string const& flt = "", size_t* num = nullptr) {_load_page<T>(range(0,pgsz),dst,build_suffix(flt),num);return *this;}
+        template<typename T> inline ref_context& load(T& dst, std::string const& flt = "", size_t* num = nullptr) {_load<T>(&dst,build_suffix(flt,true),num);return *this;}
+        template<typename T> inline ref_context& load(T* dst, std::string const& flt = "", size_t* num = nullptr) {_load<T>(dst,build_suffix(flt,true),num);return *this;}
+        template<typename T> inline ref_context& load(size_t pgsz, T& dst, std::string const& flt = "", size_t* num = nullptr) {_load_page<T>(range(0,pgsz),&dst,build_suffix(flt,true),num);return *this;}
+        template<typename T> inline ref_context& load(size_t pgsz, T* dst, std::string const& flt = "", size_t* num = nullptr) {_load_page<T>(range(0,pgsz),dst,build_suffix(flt,true),num);return *this;}
 
         template<typename T> inline ref_context& replace() {_replace<T>(nullptr);return *this;}
         template<typename T> inline ref_context& replace(T const& src) {_replace<T>(&src);return *this;}

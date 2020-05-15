@@ -227,7 +227,7 @@ namespace sql_bridge
         data_sections_ptr data_;
         suffixes_container suffixes_;
         
-        std::string build_suffix(std::string const& usr)
+        std::string build_suffix(std::string const& usr, bool blockwhere = false)
         {
             if (usr.empty())
             {
@@ -239,7 +239,13 @@ namespace sql_bridge
                 {
                     if (sfx->weight()!=cw)
                     {
-                        ret << " " << sfx->general(data_) << " " << sfx->build(data_);
+                        if (sfx->weight()==e_weight::WHERE && blockwhere)
+                        {
+                            suffix_simple_operator andop(e_simple_operator::AND);
+                            ret << " " << andop.build(data_) << " " << sfx->build(data_);
+                        }
+                        else
+                            ret << " " << sfx->general(data_) << " " << sfx->build(data_);
                         repeat = false;
                         cw = sfx->weight();
                     }

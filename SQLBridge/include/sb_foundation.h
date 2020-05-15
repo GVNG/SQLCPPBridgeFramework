@@ -112,7 +112,7 @@ namespace sql_bridge
         virtual sql_value try_cast() const = 0;
         virtual void read(void*,data_update_context&) = 0;
         virtual void read_comp(void*,data_update_context&,sql_value const&) = 0;
-        virtual void read_at(void*,void*,data_update_context&,sql_value const&) = 0;
+        virtual void read_at(void*,void*,data_update_context&,sql_value const&,std::string const&) = 0;
         virtual void read_inheritance(size_t,void*,data_update_context&,sql_value const&) = 0;
         virtual void remove_at(void const*,void const*,data_update_context&,sql_value const&) = 0;
         virtual void remove_inheritance(size_t,void const*,data_update_context&,sql_value const&) = 0;
@@ -191,7 +191,7 @@ namespace sql_bridge
         inline void bind_inheritance(size_t dat,void const* root,sql_value const& extid) {descriptor_->bind_inheritance(dat,root,*this,extid);}
         inline void read(void* dat) {return descriptor_->read(dat,*this);}
         inline void read_comp(void* dat,sql_value const& extid) {descriptor_->read_comp(dat,*this,extid);}
-        inline void read_at(void* dat,void* root,sql_value const& extid) {descriptor_->read_at(dat,root,*this,extid);}
+        inline void read_at(void* dat,void* root,sql_value const& extid, std::string const& flt) {descriptor_->read_at(dat,root,*this,extid,flt);}
         inline void read_inheritance(size_t tid,void* root,sql_value const& extid) {descriptor_->read_inheritance(tid,root,*this,extid);}
         inline void remove_at(void const* dat,void const* root,sql_value const& extid) {descriptor_->remove_at(dat, root, *this, extid);}
         inline void remove_inheritance(size_t tid,void const* root,sql_value const& extid) {descriptor_->remove_inheritance(tid, root, *this, extid);}
@@ -209,6 +209,7 @@ namespace sql_bridge
         virtual sql_value id_for_members(void const*,bool wo_pk=false) const = 0;
         virtual data_update_context_ptr context_for_member(size_t, sql_value const&, std::string const&, range const&) = 0;
         virtual data_update_context_ptr context_from_root(size_t, std::string const&, range const&) = 0;
+        virtual data_update_context_ptr context_for_filtered_member(size_t, sql_value const&, std::string const&, std::string const&) = 0;
         virtual void remove_if_possible(void const*) = 0;
         virtual void remove_by_key(sql_value const&) = 0;
         virtual void remove_rel_by_key(sql_value const&) = 0;
