@@ -63,11 +63,7 @@ namespace sql_bridge
         void read_inheritance(size_t tid,void* root,data_update_context& cont,sql_value const& extkey) override {};
         void remove_at(void const* memb,void const* src,data_update_context& cont,sql_value const& extkey) override {_remove_at<TMb>(*static_cast<T const*>(src),memb,cont,extkey);};
         void remove_inheritance(size_t,void const*,data_update_context&,sql_value const&) override {};
-        bool is_this_mem_ptr(void const* base, void const* memptr) const override
-        {
-            T const* chk = static_cast<T const*>(base);
-            return &(chk->*member_)==memptr;
-        }
+        bool is_this_mem_ptr(void const* base, void const* memptr) const override {T const* chk = static_cast<T const*>(base);return &(chk->*member_)==memptr;}
         bool is_target_map() const override {return is_map<TMb>::value;}
         bool is_not_empty_container(void const* src) const override {return _is_not_empty_container<TMb>(*static_cast<T const*>(src));}
 
@@ -80,6 +76,7 @@ namespace sql_bridge
             , member_(m)
             , description_(desc)
             {}
+        
     private:
         
 #pragma mark - check for empty containers
