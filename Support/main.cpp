@@ -80,7 +80,7 @@ int main(int argc, char** argv)
         mkdir("./DB", 0777);
         sql_bridge::local_storage<sql_bridge::sqlite_adapter> storage("./DB");
         
-#if 0
+#if 1
 
         {
             std::cout << "Case KVDB ";
@@ -764,7 +764,6 @@ int main(int argc, char** argv)
             assert(src==dst);
             std::cout << "is ok. ";
         }
-#endif
         {
             time_tracker trk;
             sql_bridge::context cont(storage["case38"]);
@@ -778,10 +777,14 @@ int main(int argc, char** argv)
             assert(dst.size()==5);
             cont.where_not_like(&Case38::val_, "%9%").load(dst);
             assert(dst.size()==81);
-
+            src.erase(std::remove_if(src.begin(),
+                                     src.end(),
+                                     [](Case38 const& v){return v.val_.find("9")!=std::string::npos;}),src.end());
+            assert(src==dst);
             std::cout << "is ok. ";
         }
-        
+#endif
+
         
     }
     catch (std::exception& ex)
