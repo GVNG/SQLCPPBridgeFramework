@@ -82,7 +82,7 @@ namespace sql_bridge
         range(size_t p, size_t ln)
             : position_(p)
             , length_(ln)
-            , active_(ln>0)
+            , active_(true)
             {};
         inline range next() const {return range(position_+length_,length_);}
         inline bool empty() const {return length_==0;}

@@ -45,14 +45,14 @@ namespace sql_bridge
     {
     public:
         template<typename T> inline void save(T const& src) {_save<T>(src);}
-        template<typename T> inline void save(T const* src,sql_context_references_container const& ref, void const* rd) {_save_page_at<T>(0, src, ref, rd);}
-        template<typename T> inline void save_page(size_t pgsz, T const& src) {_save_page<T>(pgsz,src);}
-        template<typename T> inline void save_page(size_t pgsz, T const* src, sql_context_references_container const& ref, void const* rd) {_save_page_at<T>(pgsz,src,ref,rd);}
+        template<typename T> inline void save(T const* src,sql_context_references_container const& ref, void const* rd) {_save_page_at<T>(range(), src, ref, rd);}
+        template<typename T> inline void save_page(range pgsz, T const& src) {_save_page<T>(pgsz,src);}
+        template<typename T> inline void save_page(range pgsz, T const* src, sql_context_references_container const& ref, void const* rd) {_save_page_at<T>(pgsz,src,ref,rd);}
         
         template<typename T> inline void load(T& dst, std::string const& flt, size_t& num) {_load<T>(dst,flt,num);};
         template<typename T> inline void load(T* dst, std::string const& flt, size_t& num,sql_context_references_container const& ref, void* rd) {_load_at<T>(dst,flt,num,ref,rd);};
-        template<typename T> inline void load_page(size_t pgsz, T& dst, std::string const& flt, size_t& num) {_load_page<T>(pgsz,dst,flt,num);};
-        template<typename T> inline void load_page(size_t pgsz, T* dst, std::string const& flt, size_t& num,sql_context_references_container const& ref, void* rd) {_load_page_at<T>(pgsz,dst,flt,num,ref,rd);};
+        template<typename T> inline void load_page(range pgsz, T& dst, std::string const& flt, size_t& num) {_load_page<T>(pgsz,dst,flt,num);};
+        template<typename T> inline void load_page(range pgsz, T* dst, std::string const& flt, size_t& num,sql_context_references_container const& ref, void* rd) {_load_page_at<T>(pgsz,dst,flt,num,ref,rd);};
 
         template<typename T> inline void remove(T const& src) {_remove<T>(src);}
         template<typename T> inline void remove_if(std::string const& src) {_remove_if<T>(src);}
@@ -131,11 +131,11 @@ namespace sql_bridge
 
 #pragma mark - save page at
 
-        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _save_page_at(size_t pgsz, T const* src, sql_context_references_container const& ref, void const* root)
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _save_page_at(range pgsz, T const* src, sql_context_references_container const& ref, void const* root)
         {
             if (ref.empty())
                 throw sql_bridge_error(g_internal_error_text, g_without_reference_err_text);
-            data_update_context_ptr cont = create_context(ref.front().class_id_, "", range(0,pgsz));
+            data_update_context_ptr cont = create_context(ref.front().class_id_, "", pgsz);
             if (src)
                 cont->bind_at(src, root, ref.front().key_);
             else
@@ -144,73 +144,73 @@ namespace sql_bridge
 
 #pragma mark - save page
         
-        template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _save_page(size_t pgsz, T const& src)
+        template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _save_page(range pgsz, T const& src)
         {
             size_t tid = types_selector<T>::destination_id();
-            data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+            data_update_context_ptr cont(create_context(tid,"",pgsz));
             cont->bind_comp(&(*src), sql_value());
         }
 
         template<typename T> inline typename std::enable_if<!is_pointer<T>::value &&
                                                             !is_container<T>::value &&
-                                                            !is_any_map<T>::value>::type _save_page(size_t pgsz, T const& src)
+                                                            !is_any_map<T>::value>::type _save_page(range pgsz, T const& src)
         {
             size_t tid = typeid(T).hash_code();
-            data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+            data_update_context_ptr cont(create_context(tid,"",pgsz));
             cont->bind_comp(&src, sql_value());
         }
         template<typename T> inline typename std::enable_if<is_trivial_container<T>::value ||
                                                             is_trivial_map<T>::value ||
-                                                            is_container_of_containers<T>::value>::type _save_page(size_t, T const&)
+                                                            is_container_of_containers<T>::value>::type _save_page(range, T const&)
         {
             throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
         }
         template<typename T> inline typename std::enable_if<is_container<T>::value &&
                                                             !is_trivial_container<T>::value &&
-                                                            !is_container_of_containers<T>::value>::type _save_page(size_t pgsz, T const& src) {_save_page_cont<T>(pgsz,src);}
+                                                            !is_container_of_containers<T>::value>::type _save_page(range pgsz, T const& src) {_save_page_cont<T>(pgsz,src);}
         template<typename T> inline typename std::enable_if<is_any_map<T>::value &&
                                                             !is_trivial_map<T>::value &&
-                                                            !is_container_of_containers<T>::value>::type _save_page(size_t pgsz, T const& src) {_save_page_map<T>(pgsz,src);}
-        template<typename T> inline typename std::enable_if<is_pointer<typename T::value_type>::value>::type _save_page_cont(size_t pgsz, T const& src)
+                                                            !is_container_of_containers<T>::value>::type _save_page(range pgsz, T const& src) {_save_page_map<T>(pgsz,src);}
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::value_type>::value>::type _save_page_cont(range pgsz, T const& src)
         {
             if (descriptor_->has_description<T>())
             {
                 size_t tid(typeid(T).hash_code());
-                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                data_update_context_ptr cont(create_context(tid,"",pgsz));
                 cont->bind_comp(&src,sql_value());
             }
             else
             {
                 typedef typename types_selector<T>::type type;
                 size_t tid = typeid(type).hash_code();
-                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                data_update_context_ptr cont(create_context(tid,"",pgsz));
                 for(auto const& el : src)
                     cont->bind_comp(&(*el),sql_value());
             }
         }
-        template<typename T> inline typename std::enable_if<!is_pointer<typename T::value_type>::value>::type _save_page_cont(size_t pgsz, T const& src)
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::value_type>::value>::type _save_page_cont(range pgsz, T const& src)
         {
             if (descriptor_->has_description<T>())
             {
                 size_t tid(typeid(T).hash_code());
-                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                data_update_context_ptr cont(create_context(tid,"",pgsz));
                 cont->bind_comp(&src,sql_value());
             }
             else
             {
                 typedef typename types_selector<T>::type type;
                 size_t tid = typeid(type).hash_code();
-                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                data_update_context_ptr cont(create_context(tid,"",pgsz));
                 for(auto const& el : src)
                     cont->bind_comp(&el,sql_value());
             }
         }
-        template<typename T> inline typename std::enable_if<is_pointer<typename T::mapped_type>::value>::type _save_page_map(size_t pgsz, T const& src)
+        template<typename T> inline typename std::enable_if<is_pointer<typename T::mapped_type>::value>::type _save_page_map(range pgsz, T const& src)
         {
             if (descriptor_->has_description<T>())
             {
                 size_t tid(typeid(T).hash_code());
-                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                data_update_context_ptr cont(create_context(tid,"",pgsz));
                 if (is_map<T>::value)
                     for(auto const& el : src)
                         cont->remove_by_key(sql_value(el.first));
@@ -220,17 +220,17 @@ namespace sql_bridge
             {
                 typedef typename types_selector<T>::type type;
                 size_t tid = typeid(type).hash_code();
-                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                data_update_context_ptr cont(create_context(tid,"",pgsz));
                 for(auto const& el : src)
                     cont->bind_comp(&(*el.second),sql_value());
             }
         }
-        template<typename T> inline typename std::enable_if<!is_pointer<typename T::mapped_type>::value>::type _save_page_map(size_t pgsz, T const& src)
+        template<typename T> inline typename std::enable_if<!is_pointer<typename T::mapped_type>::value>::type _save_page_map(range pgsz, T const& src)
         {
             if (descriptor_->has_description<T>())
             {
                 size_t tid(typeid(T).hash_code());
-                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                data_update_context_ptr cont(create_context(tid,"",pgsz));
                 if (is_map<T>::value)
                     for(auto const& el : src)
                         cont->remove_by_key(sql_value(el.first));
@@ -240,7 +240,7 @@ namespace sql_bridge
             {
                 typedef typename types_selector<T>::type type;
                 size_t tid = typeid(type).hash_code();
-                data_update_context_ptr cont(create_context(tid,"",range(0,pgsz)));
+                data_update_context_ptr cont(create_context(tid,"",pgsz));
                 for(auto const& el : src)
                     cont->bind_comp(&el.second,sql_value());
             }
@@ -474,11 +474,11 @@ namespace sql_bridge
 
 #pragma mark - load page at
         
-        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load_page_at(size_t pgsz, T* dst, std::string const& flt, size_t& num, sql_context_references_container const& ref, void* root)
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load_page_at(range pgsz, T* dst, std::string const& flt, size_t& num, sql_context_references_container const& ref, void* root)
         {
             if (ref.empty())
                 throw sql_bridge_error(g_internal_error_text, g_without_reference_err_text);
-            data_update_context_ptr rdr = create_reader(ref.front().class_id_, flt, range(0,pgsz));
+            data_update_context_ptr rdr = create_reader(ref.front().class_id_, flt, pgsz);
             if (dst)
                 rdr->read_at(dst, root, ref.front().key_);
             else
@@ -504,34 +504,34 @@ namespace sql_bridge
 
         template<typename T> inline typename std::enable_if<!is_pointer<T>::value &&
                                                             !is_container<T>::value &&
-                                                            !is_any_map<T>::value>::type _load_page(size_t pgsz, T& dst, std::string const& flt, size_t& num)
+                                                            !is_any_map<T>::value>::type _load_page(range pgsz, T& dst, std::string const& flt, size_t& num)
         {
             size_t tid = typeid(T).hash_code();
-            data_update_context_ptr cont(create_reader(tid, flt, range(0,pgsz)));
+            data_update_context_ptr cont(create_reader(tid, flt, pgsz));
             cont->read(&dst);
             num = cont->read_counter();
         }
         
-        template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _load_page(size_t pgsz, T& dst, std::string const& flt, size_t& num)
+        template<typename T> inline typename std::enable_if<is_pointer<T>::value>::type _load_page(range pgsz, T& dst, std::string const& flt, size_t& num)
         {
             size_t tid = types_selector<T>::destination_id();
-            data_update_context_ptr cont(create_reader(tid, flt, range(0,pgsz)));
+            data_update_context_ptr cont(create_reader(tid, flt, pgsz));
             cont->read(&(*dst));
             num = cont->read_counter();
         }
         template<typename T> inline typename std::enable_if<is_trivial_container<T>::value ||
                                                             is_trivial_map<T>::value ||
-                                                            is_container_of_containers<T>::value>::type _load_page(size_t pgsz, T& dst, std::string const& flt, size_t& num)
+                                                            is_container_of_containers<T>::value>::type _load_page(range, T&, std::string const&, size_t&)
         {
             throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
         }
         
         template<typename T> inline typename std::enable_if<is_container<T>::value &&
                                                             !is_trivial_container<T>::value &&
-                                                            !is_container_of_containers<T>::value>::type _load_page(size_t pgsz, T& dst, std::string const& flt, size_t& num){_load_cont<T>(dst,flt,range(0,pgsz),num);}
+                                                            !is_container_of_containers<T>::value>::type _load_page(range pgsz, T& dst, std::string const& flt, size_t& num){_load_cont<T>(dst,flt,pgsz,num);}
         template<typename T> inline typename std::enable_if<is_any_map<T>::value &&
                                                             !is_trivial_map<T>::value &&
-                                                            !is_container_of_containers<T>::value>::type _load_page(size_t pgsz, T& dst, std::string const& flt, size_t& num){_load_map<T>(dst,flt,range(0,pgsz),num);}
+                                                            !is_container_of_containers<T>::value>::type _load_page(range pgsz, T& dst, std::string const& flt, size_t& num){_load_map<T>(dst,flt,pgsz,num);}
 
 #pragma mark - load
 

@@ -46,7 +46,7 @@ namespace sql_bridge
         public:
             save_task(_t_base const* src,
                       data_sections_ptr section,
-                      size_t pg,
+                      range pg,
                       sql_context_references_container const& ref,
                       void const* rd)
                 : db_task(section)
@@ -55,10 +55,10 @@ namespace sql_bridge
                 , references_(ref)
                 , root_data_(rd)
                 {};
-            inline void run_task() override {if (page_size_) section_->save_page(page_size_,data_,references_,root_data_); else section_->save(data_,references_,root_data_);}
+            inline void run_task() override {if (page_size_.is_active()) section_->save_page(page_size_,data_,references_,root_data_); else section_->save(data_,references_,root_data_);}
             void error(base_sql_error const& err) override {throw err;}
         private:
-            size_t page_size_;
+            range page_size_;
             _t_base const* data_;
             void const* root_data_;
             sql_context_references_container const& references_;
@@ -92,7 +92,7 @@ namespace sql_bridge
             load_page_task(_t_base* src,
                            data_sections_ptr section,
                            std::string const& fl,
-                           size_t pg,
+                           range pg,
                            sql_context_references_container const& ref,
                            void* rd)
                 : db_task(section)
@@ -108,7 +108,7 @@ namespace sql_bridge
             size_t items_load() const {return items_load_;}
         private:
             std::string filter_;
-            size_t page_size_;
+            range page_size_;
             _t_base* data_;
             void* root_data_;
             sql_context_references_container const& references_;
@@ -167,20 +167,20 @@ namespace sql_bridge
         }
 #pragma mark - public methods
         template<typename T> inline ref_context& save() {_replace<T>(nullptr);return *this;}
-        template<typename T> inline ref_context& save(T const& src) {_save<T>(0,&src);return *this;}
-        template<typename T> inline ref_context& save(T const* src) {_save<T>(0,src);return *this;}
-        template<typename T> inline ref_context& save(T* src) {_save<T>(0,src);return *this;}
-        template<typename T> inline ref_context& save(T& src) {_save<T>(0,&src);return *this;}
-        template<typename T> inline ref_context& save(size_t pgsz, T const& src) {_save<T>(pgsz,&src);return *this;}
-        template<typename T> inline ref_context& save(size_t pgsz, T const* src) {_save<T>(pgsz,src);return *this;}
-        template<typename T> inline ref_context& save(size_t pgsz, T& src) {_save<T>(pgsz,&src);return *this;}
-        template<typename T> inline ref_context& save(size_t pgsz, T* src) {_save<T>(pgsz,src);return *this;}
+        template<typename T> inline ref_context& save(T const& src) {_save<T>(range(),&src);return *this;}
+        template<typename T> inline ref_context& save(T const* src) {_save<T>(range(),src);return *this;}
+        template<typename T> inline ref_context& save(T* src) {_save<T>(range(),src);return *this;}
+        template<typename T> inline ref_context& save(T& src) {_save<T>(range(),&src);return *this;}
+        template<typename T> inline ref_context& save(size_t pgsz, T const& src) {_save<T>(range(0,pgsz),&src);return *this;}
+        template<typename T> inline ref_context& save(size_t pgsz, T const* src) {_save<T>(range(0,pgsz),src);return *this;}
+        template<typename T> inline ref_context& save(size_t pgsz, T& src) {_save<T>(range(0,pgsz),&src);return *this;}
+        template<typename T> inline ref_context& save(size_t pgsz, T* src) {_save<T>(range(0,pgsz),src);return *this;}
 
         template<typename T> inline ref_context& load() {_load<T>(nullptr,"",nullptr);return *this;}
         template<typename T> inline ref_context& load(T& dst, std::string const& flt = "", size_t* num = nullptr) {_load<T>(&dst,build_suffix(flt),num);return *this;}
         template<typename T> inline ref_context& load(T* dst, std::string const& flt = "", size_t* num = nullptr) {_load<T>(dst,build_suffix(flt),num);return *this;}
-        template<typename T> inline ref_context& load(size_t pgsz, T& dst, std::string const& flt = "", size_t* num = nullptr) {_load_page<T>(pgsz,&dst,build_suffix(flt),num);return *this;}
-        template<typename T> inline ref_context& load(size_t pgsz, T* dst, std::string const& flt = "", size_t* num = nullptr) {_load_page<T>(pgsz,dst,build_suffix(flt),num);return *this;}
+        template<typename T> inline ref_context& load(size_t pgsz, T& dst, std::string const& flt = "", size_t* num = nullptr) {_load_page<T>(range(0,pgsz),&dst,build_suffix(flt),num);return *this;}
+        template<typename T> inline ref_context& load(size_t pgsz, T* dst, std::string const& flt = "", size_t* num = nullptr) {_load_page<T>(range(0,pgsz),dst,build_suffix(flt),num);return *this;}
 
         template<typename T> inline ref_context& replace() {_replace<T>(nullptr);return *this;}
         template<typename T> inline ref_context& replace(T const& src) {_replace<T>(&src);return *this;}
@@ -226,11 +226,11 @@ namespace sql_bridge
             }
         }
 #pragma mark - load page
-        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load_page(size_t, T*, std::string const& flt, size_t* num) const
+        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load_page(range, T*, std::string const& flt, size_t* num) const
         {
             throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);
         }
-        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load_page(size_t pg, T* dst, std::string const& flt, size_t* num) const
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load_page(range pg, T* dst, std::string const& flt, size_t* num) const
         {
             db_task_ptr task(std::make_shared< load_page_task<T> >(dst,data_,flt,pg,references_,root_data_));
             std::future<void> ret(task->get_future());
@@ -244,12 +244,12 @@ namespace sql_bridge
             }
         }
 #pragma mark - save
-        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _save(size_t, T const*) const
+        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _save(range, T const*) const
         {
             throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);
         }
 
-        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _save(size_t pg, T const* src) const
+        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _save(range pg, T const* src) const
         {
             db_task_ptr task(std::make_shared< save_task<T> >(src,data_,pg,references_,root_data_));
             std::future<void> ret(task->get_future());
