@@ -774,7 +774,7 @@ int main(int argc, char** argv)
             for(int i=0; i<100; ++i)
                 src.push_back(Case38(i));
             cont.save(src);
-            cont.where_like(&Case38::val_, "a9%").load(dst);
+            cont.where_like(&Case38::val_, "A9%").load(dst);
             assert(dst.size()==5);
             cont.where_not_like(&Case38::val_, "%9%").load(dst);
             assert(dst.size()==81);
