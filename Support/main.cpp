@@ -99,7 +99,7 @@ int main(int argc, char** argv)
             storage.remove<std::string>("to_remove");
             
             dst_rl = storage.load("test",0.0);
-            dst_str = storage.load("test",std::string());
+            dst_str = storage.load("test");
             dst_str2 = storage.load("to_remove", std::string("def"));
             dst_int = storage.load("test",0);
 
