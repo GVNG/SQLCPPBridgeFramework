@@ -129,16 +129,16 @@ namespace sql_bridge
         mt_event() {};
         mt_event(mt_event const&) = delete;
         mt_event(mt_event&&) = delete;
-        
-        inline void fire() {std::unique_lock<std::mutex> lk(mtx_);var_.notify_one();}
-        inline void fire_all() {std::unique_lock<std::mutex> lk(mtx_);var_.notify_all();}
-        template<typename T> inline bool wait_for(T const& dl) {std::unique_lock<std::mutex> lk(mtx_);return var_.wait_for(lk, dl)!=std::cv_status::timeout;}
-        inline void wait() {std::unique_lock<std::mutex> lk(mtx_);var_.wait(lk);}
+
+        inline void fire() {var_.notify_one();}
+        inline void fire_all() {var_.notify_all();}
+        template<typename T> inline bool wait_for(T const& dl) {std::lock_guard<std::mutex> lk(mtx_);return var_.wait_for(mtx_, dl)!=std::cv_status::timeout;}
+        inline void wait() {std::lock_guard<std::mutex> lk(mtx_);var_.wait(mtx_);}
     private:
         std::mutex mtx_;
-        std::condition_variable var_;
+        std::condition_variable_any var_;
     };
-    
+
     template<typename T> class interlocked
     {
     public:
