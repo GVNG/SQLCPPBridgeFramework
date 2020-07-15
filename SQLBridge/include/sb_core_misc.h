@@ -128,7 +128,7 @@ namespace sql_bridge
     public:
         mt_event() {};
         mt_event(mt_event const&) = delete;
-        mt_event(mt_event&&) = delete;
+        mt_event(mt_event&& v) = delete;
 
         inline void fire() {var_.notify_one();}
         inline void fire_all() {var_.notify_all();}
@@ -143,12 +143,10 @@ namespace sql_bridge
     {
     public:
         typedef T type;
-        interlocked(T const& v)
+        interlocked() = delete;
+        interlocked(interlocked&&) = delete;
+        interlocked(type const& v)
             : val_(v)
-            {}
-        interlocked(interlocked&& v)
-            : val_(std::move(v.val_))
-            , mtx_(std::move(v.mtx_))
             {}
         explicit interlocked(interlocked const& v)
             : val_(v)
@@ -159,6 +157,7 @@ namespace sql_bridge
             return val_;
         }
         inline type operator = (type const& v){std::lock_guard<std::mutex> lk(mtx_);val_ = v;return val_;}
+        inline type operator = (interlocked const& v){std::lock_guard<std::mutex> lk(mtx_);val_ = v;return val_;}
         inline type operator ++ () {std::lock_guard<std::mutex> lk(mtx_);return ++val_;}
         inline type operator ++ (int) {std::lock_guard<std::mutex> lk(mtx_);return val_++;}
         inline type operator -- () {std::lock_guard<std::mutex> lk(mtx_);return --val_;}
