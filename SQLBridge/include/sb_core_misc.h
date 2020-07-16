@@ -143,27 +143,25 @@ namespace sql_bridge
     {
     public:
         typedef T type;
-        interlocked() = delete;
-        interlocked(interlocked&&) = delete;
         interlocked(type const& v)
             : val_(v)
             {}
-        explicit interlocked(interlocked const& v)
-            : val_(v)
-            {};
         inline operator type() const
         {
             std::lock_guard<std::mutex> lk(mtx_);
             return val_;
         }
         inline type operator = (type const& v){std::lock_guard<std::mutex> lk(mtx_);val_ = v;return val_;}
-        inline type operator = (interlocked const& v){std::lock_guard<std::mutex> lk(mtx_);val_ = v;return val_;}
         inline type operator ++ () {std::lock_guard<std::mutex> lk(mtx_);return ++val_;}
         inline type operator ++ (int) {std::lock_guard<std::mutex> lk(mtx_);return val_++;}
         inline type operator -- () {std::lock_guard<std::mutex> lk(mtx_);return --val_;}
         inline type operator -- (int) {std::lock_guard<std::mutex> lk(mtx_);return val_--;}
 
     private:
+        interlocked() = delete;
+        interlocked(interlocked&&) = delete;
+        interlocked(interlocked const&) = delete;
+        
         type val_;
         mutable std::mutex mtx_;
     };
