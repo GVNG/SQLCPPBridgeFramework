@@ -277,7 +277,7 @@ namespace sql_bridge
                 , data_(src)
                 {};
             remove_task(_t_base&& src,data_sections_ptr section)
-                : db_task(section_)
+                : db_task(section)
                 , data_(std::move(src))
                 {};
             inline void run_task() override {section_->remove(data_);}
