@@ -25,6 +25,7 @@ Pod::Spec.new do |spec|
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
   spec.description  = <<-DESC
+The purpose of this framework is to provide the most simplest way of mapping an arbitrary structure of C ++ / STL derived classes on a flat SQL-table. The framework also provides methods for reading and writing (synchronous / asynchronous), delete and edit data both as whole containers and as individual elements of them. Currently SQLite implementation for MacOSX and iOS is used for data storing but you can work adapters further to be compatible with any SQL-like library. In addition, all the work on forming SQL statements is made inside the library and does not require intervention and any improvements on the outside.
                    DESC
 
   spec.homepage     = "https://github.com/GVNG/SQLCppBridge"
