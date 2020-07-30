@@ -373,6 +373,8 @@ namespace sql_bridge
 
         template<typename T> inline typename std::enable_if<is_map<T>::value,context&>::type remove(typename T::key_type const& val) {_remove_by_key<T>(val);return *this;}
         template<typename T> inline typename std::enable_if<is_map<T>::value,context&>::type remove(typename T::key_type const* val) {_remove_by_key<T>(*val);return *this;}
+        template<typename T> inline typename std::enable_if<is_map<T>::value,context&>::type remove(typename T::key_type& val) {_remove_by_key<T>(val);return *this;}
+        template<typename T> inline typename std::enable_if<is_map<T>::value,context&>::type remove(typename T::key_type* val) {_remove_by_key<T>(*val);return *this;}
         template<typename T> inline context& remove_if(std::string const& flt = "") {_remove_if<typename types_selector<T>::type>(build_suffix(flt));return *this;}
 
         template<typename T> inline context& replace(T const& src) {_replace<T>(src);return *this;}
