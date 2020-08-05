@@ -132,7 +132,7 @@ namespace sql_bridge
 
         inline void fire() {std::lock_guard<std::mutex> lk(mtx_);var_.notify_one();}
         inline void fire_all() {std::lock_guard<std::mutex> lk(mtx_);var_.notify_all();}
-        template<typename T> inline bool wait_for(T const& dl) {std::lock_guard<std::mutex> lk(mtx_);return var_.wait_for(mtx_, dl)!=std::cv_status::timeout;}
+        template<typename T> inline bool wait_for(T const& dl) {std::lock_guard<std::mutex> lk(mtx_);return var_.wait_for(mtx_, dl)==std::cv_status::no_timeout;}
         inline void wait() {std::lock_guard<std::mutex> lk(mtx_);var_.wait(mtx_);}
     private:
         std::mutex mtx_;
