@@ -291,6 +291,7 @@
 		93BEDCF220A34DB1004166EB /* example8.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = example8.cpp; sourceTree = "<group>"; };
 		93BEDCFB20A42306004166EB /* example9.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = example9.h; sourceTree = "<group>"; };
 		93BEDCFC20A42306004166EB /* example9.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = example9.cpp; sourceTree = "<group>"; };
+		93C9A35024DAC5AE00DF9AE7 /* SQLCppBridge.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; path = SQLCppBridge.podspec; sourceTree = SOURCE_ROOT; };
 		93CD85F920CA5A79005D37A7 /* example13.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = example13.h; sourceTree = "<group>"; };
 		93CD85FA20CA5A79005D37A7 /* example13.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = example13.cpp; sourceTree = "<group>"; };
 		93CD860820CA5D49005D37A7 /* example14.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = example14.h; sourceTree = "<group>"; };
@@ -534,6 +535,7 @@
 		93E60D7820557FFB009151ED /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				93C9A35024DAC5AE00DF9AE7 /* SQLCppBridge.podspec */,
 				937F847A21DA2A6300DD82F8 /* CODE_OF_CONDUCT.md */,
 				937F847821DA2A5200DD82F8 /* LICENSE.md */,
 				937F847921DA2A5300DD82F8 /* README.md */,
