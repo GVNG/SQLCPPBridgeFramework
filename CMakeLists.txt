@@ -74,5 +74,5 @@ if ( REQUIRE_SQLITE )
 endif()
 
 # installation
-install ( TARGETS ${PROJECT_NAME} DESTINATION lib )
+install ( TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib )
 install ( FILES ${HEADERS} DESTINATION include )
