@@ -76,4 +76,3 @@ endif()
 # installation
 install ( TARGETS ${PROJECT_NAME} ARCHIVE DESTINATION lib
     PUBLIC_HEADER DESTINATION include/sqlcppbridge)
-#install ( FILES ${HEADERS} DESTINATION include/sqlcppbridge )
