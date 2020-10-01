@@ -57,6 +57,7 @@ set_target_properties( ${PROJECT_NAME} PROPERTIES
   FRAMEWORK_VERSION C
   VERSION           ${project_version}
   SOVERSION         1.0.0
+  CXX_STANDARD      14
   PUBLIC_HEADER     "${HEADERS}" )
 
 if ( REQUIRE_SQLITE ) 
