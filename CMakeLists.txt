@@ -74,5 +74,5 @@ if ( REQUIRE_SQLITE )
 endif()
 
 # installation
-install ( TARGETS ${PROJECT_NAME} DESTINATION lib )
-install ( FILES ${HEADERS} DESTINATION include )
+install ( TARGETS ${PROJECT_NAME} ARCHIVE DESTINATION lib
+    PUBLIC_HEADER DESTINATION include/sqlcppbridge)

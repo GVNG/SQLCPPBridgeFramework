@@ -250,6 +250,9 @@
 		939B6AFE243C50340013068E /* example33.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example33.h; sourceTree = "<group>"; };
 		939B6AFF243C538C0013068E /* example33.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example33.cpp; sourceTree = "<group>"; };
 		939B6B02243C6B0C0013068E /* t_case33.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case33.cpp; sourceTree = "<group>"; };
+		939B9270251CC2E700026E5D /* common-project-include.in */ = {isa = PBXFileReference; lastKnownFileType = file; path = "common-project-include.in"; sourceTree = SOURCE_ROOT; };
+		939B9271251CC2E700026E5D /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		939B9272251CC2E700026E5D /* project-meta-info.in */ = {isa = PBXFileReference; lastKnownFileType = file; path = "project-meta-info.in"; sourceTree = SOURCE_ROOT; };
 		939E0AE420F7650200106D46 /* example21.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example21.h; sourceTree = "<group>"; };
 		939E0AE520F7651900106D46 /* example21.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example21.cpp; sourceTree = "<group>"; };
 		93A1349020D149E90041EE2E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; usesTabs = 1; };
@@ -417,6 +420,16 @@
 			path = src;
 			sourceTree = "<group>";
 		};
+		939B926F251CC2D300026E5D /* CMake */ = {
+			isa = PBXGroup;
+			children = (
+				939B9271251CC2E700026E5D /* CMakeLists.txt */,
+				939B9270251CC2E700026E5D /* common-project-include.in */,
+				939B9272251CC2E700026E5D /* project-meta-info.in */,
+			);
+			name = CMake;
+			sourceTree = "<group>";
+		};
 		93E60D6320557F7A009151ED = {
 			isa = PBXGroup;
 			children = (
@@ -535,6 +548,7 @@
 		93E60D7820557FFB009151ED /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				939B926F251CC2D300026E5D /* CMake */,
 				93C9A35024DAC5AE00DF9AE7 /* SQLCppBridge.podspec */,
 				937F847A21DA2A6300DD82F8 /* CODE_OF_CONDUCT.md */,
 				937F847821DA2A5200DD82F8 /* LICENSE.md */,
@@ -640,7 +654,7 @@
 		93E60D6420557F7A009151ED /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1100;
+				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = DataArt;
 				TargetAttributes = {
 					937F848121DA2B4800DD82F8 = {
@@ -890,6 +904,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -945,6 +960,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
