@@ -32,6 +32,11 @@
 #ifndef sql_cpp_bridge_h
 #define sql_cpp_bridge_h
 
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable:4068)
+#endif
+
 #include "sb_exceptions.h"
 #include "sb_local_storage.h"
 #include "sb_context.h"
@@ -74,5 +79,9 @@
 
 #define DECLARE_SQL_INHERITANCE_ACCESS(CLASSNAME,CLASSNAME_PARENT)\
     DECLARE_SQL_INHERITANCE_ACCESS_EXT(sql_bridge::sqlite_adapter,CLASSNAME,CLASSNAME_PARENT)
+
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif
 
 #endif /* sql_cpp_bridge_h */
