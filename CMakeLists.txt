@@ -65,6 +65,7 @@ target_compile_features ( ${PROJECT_NAME}
 target_include_directories ( ${PROJECT_NAME}
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/SQLBridge/src" 
     PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/SQLBridge/include"
+    PUBLIC  "${SQLITE_INSTALL_LOCATION}/include"
 )
 
 set_target_properties( ${PROJECT_NAME} PROPERTIES
@@ -92,4 +93,3 @@ endif()
 # installation
 install ( TARGETS ${PROJECT_NAME} ARCHIVE DESTINATION lib
     PUBLIC_HEADER DESTINATION include/sqlcppbridge)
-install (DIRECTORY ${SQLITE_INSTALL_LOCATION}/include/ DESTINATION include/sqlcppbridge)
