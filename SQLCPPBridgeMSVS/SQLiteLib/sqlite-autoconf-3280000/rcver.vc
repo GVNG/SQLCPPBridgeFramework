@@ -1,3 +1,0 @@
-!IFNDEF VERSION 
-VERSION = ^#define SQLITE_VERSION        "3.28.0" 
-!ENDIF 

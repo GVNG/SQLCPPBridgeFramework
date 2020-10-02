@@ -42,6 +42,7 @@
 #include <tuple>
 #include <typeinfo>
 #include <memory>
+#include <string>
 
 namespace sql_bridge
 {
