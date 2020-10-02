@@ -11,8 +11,7 @@ project ( SQLCppBridge
 
 include(ExternalProject)
 set(SQLITE_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/sqlite)
-set(SQLITE_SCRIPT_LOCATION ${CMAKE_CURRENT_LIST_DIR}/Support/sqlite)
-set(SQLITE_SCRIPT_FILE ${SQLITE_SCRIPT_LOCATION}/CMakeLists.txt)
+set(SQLITE_SCRIPT_FILE ${CMAKE_CURRENT_LIST_DIR}/Support/sqlite/CMakeLists.txt)
 
 ExternalProject_Add(sqlite
     URL https://www.sqlite.org/2020/sqlite-amalgamation-3330000.zip
@@ -20,10 +19,9 @@ ExternalProject_Add(sqlite
 )
 
 ExternalProject_Get_Property(sqlite SOURCE_DIR)
-set(SQLITE_SOURCE_DIR ${SOURCE_DIR})
 
 ExternalProject_Add_Step(sqlite CopyCMake
-    COMMAND ${CMAKE_COMMAND} -E copy "${SQLITE_SCRIPT_FILE}" "${SQLITE_SOURCE_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy "${SQLITE_SCRIPT_FILE}" "${SOURCE_DIR}"
     DEPENDEES patch
 )
 
@@ -60,7 +58,11 @@ MESSAGE ( STATUS "Build framework:        " ${BUILD_FRAMEWORK} )
 MESSAGE ( STATUS "Build require sqlite:   " ${REQUIRE_SQLITE} )
 MESSAGE ( STATUS "----" )
 
-add_dependencies(${PROJECT_NAME} sqlite)
+if ( REQUIRE_SQLITE )
+    include_directories(${SQLITE_INSTALL_LOCATION}/include)
+    add_dependencies(${PROJECT_NAME} sqlite)
+endif()
+
 add_library ( lib::SQLCppBridge ALIAS ${PROJECT_NAME} )
 
 target_compile_features ( ${PROJECT_NAME}
@@ -79,17 +81,17 @@ set_target_properties( ${PROJECT_NAME} PROPERTIES
   CXX_STANDARD      14
   PUBLIC_HEADER     "${HEADERS}" )
 
-if ( REQUIRE_SQLITE ) 
-  find_package ( SQLite3 )
+if ( REQUIRE_SQLITE )
+#  find_package ( SQLite3 )
 
   if ( BUILD_SHARED )
     target_link_libraries (
       ${PROJECT_NAME}
-        PRIVATE SQLite::SQLite3 ) # link right into the shared library
+        PRIVATE sqlite ) # link right into the shared library
   else()
     target_link_libraries (
       ${PROJECT_NAME}
-        INTERFACE SQLite::SQLite3 ) # just set as requirement for clients
+        INTERFACE sqlite ) # just set as requirement for clients
   endif()
 endif()
 
