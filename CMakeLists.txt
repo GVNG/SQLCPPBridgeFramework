@@ -9,6 +9,24 @@ project ( SQLCppBridge
   HOMEPAGE_URL "${project_homepage}"
   LANGUAGES    C CXX )
 
+include(ExternalProject)
+set(SQLITE_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/sqlite)
+set(SQLITE_SCRIPT_LOCATION ${CMAKE_CURRENT_LIST_DIR}/Support/sqlite)
+set(SQLITE_SCRIPT_FILE ${SQLITE_SCRIPT_LOCATION}/CMakeLists.txt)
+
+ExternalProject_Add(sqlite
+    URL https://www.sqlite.org/2020/sqlite-amalgamation-3330000.zip
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${SQLITE_INSTALL_LOCATION}
+)
+
+ExternalProject_Get_Property(sqlite SOURCE_DIR)
+set(SQLITE_SOURCE_DIR ${SOURCE_DIR})
+
+ExternalProject_Add_Step(sqlite CopyCMake
+    COMMAND ${CMAKE_COMMAND} -E copy "${SQLITE_SCRIPT_FILE}" "${SQLITE_SOURCE_DIR}"
+    DEPENDEES patch
+)
+
 # possible options
 option ( BUILD_SHARED    "Build shared library instead of static" OFF )
 option ( BUILD_FRAMEWORK "Build framework" OFF )
@@ -42,6 +60,7 @@ MESSAGE ( STATUS "Build framework:        " ${BUILD_FRAMEWORK} )
 MESSAGE ( STATUS "Build require sqlite:   " ${REQUIRE_SQLITE} )
 MESSAGE ( STATUS "----" )
 
+add_dependencies(${PROJECT_NAME} sqlite)
 add_library ( lib::SQLCppBridge ALIAS ${PROJECT_NAME} )
 
 target_compile_features ( ${PROJECT_NAME}
