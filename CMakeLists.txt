@@ -92,4 +92,4 @@ endif()
 # installation
 install ( TARGETS ${PROJECT_NAME} ARCHIVE DESTINATION lib
     PUBLIC_HEADER DESTINATION include/sqlcppbridge)
-install (DIRECTORY ${SQLITE_INSTALL_LOCATION}/include DESTINATION include/sqlcppbridge)
+install (DIRECTORY ${SQLITE_INSTALL_LOCATION}/include/ DESTINATION include/sqlcppbridge)
