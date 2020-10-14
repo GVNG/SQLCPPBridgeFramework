@@ -40,10 +40,8 @@ file ( GLOB_RECURSE HEADERS "SQLBridge/include/*.h" )
 if ( BUILD_SHARED )
   add_library ( ${PROJECT_NAME} SHARED "${ALL_SRC}" "${HEADERS}" )  
   set ( REQUIRE_SQLITE ON ) # sqlite linkage is required for shared library
-  set (TYPE SHARED_LIBRARY)
 else()
   add_library ( ${PROJECT_NAME} STATIC "${ALL_SRC}" "${HEADERS}" )  
-  set (TYPE STATIC_LIBRARY)
 endif()
 
 
