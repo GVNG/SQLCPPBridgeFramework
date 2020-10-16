@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "SQLCppBridge"
-  spec.version      = "v1.0.6"
+  spec.version      = "1.0.6"
   spec.summary      = "Simplification of using SQL from C++ code"
 
   # This description is used to generate tags and improve search results.
@@ -83,7 +83,7 @@ intervention and any improvements on the outside.
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  spec.source       = { :git => "https://github.com/GVNG/SQLCPPBridgeFramework.git", :tag => "#{spec.version}" }
+  spec.source       = { :git => "https://github.com/GVNG/SQLCPPBridgeFramework.git", :tag => "v#{spec.version}" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
