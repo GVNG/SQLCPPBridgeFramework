@@ -83,7 +83,7 @@ intervention and any improvements on the outside.
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  spec.source       = { :git => "https://github.com/GVNG/SQLCPPBridgeFramework.git", :tag => "v#{spec.version}" }
+  spec.source       = { :git => "https://github.com/GVNG/SQLCPPBridgeFramework.git" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
