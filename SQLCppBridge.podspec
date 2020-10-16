@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "SQLCppBridge"
-  spec.version      = "1.0.6"
+  spec.version      = "v1.0.6"
   spec.summary      = "Simplification of using SQL from C++ code"
 
   # This description is used to generate tags and improve search results.
@@ -137,7 +137,6 @@ intervention and any improvements on the outside.
 
 
   # spec.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
-  # spec.dependency "JSONKit", "~> 1.4"
   spec.dependency "sqlite3"
 
 end
