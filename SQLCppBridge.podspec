@@ -68,10 +68,10 @@ intervention and any improvements on the outside.
   #
 
   # spec.platform     = :ios
-  spec.platform     = :ios, "11.0"
+  spec.platform     = :ios, "12.0"
 
   #  When using multiple platforms
-  spec.ios.deployment_target = "11.0"
+  spec.ios.deployment_target = "12.0"
   spec.osx.deployment_target = "10.11"
   spec.watchos.deployment_target = "5.0"
   # spec.tvos.deployment_target = "9.0"
@@ -83,7 +83,7 @@ intervention and any improvements on the outside.
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  spec.source       = { :git => "https://github.com/GVNG/SQLCPPBridgeFramework.git", :tag => "#{spec.version}" }
+  spec.source       = { :git => "https://github.com/GVNG/SQLCPPBridgeFramework.git", :tag => "v1.0.6" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -135,7 +135,8 @@ intervention and any improvements on the outside.
 
   # spec.requires_arc = true
 
+
   # spec.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
-  # spec.dependency "JSONKit", "~> 1.4"
+  spec.dependency "sqlite3"
 
 end
