@@ -83,7 +83,7 @@ if ( REQUIRE_SQLITE )
   else()
     target_link_libraries (
       ${PROJECT_NAME}
-        INTERFACE sqlite ) # just set as requirement for clients
+        INTERFACE ${SQLITE_LIB_NAME} ) # just set as requirement for clients
   endif()
 endif()
 
@@ -93,4 +93,5 @@ install ( TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib
 
 if ( REQUIRE_SQLITE )
     install (DIRECTORY ${SQLITE_INSTALL_LOCATION}/include/ DESTINATION include/sqlcppbridge)
+    install (DIRECTORY ${SQLITE_INSTALL_LOCATION}/lib/ DESTINATION lib)
 endif()
