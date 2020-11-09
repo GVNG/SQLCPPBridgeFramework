@@ -1,11 +1,10 @@
 PROJECT(sqlite3)
-cmake_minimum_required(VERSION 2.8)
-
-
+cmake_minimum_required(VERSION 3.15)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
-add_library(sqlite3 STATIC sqlite3.c sqlite3.h sqlite3ext.h)
-#set_target_properties(sqlite PROPERTIES OUTPUT_NAME sqlite3)
+add_library(${PROJECT_NAME} STATIC sqlite3.c sqlite3.h sqlite3ext.h)
+
+#set_target_properties(sqlite PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 
 add_definitions(-DSQLITE_ENABLE_RTREE)
 add_definitions(-DSQLITE_ENABLE_FTS4)
@@ -19,4 +18,4 @@ add_definitions(-DSQLITE_ENABLE_STAT4)
 
 
 install(FILES sqlite3.h sqlite3ext.h DESTINATION include)
-install(TARGETS sqlite3 ARCHIVE DESTINATION lib)
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)

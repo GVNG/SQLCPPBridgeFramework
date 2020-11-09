@@ -12,6 +12,7 @@ project ( SQLCppBridge
 include(ExternalProject)
 set(SQLITE_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/sqlite)
 set(SQLITE_SCRIPT_FILE ${CMAKE_CURRENT_LIST_DIR}/Support/sqlite/CMakeLists.txt)
+set(SQLITE_LIB_NAME ${SQLITE_INSTALL_LOCATION}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}sqlite3${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 ExternalProject_Add(sqlite
     URL https://www.sqlite.org/2020/sqlite-amalgamation-3330000.zip
@@ -38,7 +39,7 @@ file ( GLOB_RECURSE ALL_SRC "SQLBridge/src/*.cpp" )
 file ( GLOB_RECURSE HEADERS "SQLBridge/include/*.h" )
 
 if ( BUILD_SHARED )
-  add_library ( ${PROJECT_NAME} SHARED "${ALL_SRC}" "${HEADERS}" )  
+  add_library ( ${PROJECT_NAME} SHARED "${ALL_SRC}" "${HEADERS}" )
   set ( REQUIRE_SQLITE ON ) # sqlite linkage is required for shared library
 else()
   add_library ( ${PROJECT_NAME} STATIC "${ALL_SRC}" "${HEADERS}" )  
@@ -72,17 +73,13 @@ set_target_properties( ${PROJECT_NAME} PROPERTIES
   FRAMEWORK ${BUILD_FRAMEWORK}
   FRAMEWORK_VERSION C
   VERSION           ${project_version}
-  SOVERSION         1.0.0
   CXX_STANDARD      14
   PUBLIC_HEADER     "${HEADERS}" )
 
 if ( REQUIRE_SQLITE )
-#  find_package ( SQLite3 )
 
   if ( BUILD_SHARED )
-    target_link_libraries (
-      ${PROJECT_NAME}
-        PRIVATE sqlite ) # link right into the shared library
+    target_link_libraries (${PROJECT_NAME} ${SQLITE_LIB_NAME}) # link right into the shared library
   else()
     target_link_libraries (
       ${PROJECT_NAME}
@@ -93,4 +90,7 @@ endif()
 # installation
 install ( TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib
     PUBLIC_HEADER DESTINATION include/sqlcppbridge)
-install (DIRECTORY ${SQLITE_INSTALL_LOCATION}/include/ DESTINATION include/sqlcppbridge)
+
+if ( REQUIRE_SQLITE )
+    install (DIRECTORY ${SQLITE_INSTALL_LOCATION}/include/ DESTINATION include/sqlcppbridge)
+endif()
