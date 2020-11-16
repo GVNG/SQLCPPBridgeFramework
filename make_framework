@@ -108,6 +108,9 @@ make || exit 15
 export ARCH="i386"
 make clean
 make || exit 16
+export ARCH="arm64"
+make clean
+make || exit 17
 unset DEVPATH
 unset ARCH
 unset TOS
@@ -120,6 +123,7 @@ cp -R "SQLBridge/include/." "$FRAMEWORK/Headers"
 
 lipo -arch i386 "out/$FRAMEWORK_NAME-osx-i386.a" \
      -arch x86_64 "out/$FRAMEWORK_NAME-osx-x86_64.a" \
+     -arch arm64 "out/$FRAMEWORK_NAME-osx-arm64.a" \
      -create -output "$FRAMEWORK/$FRAMEWORK_NAME"
 
 rm -r ./out
