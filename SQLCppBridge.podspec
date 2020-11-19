@@ -137,6 +137,6 @@ intervention and any improvements on the outside.
 
 
   # spec.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
-  spec.dependency "sqlite3"
+  spec.library = 'sqlite3'
 
 end
