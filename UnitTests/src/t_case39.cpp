@@ -37,7 +37,7 @@ TEST_F(DBFixture, Case39)
     Case39 dst,src(10);
     cont.save(src);
     cont.load(0,dst);
-    dst.search("%1-1%", cont);
-    src.deflate("1-1");
+    dst.search("%1\\%-1%", cont);
+    src.deflate("1%-1");
     ASSERT_EQ(src,dst);
 }
