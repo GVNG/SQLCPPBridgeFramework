@@ -46,7 +46,7 @@ public:
         {};
     Case39Member(int iv, long k)
         : ival_(iv)
-        , value_(sql_bridge::to_string() << "a" << iv+1 << "%-" << k)
+        , value_(sql_bridge::to_string() << "a" << iv+1 << "-" << k)
         {};
     inline bool operator == (Case39Member const& rv) const {return ival_==rv.ival_ && value_==rv.value_;}
     inline bool operator == (std::string const& tx) const {return value_.find(tx)==std::string::npos;}
