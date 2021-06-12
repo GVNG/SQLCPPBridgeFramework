@@ -174,16 +174,6 @@ namespace sql_bridge
             do {std::this_thread::yield();} while(ready_);
         }
         
-        local_storage(local_storage&& src)
-            : ready_(0)
-            , root_path_(std::move(src.root_path_))
-        {
-            std::lock_guard<std::mutex> lk(src.data_section_access_);
-            proc_queue_ = std::move(src.proc_queue_);
-            proc_thread_ = std::move(src.proc_thread_);
-            proc_flush_thread_ = std::move(src.proc_flush_thread_);
-        }
-        
         ~local_storage()
         {
             proc_queue_->shutdown();
