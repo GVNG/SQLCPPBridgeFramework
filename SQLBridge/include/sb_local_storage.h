@@ -175,12 +175,13 @@ namespace sql_bridge
         }
         
         local_storage(local_storage&& src)
-            : ready_(std::move(src.ready_))
+            : ready_(0)
             , root_path_(std::move(src.root_path_))
-            , proc_queue_(std::move(src.proc_queue_))
-            , proc_thread_(std::move(src.proc_thread_))
-            , proc_flush_thread_(std::move(src.proc_flush_thread_))
         {
+            std::lock_guard<std::mutex> lk(src.data_section_access_);
+            proc_queue_ = std::move(src.proc_queue_);
+            proc_thread_ = std::move(src.proc_thread_);
+            proc_flush_thread_ = std::move(src.proc_flush_thread_);
         }
         
         ~local_storage()
@@ -272,9 +273,9 @@ namespace sql_bridge
         interlocked<size_t> ready_;
         mt_event shutdown_;
         std::string root_path_;
+        std::mutex data_section_access_;
         data_sections_map data_sections_;
         sections_cache section_keepers_;
-        std::mutex data_section_access_;
         db_proc_queue_ptr proc_queue_;
         std::thread proc_thread_,proc_flush_thread_;
         // methods
