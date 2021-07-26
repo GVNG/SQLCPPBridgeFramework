@@ -125,15 +125,16 @@ namespace sql_bridge
     
     class mt_event
     {
+        typedef std::lock_guard<std::mutex> lock_guard;
     public:
         mt_event() {};
         mt_event(mt_event const&) = delete;
         mt_event(mt_event&& v) = delete;
 
-        inline void fire() {std::lock_guard<std::mutex> lk(mtx_);var_.notify_one();}
-        inline void fire_all() {std::lock_guard<std::mutex> lk(mtx_);var_.notify_all();}
-        template<typename T> inline bool wait_for(T const& dl) {std::lock_guard<std::mutex> lk(mtx_);return var_.wait_for(mtx_, dl)==std::cv_status::no_timeout;}
-        inline void wait() {std::lock_guard<std::mutex> lk(mtx_);var_.wait(mtx_);}
+        inline void fire() {lock_guard lk(mtx_);var_.notify_one();}
+        inline void fire_all() {lock_guard lk(mtx_);var_.notify_all();}
+        template<typename T> inline bool wait_for(T const& dl) {lock_guard lk(mtx_);return var_.wait_for(mtx_, dl)==std::cv_status::no_timeout;}
+        inline void wait() {lock_guard lk(mtx_);var_.wait(mtx_);}
     private:
         std::mutex mtx_;
         std::condition_variable_any var_;
@@ -141,6 +142,7 @@ namespace sql_bridge
 
     template<typename T> class interlocked
     {
+        typedef std::lock_guard<std::mutex> lock_guard;
     public:
         typedef T type;
         interlocked(type const& v)
@@ -148,14 +150,14 @@ namespace sql_bridge
             {}
         inline operator type() const
         {
-            std::lock_guard<std::mutex> lk(mtx_);
+            lock_guard lk(mtx_);
             return val_;
         }
-        inline type operator = (type const& v){std::lock_guard<std::mutex> lk(mtx_);val_ = v;return val_;}
-        inline type operator ++ () {std::lock_guard<std::mutex> lk(mtx_);return ++val_;}
-        inline type operator ++ (int) {std::lock_guard<std::mutex> lk(mtx_);return val_++;}
-        inline type operator -- () {std::lock_guard<std::mutex> lk(mtx_);return --val_;}
-        inline type operator -- (int) {std::lock_guard<std::mutex> lk(mtx_);return val_--;}
+        inline type operator = (type const& v){lock_guard lk(mtx_);val_ = v;return val_;}
+        inline type operator ++ () {lock_guard lk(mtx_);return ++val_;}
+        inline type operator ++ (int) {lock_guard lk(mtx_);return val_++;}
+        inline type operator -- () {lock_guard lk(mtx_);return --val_;}
+        inline type operator -- (int) {lock_guard lk(mtx_);return val_--;}
 
     private:
         interlocked() = delete;
