@@ -60,6 +60,58 @@ namespace sql_bridge
     using to_string = _t_to_string<std::string>;
     using to_wstring = _t_to_string<std::wstring>;
 
+    template<typename T> class protected_section
+    {
+        typedef typename std::decay<typename std::remove_pointer<T>::type>::type type;
+        template<bool,typename TInt> struct check_for_container {typedef TInt value_type;};
+        template<typename TInt> struct check_for_container<true,TInt> {typedef typename TInt::value_type value_type;};
+        typedef typename check_for_container<is_any_container<type>::value,type>::value_type init_type;
+        typedef std::unique_ptr<type> pointer_type;
+        typedef std::lock_guard<std::mutex> lock_guard;
+    public:
+        class access
+        {
+            friend protected_section;
+        public:
+            access(protected_section const& src)
+                : guard_(src.access_)
+                , value_(src.pointer_.get())
+                , mt_value_(nullptr)
+                {}
+            access(protected_section& src)
+                : guard_(src.access_)
+                , value_(src.pointer_.get())
+                , mt_value_(src.pointer_.get())
+                {}
+            inline bool empty() const {return !value_;}
+            inline type const& data() const {return *value_;}
+            inline type& mutable_data() {assert(mt_value_);return *mt_value_;}
+        private:
+            lock_guard guard_;
+            type const* value_;
+            type* mt_value_;
+        };
+        inline protected_section()
+            : pointer_(std::make_unique<type>())
+            {};
+        protected_section(protected_section const&) = delete;
+        protected_section(protected_section&&) = delete;
+        
+        explicit inline protected_section(type&& src)
+            : pointer_(std::make_unique<type>(std::move(src)))
+            {}
+        explicit inline protected_section(type const& src)
+            : pointer_(std::make_unique<type>(src))
+            {}
+        inline protected_section(std::initializer_list<init_type> src)
+            : pointer_(std::make_unique<type>(src))
+            {}
+        ~protected_section() {lock_guard lk(access_);pointer_.reset();}
+    private:
+        mutable std::mutex access_;
+        pointer_type pointer_;
+    };
+
 };
 
 #endif /* sb_core_h */
