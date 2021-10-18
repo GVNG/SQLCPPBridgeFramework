@@ -98,7 +98,7 @@ intervention and any improvements on the outside.
   #spec.exclude_files = "Classes/Exclude"
 
   spec.public_header_files = "SQLBridge/include/*.h"
-  spec.compiler_flags = '-std=gnu++14'
+  spec.xcconfig = {"CLANG_CXX_LANGUAGE_STANDARD" => "c++14", "CLANG_CXX_LIBRARY" => "libc++"}
 
   # ――― Resources ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
@@ -137,6 +137,6 @@ intervention and any improvements on the outside.
 
 
   # spec.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
-  spec.library = 'sqlite3'
+  spec.libraries = 'sqlite3'
 
 end
