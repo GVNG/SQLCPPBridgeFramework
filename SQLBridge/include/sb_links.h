@@ -52,6 +52,7 @@ namespace sql_bridge
     struct statements_set
     {
         std::string create_;
+        std::string drop_table_;
         string_container indexes_;
         string_container trigger_;
         std::string insert_;
@@ -90,6 +91,7 @@ namespace sql_bridge
         inline void update_for_create_statement(std::string const& stm) {statements_.create_ = stm;}
         inline void update_for_index_statement(std::string const& stm) {statements_.indexes_.push_back(stm);}
         inline void update_for_trigger_statement(std::string const& stm) {statements_.trigger_.push_back(stm);}
+        inline void update_for_drop_table_statement(std::string const& stm) {statements_.drop_table_ = stm;}
         inline void update_for_insert_statement(std::string const& stm) {statements_.insert_ = stm;}
         inline void update_for_remove_statement(std::string const& stm) {statements_.remove_ = stm;}
         inline void update_for_remove_rel_statement(std::string const& stm) {statements_.remove_rel_ = stm;}

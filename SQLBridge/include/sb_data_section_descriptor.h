@@ -168,16 +168,25 @@ namespace sql_bridge
             : TStrategy::sql_file
             , TStrategy::sql_file::transactions_lock
         {
-            updater(std::string const& fname)
+            updater(std::string const& fname,string_container const& drps)
                 : TStrategy::sql_file(fname)
                 , TStrategy::sql_file::transactions_lock((typename TStrategy::sql_file const&)*this)
+                , drop_statements_(drps)
                 {};
             void upgrade_structure(size_t from, size_t to);
+            inline void drop_all()
+            {
+                for(auto const& cmd : drop_statements_)
+                    TStrategy::sql_file::execute(cmd);
+            }
+            string_container const& drop_statements_;
         };
 
         void update(std::string const& fname, size_t from, size_t to) const
         {
-            updater fl(fname);
+            string_container rmsttm;
+            get_drop_all_statements(rmsttm);
+            updater fl(fname,rmsttm);
             fl.upgrade_structure(from, to);
         }
         

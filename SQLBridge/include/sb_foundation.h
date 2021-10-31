@@ -68,6 +68,7 @@ namespace sql_bridge
         void apply_links(class_links_container const&);
 
         void get_create_statements(string_container&) const;
+        void get_drop_all_statements(string_container&) const;
         
         template<typename TFn> bool has_description() const
         {
@@ -88,6 +89,7 @@ namespace sql_bridge
         member_for_index_ref lookup_for_key_mode(class_link&,std::string const&,std::string const&,size_t_set) const;
         void dump_statements(class_link const&,std::string const&) const;
         void get_create_statements(class_link const&,string_container&) const;
+        void get_drop_all_statements(class_link const&,string_container&) const;
         // members
         size_t version_;
         std::string section_name_;

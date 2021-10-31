@@ -52,6 +52,9 @@ DEFINE_SQL_TABLE(attaches, Case1Attach)
 
 DEFINE_SQL_DATABASE(case1 /*name of context*/, 1 /*current version*/, Case1, Case1Related, Case1Attach)::upgrade_structure(size_t from, size_t to)
 {
+    if (from)
+        drop_all();
+    
     // ------------------------------------------------------------------------------------
     // you can place here the upgrade script from the 'from' to the 'to' version
     // something like below, or whatever SQL statements you want
