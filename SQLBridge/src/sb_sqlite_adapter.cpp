@@ -371,6 +371,9 @@ namespace sql_bridge
         crts.remove_from_tail(1);
         crts << ")";
         dp.update_for_create_statement(crts);
+        
+        dp.update_for_drop_table_statement(to_string() << "DROP TABLE " << dp.table_name());
+        
         for(auto const& isr : dp.should_create_indexes())
         {
             to_string idts;

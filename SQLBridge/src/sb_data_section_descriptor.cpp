@@ -201,7 +201,7 @@ namespace sql_bridge
                 throw sql_bridge_error(g_internal_error_text,g_architecture_error_text);
             if (tids_in_proc.find(chl.source_id())!=tids_in_proc.end())
             {
-                throw sql_bridge_error("Recursive dependencies don't support yet","You should wait the next releases or simplificate your object model.");
+                throw sql_bridge_error("Recursive dependencies don't support yet", "You should wait the next releases or simplificate your object model.");
                 
 //                ret = member_for_index_ref(e_db_key_mode::None,to_string() << "sqlcpp_recursive_field");
 //                dp.add_field({ret.name(),def_recursive_type,false,true});
@@ -223,6 +223,25 @@ namespace sql_bridge
                 throw sql_bridge_error(to_string() << "Unspecified table with name \"" << cn.table_name() <<"\"","You should use the DEFINE_SQL_DATABASE macro somewhere in your code");
             pos->second->update_for_depends(cn);
         }
+    }
+    
+    void data_section_descriptor::get_drop_all_statements(string_container &dst) const
+    {
+        for(auto const& cn : classes_map_)
+        {
+            if (cn.second->depends().empty()) continue;
+            dst.push_back(cn.second->depends().statements().drop_table_);
+            
+            for(auto const& tr : cn.second->depends().target())
+                get_drop_all_statements(tr, dst);
+        }
+    }
+    
+    void data_section_descriptor::get_drop_all_statements(class_link const& lnk, string_container &dst) const
+    {
+        dst.push_back(lnk.statements().drop_table_);
+        for(auto const& tr : lnk.target())
+            get_drop_all_statements(tr, dst);
     }
     
     void data_section_descriptor::get_create_statements(string_container &dst) const
@@ -296,6 +315,7 @@ namespace sql_bridge
             std::cerr << std::endl;
         else
             std::cerr << "  // optional: " << stm.select_app_ << std::endl;
+        std::cerr << pref << "       drop: " << stm.drop_table_ << std::endl;
 
         std::cerr << pref << std::endl;
         for(size_t i=0; i<src.target().size(); ++i)
