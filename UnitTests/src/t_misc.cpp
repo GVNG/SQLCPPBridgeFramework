@@ -23,8 +23,8 @@ TEST(Core,Optional)
     v3 = 10;
     v4 = 20;
     
-    ASSERT_EQ(v1<v2,true);
-    ASSERT_EQ(v2<v1,true);
+    ASSERT_EQ(v1<v2,false);
+    ASSERT_EQ(v2<v1,false);
     
     ASSERT_EQ(v3<v4,true);
     ASSERT_EQ(v4<v3,false);
