@@ -167,10 +167,9 @@ namespace sql_bridge
             : ready_(2)
             , root_path_(path)
             , proc_queue_(std::make_shared<db_queue_entry>(TStrategy::main_db_name(path)))
-            , proc_thread_(std::bind(std::mem_fn(&local_storage::proc),this))
-            , proc_flush_thread_(std::bind(std::mem_fn(&local_storage::proc_flush),this))
-        
         {
+            proc_thread_ = std::thread(std::bind(std::mem_fn(&local_storage::proc),this));
+            proc_flush_thread_ = std::thread(std::bind(std::mem_fn(&local_storage::proc_flush),this));
             do {std::this_thread::yield();} while(ready_);
         }
         
