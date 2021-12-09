@@ -1,11 +1,3 @@
-#
-#  Be sure to run `pod spec lint SQLCppBridge.podspec' to ensure this is a
-#  valid spec and to remove all comments including this before submitting the spec.
-#
-#  To learn more about Podspec attributes see https://guides.cocoapods.org/syntax/podspec.html
-#  To see working Podspecs in the CocoaPods repo see https://github.com/CocoaPods/Specs/
-#
-
 Pod::Spec.new do |spec|
 
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -33,33 +25,8 @@ intervention and any improvements on the outside.
 
   spec.homepage     = "https://github.com/GVNG/SQLCPPBridgeFramework"
   # spec.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
-
-
-  # ―――  Spec License  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  Licensing your code is important. See https://choosealicense.com for more info.
-  #  CocoaPods will detect a license file if there is a named LICENSE*
-  #  Popular ones are 'MIT', 'BSD' and 'Apache License, Version 2.0'.
-  #
-
   spec.license      = "BSD 3-Clause"
-  # spec.license      = { :type => "MIT", :file => "FILE_LICENSE" }
-
-
-  # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  Specify the authors of the library, with email addresses. Email addresses
-  #  of the authors are extracted from the SCM log. E.g. $ git log. CocoaPods also
-  #  accepts just a name if you'd rather not provide an email address.
-  #
-  #  Specify a social_media_url where others can refer to, for example a twitter
-  #  profile URL.
-  #
-
   spec.author             = { "Roman Makhnenko" => "gvng@dataart.com" }
-  # Or just: spec.author    = "Roman Makhnenko"
-  # spec.authors            = { "Roman Makhnenko" => "gvng@dataart.com" }
-  # spec.social_media_url   = "https://twitter.com/Roman Makhnenko"
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
@@ -67,15 +34,13 @@ intervention and any improvements on the outside.
   #  the deployment target. You can optionally include the target after the platform.
   #
 
-  # spec.platform     = :ios
   spec.platform     = :ios, "12.0"
 
   #  When using multiple platforms
   spec.ios.deployment_target = "12.0"
-  spec.osx.deployment_target = "10.11"
+  spec.osx.deployment_target = "10.10"
   spec.watchos.deployment_target = "5.0"
   # spec.tvos.deployment_target = "9.0"
-
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
@@ -84,7 +49,6 @@ intervention and any improvements on the outside.
   #
 
   spec.source       = { :git => "https://github.com/GVNG/SQLCPPBridgeFramework.git", :tag => "v1.0.11" }
-
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
@@ -100,43 +64,12 @@ intervention and any improvements on the outside.
   spec.public_header_files = "SQLBridge/include/*.h"
   spec.xcconfig = {"CLANG_CXX_LANGUAGE_STANDARD" => "c++14", "CLANG_CXX_LIBRARY" => "libc++"}
 
-  # ――― Resources ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  A list of resources included with the Pod. These are copied into the
-  #  target bundle with a build phase script. Anything else will be cleaned.
-  #  You can preserve files from being cleaned, please don't preserve
-  #  non-essential files like tests, examples and documentation.
-  #
-
-  # spec.resource  = "icon.png"
-  # spec.resources = "Resources/*.png"
-
-  # spec.preserve_paths = "FilesToSave", "MoreFilesToSave"
-
-
   # ――― Project Linking ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
   #  Link your library with frameworks, or libraries. Libraries do not include
   #  the lib prefix of their name.
   #
 
-  # spec.framework  = "SomeFramework"
-  # spec.frameworks = "SomeFramework", "AnotherFramework"
-
-  # spec.library   = "iconv"
-  # spec.libraries = "iconv", "xml2"
-
-
-  # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  If your library depends on compiler flags you can set them in the xcconfig hash
-  #  where they will only apply to your library. If you depend on other Podspecs
-  #  you can include multiple dependencies to ensure it works.
-
-  # spec.requires_arc = true
-
-
-  # spec.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
-  spec.libraries = 'sqlite3'
+  spec.library = "sqlite3"
 
 end
