@@ -37,3 +37,15 @@ TEST(Core,Optional)
     ASSERT_EQ(v1.empty(),true);
     ASSERT_EQ(v4.empty(),false);
 }
+
+TEST(Core,TextQuotation)
+{
+    struct t_test : sql_bridge::context_engine
+    {
+        static std::string quotation(std::string const& src) {return sql_bridge::context_engine::make_text_quotation(src);}
+    };
+    
+    ASSERT_EQ(t_test::quotation("test's"),"'test''s'");
+    ASSERT_NE(t_test::quotation("test's"),"test's");
+    ASSERT_EQ(t_test::quotation("aaa"),"'aaa'");
+}

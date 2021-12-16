@@ -96,7 +96,7 @@ namespace sql_bridge
         template<typename T, typename TFn> inline typename std::enable_if<is_convertible_to_text<TFn>::value>::type _where_def(TFn const T::*mem_ptr, std::string const& op, TFn const& val)
         {
             static std::string const field = data_->field_name(mem_ptr);
-            suffixes_.push_back(std::make_shared<suffix_where>(field,to_string() << op << "'" << val << "'"));
+            suffixes_.push_back(std::make_shared<suffix_where>(field,to_string() << op << make_text_quotation(val)));
         }
         template<typename T, typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_def(TFn const T::*mem_ptr, std::string const& op, TFn const& val)
         {
@@ -107,7 +107,7 @@ namespace sql_bridge
         template<typename T, typename TFn> inline typename std::enable_if<is_convertible_to_text<TFn>::value>::type _where_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
         {
             static std::string const field = data_->field_name(mem_ptr);
-            suffixes_.push_back(std::make_shared<suffix_between>(field,to_string() << "'" << from << "'", to_string() << "'" << to << "'", false));
+            suffixes_.push_back(std::make_shared<suffix_between>(field, make_text_quotation(from), make_text_quotation(to), false));
         }
         template<typename T, typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
         {
@@ -117,7 +117,7 @@ namespace sql_bridge
         template<typename T, typename TFn> inline typename std::enable_if<is_convertible_to_text<TFn>::value>::type _where_not_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
         {
             static std::string const field = data_->field_name(mem_ptr);
-            suffixes_.push_back(std::make_shared<suffix_between>(field,to_string() << "'" << from << "'", to_string() << "'" << to << "'", true));
+            suffixes_.push_back(std::make_shared<suffix_between>(field,make_text_quotation(from), make_text_quotation(to), true));
         }
         template<typename T, typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_not_between_def(TFn const T::*mem_ptr, TFn const& from, TFn const& to)
         {
@@ -129,7 +129,7 @@ namespace sql_bridge
         {
             static std::string const field = data_->field_name(mem_ptr_from);
             static std::string const field2 = data_->field_name(mem_ptr_to);
-            suffixes_.push_back(std::make_shared<suffix_between_rev>(field,field2,to_string() << "'" << val << "'", false));
+            suffixes_.push_back(std::make_shared<suffix_between_rev>(field,field2,make_text_quotation(val), false));
         }
         template<typename T, typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_between_def(TFn const& val, TFn const T::*mem_ptr_from, TFn const T::*mem_ptr_to)
         {
@@ -141,7 +141,7 @@ namespace sql_bridge
         {
             static std::string const field = data_->field_name(mem_ptr_from);
             static std::string const field2 = data_->field_name(mem_ptr_to);
-            suffixes_.push_back(std::make_shared<suffix_between_rev>(field,field2,to_string() << "'" << val << "'", true));
+            suffixes_.push_back(std::make_shared<suffix_between_rev>(field,field2,make_text_quotation(val), true));
         }
         template<typename T, typename TFn> inline typename std::enable_if<!is_convertible_to_text<TFn>::value>::type _where_not_between_def(TFn const& val, TFn const T::*mem_ptr_from, TFn const T::*mem_ptr_to)
         {
@@ -154,7 +154,7 @@ namespace sql_bridge
             to_string ts;
             static std::string const field = data_->field_name(mem_ptr);
             for(auto const& v : from)
-                ts << "'" << v << "',";
+                ts << make_text_quotation(v) << ",";
             ts.remove_from_tail(1);
             ts << " ";
             suffixes_.push_back(std::make_shared<suffix_where_in>(field,ts,false));
@@ -174,7 +174,7 @@ namespace sql_bridge
             to_string ts;
             static std::string const field = data_->field_name(mem_ptr);
             for(auto const& v : from)
-                ts << "'" << v << "',";
+                ts << make_text_quotation(v) << ",";
             ts.remove_from_tail(1);
             ts << " ";
             suffixes_.push_back(std::make_shared<suffix_where_in>(field,ts,true));
@@ -263,6 +263,24 @@ namespace sql_bridge
             {
                 suffixes_.clear();
                 return usr;
+            }
+        }
+
+        static std::string make_text_quotation(std::string const& src)
+        {
+            if (src.find('\'')==std::string::npos)
+                return to_string() << "'" << src << "'";
+            else
+            {
+                to_string ret;
+                ret << "'";
+                for(auto const& c : src)
+                {
+                    if (c=='\'') ret << c;
+                    ret << c;
+                }
+                ret << "'";
+                return ret;
             }
         }
     };
