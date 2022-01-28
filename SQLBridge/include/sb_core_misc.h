@@ -175,7 +175,8 @@ namespace sql_bridge
         typedef bool type_optional_flag;
         
         optional_value()
-            : optional_(true)
+            : value_(default_init<value_type>())
+            , optional_(true)
             {};
         explicit optional_value(value_type const& src)
             : value_(src)
@@ -204,14 +205,22 @@ namespace sql_bridge
         inline operator value_type const& () const {return value_;}
         inline void const* values_ptr() const {return &value_;}
         inline value_type const& value() const {return value_;}
-        inline void operator = (optional_value const& src) {value_ = src.value_;optional_ = src.optional_;}
-        inline void operator = (value_type const& src) {value_ = src;optional_ = false;}
-        inline void operator = (optional_value&& src) {optional_ = src.optional_;value_ = std::move(src.value_);}
-        inline void operator = (value_type&& src) {optional_ = false;value_ = std::move(src);}
+        inline void operator = (optional_value const& src) {value_ = src.value_; optional_ = src.optional_;}
+        inline void operator = (value_type const& src) {value_ = src; optional_ = false;}
+        inline void operator = (optional_value&& src) {optional_ = src.optional_; value_ = std::move(src.value_);}
+        inline void operator = (value_type&& src) {optional_ = false; value_ = std::move(src);}
         inline type_optional_flag empty() const {return optional_;}
     private:
         value_type value_;
         type_optional_flag optional_;
+        
+        template<typename _tf> static typename std::enable_if<!std::is_pod<_tf>::value && std::is_default_constructible<_tf>::value,_tf>::type default_init() {return _tf();}
+        template<typename _tf> static typename std::enable_if<std::is_pod<_tf>::value,_tf>::type default_init()
+        {
+            _tf ret;
+            std::memset(&ret, 0, sizeof(ret));
+            return ret;
+        }
     };
 
 };
