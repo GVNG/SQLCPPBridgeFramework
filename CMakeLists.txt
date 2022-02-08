@@ -15,7 +15,7 @@ set(SQLITE_SCRIPT_FILE ${CMAKE_CURRENT_LIST_DIR}/Support/sqlite/CMakeLists.txt)
 set(SQLITE_LIB_NAME ${SQLITE_INSTALL_LOCATION}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}sqlite3${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 ExternalProject_Add(sqlite
-    URL https://www.sqlite.org/2020/sqlite-amalgamation-3330000.zip
+    URL https://www.sqlite.org/2022/sqlite-amalgamation-3370200.zip
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${SQLITE_INSTALL_LOCATION} -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
     PATCH_COMMAND ${CMAKE_COMMAND} -E copy "${SQLITE_SCRIPT_FILE}" "."
 )
