@@ -40,8 +40,6 @@ intervention and any improvements on the outside.
   spec.watchos.deployment_target = "5.0"
   # spec.tvos.deployment_target = "9.0"
 
-  spec.static_framework = true
-  
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
   #  Specify the location from where the source should be retrieved.
