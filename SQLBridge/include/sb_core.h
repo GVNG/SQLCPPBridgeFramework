@@ -41,9 +41,9 @@ namespace sql_bridge
     template<typename T> class _t_to_string
     {
     public:
-        typedef T type;
-        typedef typename T::value_type type_elem;
-        typedef std::basic_ostringstream<type_elem> type_stream;
+        using type = T;
+        using type_elem = typename T::value_type;
+        using type_stream = std::basic_ostringstream<type_elem>;
         
         template<typename TFn> inline _t_to_string& operator << (TFn const& src) {_write(src);return *this;}
         inline operator type() const {return str();}
@@ -62,12 +62,12 @@ namespace sql_bridge
 
     template<typename T> class protected_section
     {
-        typedef typename std::decay<typename std::remove_pointer<T>::type>::type type;
+        using type = typename std::decay<typename std::remove_pointer<T>::type>::type;
         template<bool,typename TInt> struct check_for_container {typedef TInt value_type;};
         template<typename TInt> struct check_for_container<true,TInt> {typedef typename TInt::value_type value_type;};
-        typedef typename check_for_container<is_any_container<type>::value,type>::value_type init_type;
-        typedef std::unique_ptr<type> pointer_type;
-        typedef std::lock_guard<std::mutex> lock_guard;
+        using init_type = typename check_for_container<is_any_container<type>::value,type>::value_type;
+        using pointer_type = std::unique_ptr<type>;
+        using lock_guard = std::lock_guard<std::mutex>;
     public:
         class access
         {

@@ -48,7 +48,7 @@ namespace sql_bridge
         
         class sql_file
         {
-            typedef std::map<std::string,sqlite3_stmt*> _TStatementsMap;
+            using _t_statements_map = std::map<std::string,sqlite3_stmt*>;
         public:
             ~sql_file();
             inline sqlite_int64 last_insert_id() const {return sqlite3_last_insert_rowid(base_);}
@@ -85,7 +85,7 @@ namespace sql_bridge
             void reset_cache() const;
             sqlite3* base_;
             std::string const file_name_;
-            mutable _TStatementsMap statements_cache_;
+            mutable _t_statements_map statements_cache_;
             mutable int err_code_;
         };
         

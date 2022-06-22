@@ -41,9 +41,9 @@ namespace sql_bridge
 {
     
     class data_section_descriptors_bare;
-    typedef std::map<std::string,data_section_descriptors_ptr> data_section_descriptors_map;
-    typedef std::function<void()> _t_init_routine;
-    typedef std::queue<_t_init_routine> _t_init_queue;
+    using data_section_descriptors_map = std::map<std::string,data_section_descriptors_ptr>;
+    using _t_init_routine = std::function<void()>;
+    using _t_init_queue = std::queue<_t_init_routine>;
     
     class data_section_descriptors
     {
@@ -73,8 +73,8 @@ namespace sql_bridge
             _init<T...>(*ret);
             _check_inheritance<T...>(*ret);
             class_links_container rel;
-            typedef typename TStrategy::template sql_types<long long> long_sql;
-            typedef typename TStrategy::template sql_types<std::string> string_sql;
+            using long_sql = typename TStrategy::template sql_types<long long>;
+            using string_sql = typename TStrategy::template sql_types<std::string>;
             ret->prepare_relations(rel,
                                    long_sql::type_name(),
                                    string_sql::type_name());
@@ -144,7 +144,7 @@ namespace sql_bridge
         
         template<typename TFn> inline typename std::enable_if<is_trivial_container<TFn>::value || is_trivial_map<TFn>::value>::type _register_container()
         {
-            typedef _t_container_descriptor<TStrategy,TFn> type;
+            using type = _t_container_descriptor<TStrategy,TFn>;
             size_t code = typeid(TFn).hash_code();
             classes_map_.insert({code,std::make_shared<type>()});
         }
@@ -213,7 +213,7 @@ namespace sql_bridge
     
     template<typename TStrategy, typename TNamesSelector, typename ...T> struct _t_data_section_descriptors_creator
     {
-        typedef _t_data_section_descriptor<TStrategy,TNamesSelector,T...> type;
+        using type = _t_data_section_descriptor<TStrategy,TNamesSelector,T...>;
         _t_data_section_descriptors_creator(std::string const& name, size_t ver)
         {
             std::string locname(name);

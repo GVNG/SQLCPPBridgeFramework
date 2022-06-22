@@ -38,8 +38,8 @@ namespace sql_bridge
 {
     class class_link;
     struct fields_definition;
-    typedef std::vector<class_link> class_links_container;
-    typedef std::vector<fields_definition> fields_definitions_container;
+    using class_links_container = std::vector<class_link>;
+    using fields_definitions_container = std::vector<fields_definition>;
 
     struct fields_definition
     {

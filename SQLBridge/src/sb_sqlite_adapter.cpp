@@ -64,7 +64,7 @@ namespace sql_bridge
     sqlite3_stmt* sqlite_adapter::sql_file::operator[](std::string const& txstm) const
     {
         if (!base_ || txstm.empty()) return nullptr;
-        _TStatementsMap::const_iterator pos = statements_cache_.find(txstm);
+        _t_statements_map::const_iterator pos = statements_cache_.find(txstm);
         if (pos!=statements_cache_.end())
         {
             sqlite3_reset(pos->second);

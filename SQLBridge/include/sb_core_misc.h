@@ -125,7 +125,7 @@ namespace sql_bridge
     
     class mt_event
     {
-        typedef std::unique_lock<std::mutex> lock_guard;
+        using lock_guard = std::unique_lock<std::mutex>;
     public:
         mt_event() {};
         mt_event(mt_event const&) = delete;
@@ -142,9 +142,9 @@ namespace sql_bridge
 
     template<typename T> class interlocked
     {
-        typedef std::lock_guard<std::mutex> lock_guard;
+        using lock_guard = std::lock_guard<std::mutex>;
     public:
-        typedef T type;
+        using type = T;
         interlocked(type const& v)
             : val_(v)
             {}
@@ -171,8 +171,8 @@ namespace sql_bridge
     template<typename T> class optional_value
     {
     public:
-        typedef T value_type;
-        typedef bool type_optional_flag;
+        using value_type = T;
+        using type_optional_flag = bool;
         
         optional_value()
             : value_(default_init<value_type>())

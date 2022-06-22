@@ -41,15 +41,15 @@ namespace sql_bridge
     template<typename TStrategy> class local_storage
     {
         class sections_keeper;
-        typedef class _t_db_queue_entry<TStrategy> db_queue_entry;
-        typedef std::shared_ptr<db_queue_entry> db_proc_queue_ptr;
-        typedef std::weak_ptr<db_queue_entry> db_proc_queue_weak_ptr;
-        typedef std::map<std::string,sections_keeper> sections_cache;
+        using db_queue_entry = class _t_db_queue_entry<TStrategy>;
+        using db_proc_queue_ptr = std::shared_ptr<db_queue_entry>;
+        using db_proc_queue_weak_ptr = std::weak_ptr<db_queue_entry>;
+        using sections_cache = std::map<std::string,sections_keeper>;
     private:
         
         template<typename T> class load_task : public db_task
         {
-            typedef typename std::decay<T>::type _t_base;
+            using _t_base = typename std::decay<T>::type;
         public:
             load_task(T const& src, std::string const& key, db_proc_queue_ptr const& trg)
                 : db_task(data_sections_ptr())
@@ -73,7 +73,7 @@ namespace sql_bridge
         
         template<typename T> class save_task : public db_task
         {
-            typedef typename std::decay<T>::type _t_base;
+            using _t_base = typename std::decay<T>::type;
         public:
             save_task(T const& src, std::string const& key, db_proc_queue_ptr const& trg)
                 : db_task(data_sections_ptr())
@@ -101,7 +101,7 @@ namespace sql_bridge
 
         template<typename T,typename TKey> class remove_task : public db_task
         {
-            typedef typename std::decay<T>::type _t_proc_type;
+            using _t_proc_type = typename std::decay<T>::type;
         public:
             remove_task(std::string const& tab, TKey const& key, db_proc_queue_ptr const& trg)
                 : db_task(data_sections_ptr())

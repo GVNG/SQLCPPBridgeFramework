@@ -45,10 +45,10 @@ namespace sql_bridge
     
     class db_task;
     class db_tasks_queue_interface;
-    typedef std::shared_ptr<db_task> db_task_ptr;
-    typedef std::list<db_task_ptr> db_tasks_queue;
-    typedef std::shared_ptr<db_tasks_queue_interface> db_tasks_queue_interface_ptr;
-    typedef std::weak_ptr<db_tasks_queue_interface> db_tasks_queue_interface_weak_ptr;
+    using db_task_ptr = std::shared_ptr<db_task>;
+    using db_tasks_queue = std::list<db_task_ptr>;
+    using db_tasks_queue_interface_ptr = std::shared_ptr<db_tasks_queue_interface>;
+    using db_tasks_queue_interface_weak_ptr = std::weak_ptr<db_tasks_queue_interface>;
     
     class db_tasks_queue_interface
     {

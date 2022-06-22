@@ -37,9 +37,9 @@
 namespace sql_bridge
 {
     class data_section;
-    typedef std::shared_ptr<data_section> data_sections_ptr;
-    typedef std::weak_ptr<data_section> data_sections_weak_ptr;
-    typedef std::map<std::string, data_sections_weak_ptr> data_sections_map;
+    using data_sections_ptr = std::shared_ptr<data_section>;
+    using data_sections_weak_ptr = std::weak_ptr<data_section>;
+    using data_sections_map = std::map<std::string, data_sections_weak_ptr>;
     
     class data_section
     {
@@ -181,7 +181,7 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename types_selector<T>::type type;
+                using type = typename types_selector<T>::type;
                 size_t tid = typeid(type).hash_code();
                 data_update_context_ptr cont(create_context(tid,"",pgsz));
                 for(auto const& el : src)
@@ -198,7 +198,7 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename types_selector<T>::type type;
+                using type = typename types_selector<T>::type;
                 size_t tid = typeid(type).hash_code();
                 data_update_context_ptr cont(create_context(tid,"",pgsz));
                 for(auto const& el : src)
@@ -218,7 +218,7 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename types_selector<T>::type type;
+                using type = typename types_selector<T>::type;
                 size_t tid = typeid(type).hash_code();
                 data_update_context_ptr cont(create_context(tid,"",pgsz));
                 for(auto const& el : src)
@@ -238,7 +238,7 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename types_selector<T>::type type;
+                using type = typename types_selector<T>::type;
                 size_t tid = typeid(type).hash_code();
                 data_update_context_ptr cont(create_context(tid,"",pgsz));
                 for(auto const& el : src)
@@ -287,7 +287,7 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename types_selector<T>::type type;
+                using type = typename types_selector<T>::type;
                 size_t tid = typeid(type).hash_code();
                 data_update_context_ptr cont(create_context(tid,"",range()));
                 for(auto const& el : src)
@@ -304,7 +304,7 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename types_selector<T>::type type;
+                using type = typename types_selector<T>::type;
                 size_t tid = typeid(type).hash_code();
                 data_update_context_ptr cont(create_context(tid,"",range()));
                 for(auto const& el : src)
@@ -324,7 +324,7 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename types_selector<T>::type type;
+                using type = typename types_selector<T>::type;
                 size_t tid = typeid(type).hash_code();
                 data_update_context_ptr cont(create_context(tid,"",range()));
                 for(auto const& el : src)
@@ -344,7 +344,7 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename types_selector<T>::type type;
+                using type = typename types_selector<T>::type;
                 size_t tid = typeid(type).hash_code();
                 data_update_context_ptr cont(create_context(tid,"",range()));
                 for(auto const& el : src)
@@ -403,7 +403,7 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename types_selector<T>::type type;
+                using type = typename types_selector<T>::type;
                 size_t tid = typeid(type).hash_code();
                 data_update_context_ptr cont(create_context(tid,"",range()));
                 cont->remove_all();
@@ -422,7 +422,7 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename types_selector<T>::type type;
+                using type = typename types_selector<T>::type;
                 size_t tid = typeid(type).hash_code();
                 data_update_context_ptr cont(create_context(tid,"",range()));
                 cont->remove_all();
@@ -444,7 +444,7 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename types_selector<T>::type type;
+                using type = typename types_selector<T>::type;
                 size_t tid = typeid(type).hash_code();
                 data_update_context_ptr cont(create_context(tid,"",range()));
                 cont->remove_all();
@@ -463,7 +463,7 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename types_selector<T>::type type;
+                using type = typename types_selector<T>::type;
                 size_t tid = typeid(type).hash_code();
                 data_update_context_ptr cont(create_context(tid,"",range()));
                 cont->remove_all();
@@ -578,9 +578,9 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename is_pointer<typename T::value_type>::type type;
+                using type = typename is_pointer<typename T::value_type>::type;
                 size_t tid = types_selector<T>::destination_id();
-                typedef std::conditional_t<std::is_pointer<typename T::value_type>::value, std::unique_ptr<type>, typename T::value_type> obj_type;
+                using obj_type = std::conditional_t<std::is_pointer<typename T::value_type>::value, std::unique_ptr<type>, typename T::value_type>;
                 data_update_context_ptr cont(create_reader(tid, flt, pgsz));
                 dst.clear();
                 while(cont->is_ok())
@@ -603,7 +603,7 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename T::value_type type;
+                using type = typename T::value_type;
                 size_t tid = types_selector<T>::destination_id();
                 data_update_context_ptr cont(create_reader(tid, flt, pgsz));
                 dst.clear();
@@ -627,9 +627,9 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename T::key_type k_type;
-                typedef typename T::mapped_type m_type;
-                typedef std::conditional_t<std::is_pointer<typename T::mapped_type>::value, std::unique_ptr<typename is_pointer<m_type>::type>, typename T::mapped_type> obj_type;
+                using k_type = typename T::key_type;
+                using m_type = typename T::mapped_type;
+                using obj_type = std::conditional_t<std::is_pointer<typename T::mapped_type>::value, std::unique_ptr<typename is_pointer<m_type>::type>, typename T::mapped_type>;
                 size_t tid = types_selector<T>::destination_id();
                 data_update_context_ptr cont(create_reader(tid, flt, pgsz));
                 dst.clear();
@@ -655,8 +655,8 @@ namespace sql_bridge
             }
             else
             {
-                typedef typename T::key_type k_type;
-                typedef typename T::mapped_type m_type;
+                using k_type = typename T::key_type;
+                using m_type = typename T::mapped_type;
                 size_t tid = typeid(m_type).hash_code();
                 data_update_context_ptr cont(create_reader(tid, flt, pgsz));
                 m_type val;

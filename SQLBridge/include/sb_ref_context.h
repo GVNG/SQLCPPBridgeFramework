@@ -42,7 +42,7 @@ namespace sql_bridge
 
         template<typename T> class save_task : public db_task
         {
-            typedef typename std::decay<T>::type _t_base;
+            using _t_base = typename std::decay<T>::type;
         public:
             save_task(_t_base const* src,
                       data_sections_ptr section,
@@ -66,7 +66,7 @@ namespace sql_bridge
 
         template<typename T> class replace_task : public db_task
         {
-            typedef typename std::decay<T>::type _t_base;
+            using _t_base = typename std::decay<T>::type;
         public:
             replace_task(_t_base const* src,
                          data_sections_ptr section,
@@ -87,7 +87,7 @@ namespace sql_bridge
 
         template<typename T> class load_page_task : public db_task
         {
-            typedef typename std::decay<T>::type _t_base;
+            using _t_base = typename std::decay<T>::type;
         public:
             load_page_task(_t_base* src,
                            data_sections_ptr section,
@@ -117,7 +117,7 @@ namespace sql_bridge
         
         template<typename T> class load_task : public db_task
         {
-            typedef typename std::decay<T>::type _t_base;
+            using _t_base = typename std::decay<T>::type;
         public:
             load_task(_t_base* src,
                       data_sections_ptr section,

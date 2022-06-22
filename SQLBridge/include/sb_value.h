@@ -37,9 +37,9 @@ namespace sql_bridge
 {
     class sql_value;
     struct sql_context_reference;
-    typedef std::vector<sql_value> sql_values_container;
-    typedef std::map<sql_value,sql_value> sql_values_map;
-    typedef std::deque<sql_context_reference> sql_context_references_container;
+    using sql_values_container = std::vector<sql_value>;
+    using sql_values_map = std::map<sql_value,sql_value>;
+    using sql_context_references_container = std::deque<sql_context_reference>;
     
     class sql_value
     {

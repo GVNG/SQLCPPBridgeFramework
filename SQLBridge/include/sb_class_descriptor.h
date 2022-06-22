@@ -79,7 +79,7 @@ namespace sql_bridge
         template<typename TFn> static class_descriptors_ptr create_description() {return _create_description_pub<TFn>();}
         template<typename TFn> static class_descriptors_ptr create_inheritance(class_descriptors_ptr desc)
         {
-            typedef _t_inheritance_descriptor<TStrategy, T, TFn> type;
+            using type = _t_inheritance_descriptor<TStrategy, T, TFn>;
             struct make_shared_enabler : public type {make_shared_enabler(class_descriptors_ptr desc):type(desc){}};
             std::shared_ptr<type> ret(std::make_shared<make_shared_enabler>(desc));
             return ret;
@@ -88,7 +88,7 @@ namespace sql_bridge
     private:
         template<typename TMb, typename TCl> inline static typename std::enable_if<std::is_base_of<TCl, T>::value,class_descriptors_ptr>::type bind(std::string const& fn, TMb TCl::* m, e_db_index_type it = e_db_index_type::None)
         {
-            typedef _t_member_descriptor<TStrategy,TCl,TMb> type;
+            using type = _t_member_descriptor<TStrategy,TCl,TMb>;
             struct make_shared_enabler : public type {make_shared_enabler(std::string const& fn, TMb TCl::* m, e_db_index_type it, class_descriptors_ptr desc) : type(fn,m,it,desc){}};
             std::shared_ptr<type> ret(std::make_shared<make_shared_enabler>(fn,m,it,_create_description<TMb>()));
             return ret;
@@ -121,19 +121,19 @@ namespace sql_bridge
         template<typename TFn> inline static typename std::enable_if<!is_trivial_container<TFn>::value && !is_trivial_map<TFn>::value && !is_container_of_containers<TFn>::value,class_descriptors_ptr>::type _create_containers_description() {return _create_nt_containers_description<TFn>();}
         template<typename TFn> inline static typename std::enable_if<is_container<TFn>::value || is_any_map<TFn>::value,class_descriptors_ptr>::type _create_description_pub()
         {
-            typedef _t_container_descriptor<TStrategy,TFn> type;
+            using type = _t_container_descriptor<TStrategy,TFn>;
             return std::make_shared<type>();
         }
         
         template<typename TFn> inline static typename std::enable_if<!is_optional_or_trivial<TFn>::value && !is_container<TFn>::value && !is_map<TFn>::value,class_descriptors_ptr>::type _create_description_pub()
         {
-            typedef _t_class_descriptor<TStrategy,TFn> type;
+            using type = _t_class_descriptor<TStrategy,TFn>;
             return std::make_shared<type>();
         }
         
         template<typename TFn> inline static typename std::enable_if<!is_optional_or_trivial<TFn>::value && !is_container<TFn>::value && !is_map<TFn>::value,class_descriptors_ptr>::type _create_description()
         {
-            typedef _t_class_descriptor<TStrategy,TFn> type;
+            using type = _t_class_descriptor<TStrategy,TFn>;
             return std::make_shared<type>();
         }
         
@@ -141,7 +141,7 @@ namespace sql_bridge
                                                                      is_trivial_map<TFn>::value ||
                                                                      is_container_of_containers<TFn>::value,class_descriptors_ptr>::type _create_containers_description()
         {
-            typedef _t_container_descriptor<TStrategy,TFn> type;
+            using type = _t_container_descriptor<TStrategy,TFn>;
             return std::make_shared<type>();
         }
         
@@ -149,7 +149,7 @@ namespace sql_bridge
                                                                      is_pointer<typename TFn::value_type>::value &&
                                                                      !is_container_of_containers<TFn>::value,class_descriptors_ptr>::type _create_nt_containers_description()
         {
-            typedef _t_class_descriptor<TStrategy, typename is_pointer<typename TFn::value_type>::type> type;
+            using type = _t_class_descriptor<TStrategy, typename is_pointer<typename TFn::value_type>::type>;
             return std::make_shared<type>(true);
         }
         
@@ -157,7 +157,7 @@ namespace sql_bridge
                                                                      !is_pointer<typename TFn::value_type>::value &&
                                                                      !is_container_of_containers<TFn>::value,class_descriptors_ptr>::type _create_nt_containers_description()
         {
-            typedef _t_class_descriptor<TStrategy, typename TFn::value_type> type;
+            using type = _t_class_descriptor<TStrategy, typename TFn::value_type>;
             return std::make_shared<type>();
         }
 
@@ -165,10 +165,10 @@ namespace sql_bridge
                                                                      is_pointer<typename TFn::mapped_type>::value &&
                                                                      !is_container_of_containers<TFn>::value, class_descriptors_ptr>::type _create_nt_containers_description()
         {
-            typedef typename TFn::key_type key;
-            typedef typename is_pointer<typename TFn::mapped_type>::type mapped;
+            using key = typename TFn::key_type;
+            using mapped = typename is_pointer<typename TFn::mapped_type>::type;
             static_assert(is_sql_acceptable<key>::value, "The key of the maps-like containers must be trivial");
-            typedef _t_class_descriptor<TStrategy,mapped> type;
+            using type = _t_class_descriptor<TStrategy,mapped>;
             return std::make_shared<type>(true);
         }
 
@@ -176,10 +176,10 @@ namespace sql_bridge
                                                                      !is_pointer<typename TFn::mapped_type>::value &&
                                                                      !is_container_of_containers<TFn>::value, class_descriptors_ptr>::type _create_nt_containers_description()
         {
-            typedef typename TFn::key_type key;
-            typedef typename TFn::mapped_type mapped;
+            using key = typename TFn::key_type;
+            using mapped = typename TFn::mapped_type;
             static_assert(is_sql_acceptable<key>::value, "The key of the maps-like containers must be trivial");
-            typedef _t_class_descriptor<TStrategy,mapped> type;
+            using type = _t_class_descriptor<TStrategy,mapped>;
             return std::make_shared<type>();
         }
 
