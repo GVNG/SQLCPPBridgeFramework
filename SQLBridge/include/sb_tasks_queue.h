@@ -86,17 +86,20 @@ namespace sql_bridge
             {}
         void add(db_task_ptr tsk) override
         {
-            std::lock_guard<std::mutex> lck(access_);
-            if (tsk->out_of_band() && !tasks_queue_.empty())
+            tasks_queue_access_.under_guard([this,tsk]()
             {
-                db_tasks_queue::iterator pos = std::find_if(tasks_queue_.begin(),
-                                                            tasks_queue_.end(),
-                                                            [](db_task_ptr ts){return !ts->out_of_band();});
-                tasks_queue_.insert(pos,tsk);
-            }
-            else
-                tasks_queue_.push_back(tsk);
-            new_data_.fire();
+                if (tsk->out_of_band() && !tasks_queue_.empty())
+                {
+                    db_tasks_queue::iterator pos = std::find_if(tasks_queue_.begin(),
+                                                                tasks_queue_.end(),
+                                                                [](db_task_ptr ts){return !ts->out_of_band();});
+                    tasks_queue_.insert(pos,tsk);
+                }
+                else
+                    tasks_queue_.push_back(tsk);
+                return false;
+            });
+            tasks_queue_access_.fire();
         }
         void do_proc(interlocked<size_t>& ready)
         {
@@ -104,33 +107,33 @@ namespace sql_bridge
             for(;;)
             {
                 db_task_ptr task;
+                if (tasks_queue_access_.under_guard([this,&task]()
                 {
-                    std::lock_guard<std::mutex> lck(access_);
                     if (!tasks_queue_.empty())
                     {
                         task = tasks_queue_.front();
                         tasks_queue_.pop_front();
                     }
                     else
-                        if (shutdown_) break;
-                }
+                        if (shutdown_) return true;
+                    return false;
+                })) break;
                 if (task!=nullptr)
                     task->operator()(task.get());
                 else
-                    new_data_.wait();
+                    tasks_queue_access_.wait();
             }
         }
         
         void shutdown()
         {
             shutdown_ = true;
-            new_data_.fire();
+            tasks_queue_access_.fire();
         }
     private:
         bool shutdown_;
         db_tasks_queue tasks_queue_;
-        std::mutex access_;
-        mt_event new_data_;
+        mt_event tasks_queue_access_;
     };
     
 };
