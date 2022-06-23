@@ -46,9 +46,9 @@ namespace sql_bridge
     data_section_descriptors_ptr data_section_descriptors::operator[](std::string const& name)
     {
         proc_init_queue();
-        std::lock_guard<std::mutex> lck(access_);
-        data_section_descriptors_map::const_iterator pos = index_.find(name);
-        if (pos==index_.end())
+        protected_data_section_descriptors_map::access lck(index_);
+        data_section_descriptors_map::const_iterator pos = lck.data().find(name);
+        if (pos==lck.data().end())
             throw sql_bridge_error(to_string() << "The data section with the name \"" << name << "\" doesn't exist",
                                    to_string() << "You should use \"DEFINE_SQL_DATABASE(" << name << "...\" macro somewhere in one of yours compile units");
         return pos->second;
@@ -57,11 +57,11 @@ namespace sql_bridge
     void data_section_descriptors::add_data_section(std::string const& name, data_section_descriptors_ptr sect)
     {
         static std::string const rec("Use the different name");
-        std::lock_guard<std::mutex> lck(access_);
-        data_section_descriptors_map::const_iterator pos = index_.find(name);
-        if (pos!=index_.end())
+        protected_data_section_descriptors_map::access lck(index_);
+        data_section_descriptors_map::const_iterator pos = lck.data().find(name);
+        if (pos!=lck.data().end())
             throw sql_bridge_error(to_string() << "The data section with the name \"" << name << "\" is duplicated", rec);
-        index_.insert({name,sect});
+        lck.mutable_data().insert({name,sect});
     }
   
     void data_section_descriptors::proc_init_queue()

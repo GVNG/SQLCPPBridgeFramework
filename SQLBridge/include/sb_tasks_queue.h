@@ -104,6 +104,7 @@ namespace sql_bridge
         void do_proc(interlocked<size_t>& ready)
         {
             ready--;
+            tasks_queue_access_.wait();
             for(;;)
             {
                 db_task_ptr task;

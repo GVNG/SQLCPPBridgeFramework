@@ -42,6 +42,7 @@ namespace sql_bridge
     
     class data_section_descriptors_bare;
     using data_section_descriptors_map = std::map<std::string,data_section_descriptors_ptr>;
+    using protected_data_section_descriptors_map = protected_section<data_section_descriptors_map>;
     using _t_init_routine = std::function<void()>;
     using _t_init_queue = std::queue<_t_init_routine>;
     
@@ -56,8 +57,7 @@ namespace sql_bridge
         data_section_descriptors() {};
         void proc_init_queue();
         // data
-        data_section_descriptors_map index_;
-        std::mutex access_;
+        protected_data_section_descriptors_map index_;
         _t_init_queue init_queue_;
     };
 

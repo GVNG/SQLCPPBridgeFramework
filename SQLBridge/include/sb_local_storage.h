@@ -45,6 +45,12 @@ namespace sql_bridge
         using db_proc_queue_ptr = std::shared_ptr<db_queue_entry>;
         using db_proc_queue_weak_ptr = std::weak_ptr<db_queue_entry>;
         using sections_cache = std::map<std::string,sections_keeper>;
+        struct _t_sections
+        {
+            data_sections_map sections_;
+            sections_cache keepers_;
+        };
+        using _t_protected_data = protected_section<_t_sections>;
     private:
         
         template<typename T> class load_task : public db_task
@@ -220,17 +226,17 @@ namespace sql_bridge
         {
             struct _t_context_creator : context {_t_context_creator(db_tasks_queue_interface_ptr q, data_sections_ptr ds) : context(q,ds) {}};
             {
-                std::lock_guard<std::mutex> lk(data_section_access_);
-                data_sections_map::iterator pos(data_sections_.find(nm));
-                if (pos!=data_sections_.end() && !pos->second.expired())
+                typename _t_protected_data::access lk(data_);
+                data_sections_map::iterator pos(lk.mutable_data().sections_.find(nm));
+                if (pos!=lk.mutable_data().sections_.end() && !pos->second.expired())
                 {
                     data_sections_ptr sect = pos->second.lock();
-                    section_keepers_.erase(nm);
-                    section_keepers_.insert({nm,sections_keeper(sect)});
+                    lk.mutable_data().keepers_.erase(nm);
+                    lk.mutable_data().keepers_.insert({nm,sections_keeper(sect)});
                     return _t_context_creator(proc_queue_,sect);
                 }
-                data_sections_.erase(nm);
-                section_keepers_.erase(nm);
+                lk.mutable_data().sections_.erase(nm);
+                lk.mutable_data().keepers_.erase(nm);
             }
             db_task_ptr task(std::make_shared< create_task >(nm,proc_queue_,root_path_,fn));
             std::future<void> ret(task->get_future());
@@ -239,20 +245,20 @@ namespace sql_bridge
             ret.get(); // exceptions check
             data_sections_ptr sect(static_cast<create_task*>(task.get())->section());
             {
-                std::lock_guard<std::mutex> lk(data_section_access_);
-                data_sections_map::iterator pos(data_sections_.find(nm));
-                section_keepers_.erase(nm);
-                if (pos!=data_sections_.end() && !pos->second.expired())
+                typename _t_protected_data::access lk(data_);
+                data_sections_map::iterator pos(lk.mutable_data().sections_.find(nm));
+                lk.mutable_data().keepers_.erase(nm);
+                if (pos!=lk.mutable_data().sections_.end() && !pos->second.expired())
                 {
                     data_sections_ptr ls = pos->second.lock();
-                    section_keepers_.insert({nm,sections_keeper(ls)});
+                    lk.mutable_data().keepers_.insert({nm,sections_keeper(ls)});
                     return _t_context_creator(proc_queue_,ls);
                 }
                 else
                 {
-                    data_sections_.erase(nm);
-                    data_sections_.insert({nm,sect});
-                    section_keepers_.insert({nm,sections_keeper(sect)});
+                    lk.mutable_data().sections_.erase(nm);
+                    lk.mutable_data().sections_.insert({nm,sect});
+                    lk.mutable_data().keepers_.insert({nm,sections_keeper(sect)});
                     return _t_context_creator(proc_queue_,sect);
                 }
             }
@@ -262,9 +268,7 @@ namespace sql_bridge
         interlocked<size_t> ready_;
         mt_event shutdown_;
         std::string root_path_;
-        std::mutex data_section_access_;
-        data_sections_map data_sections_;
-        sections_cache section_keepers_;
+        _t_protected_data data_;
         db_proc_queue_ptr proc_queue_;
         std::thread proc_thread_,proc_flush_thread_;
         // methods
@@ -276,11 +280,11 @@ namespace sql_bridge
             ready_--;
             while(!shutdown_.wait_for(std::chrono::seconds(10)))
             {
-                std::lock_guard<std::mutex> lk(data_section_access_);
-                for(typename sections_cache::iterator pos = section_keepers_.begin(); pos!=section_keepers_.end();)
+                typename _t_protected_data::access lk(data_);
+                for(typename sections_cache::iterator pos = lk.mutable_data().keepers_.begin(); pos!=lk.mutable_data().keepers_.end();)
                 {
                     if (pos->second.is_expired())
-                        pos = section_keepers_.erase(pos);
+                        pos = lk.mutable_data().keepers_.erase(pos);
                     else
                         pos++;
                 }
