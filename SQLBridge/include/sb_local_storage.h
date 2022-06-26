@@ -171,6 +171,7 @@ namespace sql_bridge
     public:
         local_storage(std::string const& path)
             : ready_(2)
+            , flush_shutdown_(false)
             , root_path_(path)
             , proc_queue_(std::make_shared<db_queue_entry>(TStrategy::main_db_name(path)))
         {
@@ -183,7 +184,8 @@ namespace sql_bridge
         {
             proc_queue_->shutdown();
             proc_thread_.join();
-            shutdown_.fire();
+            flush_shutdown_ = true;
+            flush_event_.fire();
             proc_flush_thread_.join();
         }
 #pragma mark - save
@@ -266,7 +268,8 @@ namespace sql_bridge
     private:
         // data
         interlocked<size_t> ready_;
-        mt_event shutdown_;
+        bool flush_shutdown_;
+        mt_event flush_event_;
         std::string root_path_;
         _t_protected_data data_;
         db_proc_queue_ptr proc_queue_;
@@ -278,7 +281,7 @@ namespace sql_bridge
         void proc_flush()
         {
             ready_--;
-            while(!shutdown_.wait_for(std::chrono::seconds(10)))
+            while(!flush_event_.wait_for(std::chrono::seconds(10)))
             {
                 typename _t_protected_data::access lk(data_);
                 for(typename sections_cache::iterator pos = lk.mutable_data().keepers_.begin(); pos!=lk.mutable_data().keepers_.end();)
@@ -288,6 +291,7 @@ namespace sql_bridge
                     else
                         pos++;
                 }
+                if (flush_shutdown_) break;
             }
         }
     };
