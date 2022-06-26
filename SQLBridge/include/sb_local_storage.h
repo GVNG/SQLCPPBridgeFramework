@@ -182,11 +182,11 @@ namespace sql_bridge
         
         ~local_storage()
         {
-            proc_queue_->shutdown();
-            proc_thread_.join();
             flush_shutdown_ = true;
             flush_event_.fire();
             proc_flush_thread_.join();
+            proc_queue_->shutdown();
+            proc_thread_.join();
         }
 #pragma mark - save
         
