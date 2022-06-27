@@ -129,19 +129,18 @@ namespace sql_bridge
         using lock_guard = std::lock_guard<std::mutex>;
         using guarded_function = std::function<bool()>;
     public:
-        mt_event() : ready_(false) {};
+        mt_event() {};
         mt_event(mt_event const&) = delete;
         mt_event(mt_event&& v) = delete;
 
-        inline void fire() {{lock_guard lk(mtx_);ready_=true;}var_.notify_one();}
-        inline void fire_all() {{lock_guard lk(mtx_);ready_=true;}var_.notify_all();}
-        template<typename T> inline bool wait_for(T const& dl) {locker lk(mtx_);bool ret = var_.wait_for(lk, dl)==std::cv_status::no_timeout;ready_=false;return ret;}
-        inline void wait() {locker lk(mtx_);var_.wait(lk,[this]{return ready_;});ready_=false;}
+        inline void fire() {var_.notify_one();}
+        inline void fire_all() {var_.notify_all();}
+        template<typename T> inline bool wait_for(T const& dl) {locker lk(mtx_);bool ret = var_.wait_for(lk, dl)==std::cv_status::no_timeout;return ret;}
+        inline void wait() {locker lk(mtx_);var_.wait(lk);}
         inline bool under_guard(guarded_function fn) {lock_guard lk(mtx_);return fn();}
     private:
         std::mutex mtx_;
         std::condition_variable var_;
-        bool ready_;
     };
 
     template<typename T> class interlocked

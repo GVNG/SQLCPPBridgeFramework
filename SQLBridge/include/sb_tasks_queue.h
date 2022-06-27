@@ -97,9 +97,9 @@ namespace sql_bridge
                 }
                 else
                     tasks_queue_.push_back(tsk);
+                tasks_queue_access_.fire();
                 return false;
             });
-            tasks_queue_access_.fire();
         }
         void do_proc(interlocked<size_t>& ready)
         {
