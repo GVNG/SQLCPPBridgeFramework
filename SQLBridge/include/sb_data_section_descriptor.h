@@ -43,22 +43,22 @@ namespace sql_bridge
     class data_section_descriptors_bare;
     using data_section_descriptors_map = std::map<std::string,data_section_descriptors_ptr>;
     using protected_data_section_descriptors_map = protected_section<data_section_descriptors_map>;
-    using _t_init_routine = std::function<void()>;
-    using _t_init_queue = std::queue<_t_init_routine>;
+    using init_routine = std::function<void()>;
+    using init_queue = std::queue<init_routine>;
     
     class data_section_descriptors
     {
     public:
         data_section_descriptors_ptr operator [](std::string const& name);
         void add_data_section(std::string const& name, data_section_descriptors_ptr sect);
-        void add_init(_t_init_routine fn) {init_queue_.push(fn);}
+        void add_init(init_routine fn) {init_queue_.push(std::move(fn));}
         static data_section_descriptors& instance();
     private:
         data_section_descriptors() {};
         void proc_init_queue();
         // data
         protected_data_section_descriptors_map index_;
-        _t_init_queue init_queue_;
+        init_queue init_queue_;
     };
 
     template<typename TStrategy, typename TNamesSelector, typename... T> class _t_data_section_descriptor

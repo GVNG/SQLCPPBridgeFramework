@@ -171,6 +171,11 @@ namespace sql_bridge
         mutable std::mutex mtx_;
     };
     
+    // sqlbridge uses this implementation instead of standard
+    // the reasons are:
+    //      - 'in place' allocation for data
+    //      - 'extra compare rules' for the mixed set of 'optional' and presented data
+    // please use std::optional (C++14) implementation outside the library
     template<typename T> class optional_value
     {
     public:

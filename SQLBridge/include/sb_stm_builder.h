@@ -40,7 +40,7 @@ namespace sql_bridge
     using suffix_bare_ptr = std::shared_ptr<suffix_bare>;
     using suffixes_container = std::vector<suffix_bare_ptr>;
     enum class e_weight {BASE, WHERE, ORDER, LIMIT};
-    enum class e_simple_operator {OR,AND};
+    enum class e_simple_operator {OR, AND};
 
     class suffix_bare
     {

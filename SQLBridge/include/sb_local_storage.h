@@ -45,12 +45,12 @@ namespace sql_bridge
         using db_proc_queue_ptr = std::shared_ptr<db_queue_entry>;
         using db_proc_queue_weak_ptr = std::weak_ptr<db_queue_entry>;
         using sections_cache = std::map<std::string,sections_keeper>;
-        struct _t_sections
+        struct sections_data
         {
             data_sections_map sections_;
             sections_cache keepers_;
         };
-        using _t_protected_data = protected_section<_t_sections>;
+        using protected_data = protected_section<sections_data>;
     private:
         
         template<typename T> class load_task : public db_task
@@ -228,7 +228,7 @@ namespace sql_bridge
         {
             struct _t_context_creator : context {_t_context_creator(db_tasks_queue_interface_ptr q, data_sections_ptr ds) : context(q,ds) {}};
             {
-                typename _t_protected_data::access lk(data_);
+                typename protected_data::access lk(data_);
                 data_sections_map::iterator pos(lk.mutable_data().sections_.find(nm));
                 if (pos!=lk.mutable_data().sections_.end() && !pos->second.expired())
                 {
@@ -247,7 +247,7 @@ namespace sql_bridge
             ret.get(); // exceptions check
             data_sections_ptr sect(static_cast<create_task*>(task.get())->section());
             {
-                typename _t_protected_data::access lk(data_);
+                typename protected_data::access lk(data_);
                 data_sections_map::iterator pos(lk.mutable_data().sections_.find(nm));
                 lk.mutable_data().keepers_.erase(nm);
                 if (pos!=lk.mutable_data().sections_.end() && !pos->second.expired())
@@ -271,7 +271,7 @@ namespace sql_bridge
         bool flush_shutdown_;
         mt_event flush_event_;
         std::string root_path_;
-        _t_protected_data data_;
+        protected_data data_;
         db_proc_queue_ptr proc_queue_;
         std::thread proc_thread_,proc_flush_thread_;
         // methods
@@ -283,8 +283,9 @@ namespace sql_bridge
             ready_--;
             while(!flush_event_.wait_for(std::chrono::seconds(10)))
             {
-                typename _t_protected_data::access lk(data_);
-                for(typename sections_cache::iterator pos = lk.mutable_data().keepers_.begin(); pos!=lk.mutable_data().keepers_.end();)
+                typename protected_data::access lk(data_);
+                for(auto pos = lk.mutable_data().keepers_.begin();
+                    pos!=lk.mutable_data().keepers_.end();)
                 {
                     if (pos->second.is_expired())
                         pos = lk.mutable_data().keepers_.erase(pos);

@@ -46,7 +46,8 @@ namespace sql_bridge
     class db_task;
     class db_tasks_queue_interface;
     using db_task_ptr = std::shared_ptr<db_task>;
-    using db_tasks_queue = std::list<db_task_ptr>;
+    using db_tasks_queue = std::list<db_task_ptr>; // use list instead of the queue because
+                                                   // processing out-of-bound tasks are possible
     using db_tasks_queue_interface_ptr = std::shared_ptr<db_tasks_queue_interface>;
     using db_tasks_queue_interface_weak_ptr = std::weak_ptr<db_tasks_queue_interface>;
     
@@ -91,9 +92,10 @@ namespace sql_bridge
                 if (tsk->out_of_band() && !tasks_queue_.empty())
                     tasks_queue_.insert(std::find_if(tasks_queue_.begin(),
                                                      tasks_queue_.end(),
-                                                     [](db_task_ptr ts){return !ts->out_of_band();}),tsk);
+                                                     [](db_task_ptr const& ts){return !ts->out_of_band();}),
+                                        std::move(tsk));
                 else
-                    tasks_queue_.push_back(tsk);
+                    tasks_queue_.push_back(std::move(tsk));
             });
             tasks_queue_access_.fire();
         }
@@ -108,7 +110,7 @@ namespace sql_bridge
                 tasks_queue_access_.under_guard([this,&task]()
                 {
                     if (tasks_queue_.empty()) return;
-                    task = tasks_queue_.front();
+                    task = std::move(tasks_queue_.front());
                     tasks_queue_.pop_front();
                 });
                 if (task!=nullptr)

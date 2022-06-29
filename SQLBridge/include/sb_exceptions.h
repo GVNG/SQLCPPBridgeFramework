@@ -71,7 +71,7 @@ namespace sql_bridge
         file_sql_error(std::string const& err, std::string const& rs)
             : base_sql_error(err,rs,0)
         {
-            what_ = to_string() << "[FS]: " << err << " \"" << rs << "\"";
+            what_ = to_string() << "[FILE]: " << err << " \"" << rs << "\"";
         };
     };
     
