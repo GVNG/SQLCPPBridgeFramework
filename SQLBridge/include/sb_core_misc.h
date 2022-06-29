@@ -127,17 +127,17 @@ namespace sql_bridge
     {
         using locker = std::unique_lock<std::mutex>;
         using lock_guard = std::lock_guard<std::mutex>;
-        using guarded_function = std::function<bool()>;
+        using guarded_function = std::function<void()>;
     public:
         mt_event() {};
         mt_event(mt_event const&) = delete;
         mt_event(mt_event&& v) = delete;
 
-        inline void fire() {var_.notify_one();}
-        inline void fire_all() {var_.notify_all();}
-        template<typename T> inline bool wait_for(T const& dl) {locker lk(mtx_);bool ret = var_.wait_for(lk, dl)==std::cv_status::no_timeout;return ret;}
+        inline void fire() {lock_guard lk(mtx_);var_.notify_one();}
+        inline void fire_all() {lock_guard lk(mtx_);var_.notify_all();}
+        template<typename T> inline bool wait_for(T const& dl) {locker lk(mtx_);return var_.wait_for(lk, dl)==std::cv_status::no_timeout;}
         inline void wait() {locker lk(mtx_);var_.wait(lk);}
-        inline bool under_guard(guarded_function fn) {lock_guard lk(mtx_);return fn();}
+        inline void under_guard(guarded_function fn) {lock_guard lk(mtx_);fn();}
     private:
         std::mutex mtx_;
         std::condition_variable var_;

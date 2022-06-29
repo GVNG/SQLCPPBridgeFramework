@@ -89,38 +89,33 @@ namespace sql_bridge
             tasks_queue_access_.under_guard([this,tsk]()
             {
                 if (tsk->out_of_band() && !tasks_queue_.empty())
-                {
-                    db_tasks_queue::iterator pos = std::find_if(tasks_queue_.begin(),
-                                                                tasks_queue_.end(),
-                                                                [](db_task_ptr ts){return !ts->out_of_band();});
-                    tasks_queue_.insert(pos,tsk);
-                }
+                    tasks_queue_.insert(std::find_if(tasks_queue_.begin(),
+                                                     tasks_queue_.end(),
+                                                     [](db_task_ptr ts){return !ts->out_of_band();}),tsk);
                 else
                     tasks_queue_.push_back(tsk);
-                tasks_queue_access_.fire();
-                return false;
             });
+            tasks_queue_access_.fire();
         }
         void do_proc(interlocked<size_t>& ready)
         {
             ready--;
             tasks_queue_access_.wait();
-            for(;;)
+            if (!shutdown_)
+                for(;;)
             {
                 db_task_ptr task;
-                if (tasks_queue_access_.under_guard([this,&task]()
+                tasks_queue_access_.under_guard([this,&task]()
                 {
-                    if (!tasks_queue_.empty())
-                    {
-                        task = tasks_queue_.front();
-                        tasks_queue_.pop_front();
-                    }
-                    else
-                        if (shutdown_) return true;
-                    return false;
-                })) break;
+                    if (tasks_queue_.empty()) return;
+                    task = tasks_queue_.front();
+                    tasks_queue_.pop_front();
+                });
                 if (task!=nullptr)
                     task->operator()(task.get());
+                else
+                if (shutdown_)
+                    break;
                 else
                     tasks_queue_access_.wait();
             }
