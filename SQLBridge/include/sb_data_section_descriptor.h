@@ -85,25 +85,20 @@ namespace sql_bridge
         }
 
     private:
-        template<bool> struct _t_var_last_adapter {};
-        template<bool> struct _t_inheritance_adapter {};
 
 #pragma mark - check inheritance
         
-        template<typename... Ts> inline static void _check_inheritance(_t_data_section_descriptor& inst) {inst._check_inheritance<Ts...>(_t_var_last_adapter<sizeof...(Ts)<=2>());}
-        template<typename TFs, typename TSc, typename... Ts> inline void _check_inheritance(_t_var_last_adapter<false>)
+        template<typename... Ts> inline static void _check_inheritance(_t_data_section_descriptor& inst) {inst._check_inheritance<Ts...>(std::integral_constant<bool, sizeof...(Ts)<=2>());}
+        template<typename TFs, typename TSc, typename... Ts> inline void _check_inheritance(std::false_type)
         {
-            _check_inheritance<TFs,TSc>(_t_var_last_adapter<true>());
-            _check_inheritance<TFs,Ts...>(_t_var_last_adapter<sizeof...(Ts)==1>());
-            _check_inheritance<TSc,Ts...>(_t_var_last_adapter<sizeof...(Ts)==1>());
+            _check_inheritance<TFs,TSc>(std::true_type());
+            _check_inheritance<TFs,Ts...>(std::integral_constant<bool, sizeof...(Ts)==1>());
+            _check_inheritance<TSc,Ts...>(std::integral_constant<bool, sizeof...(Ts)==1>());
         }
-        template<typename TFs, typename TSc> inline void _check_inheritance(_t_var_last_adapter<true>)
-        {
-            _check_inheritance<TFs,TSc>(_t_inheritance_adapter<std::is_base_of<TSc, TFs>::value && !std::is_same<TFs, TSc>::value>());
-        }
-        template<typename TFs> inline void _check_inheritance(_t_var_last_adapter<true>) {};
-        template<typename TFs, typename TSc> inline void _check_inheritance(_t_inheritance_adapter<false>) {};
-        template<typename TFs, typename TSc> inline void _check_inheritance(_t_inheritance_adapter<true>)
+        template<typename TFs, typename TSc> inline void _check_inheritance(std::true_type) {_proc_inheritance<TFs,TSc>(std::integral_constant<bool, std::is_base_of<TSc, TFs>::value && !std::is_same<TFs, TSc>::value>());}
+        template<typename TFs> inline void _check_inheritance(std::true_type) {};
+        template<typename TFs, typename TSc> inline void _proc_inheritance(std::false_type) {};
+        template<typename TFs, typename TSc> inline void _proc_inheritance(std::true_type)
         {
             class_descriptors_map::iterator fspos = classes_map_.find(typeid(TFs).hash_code());
             class_descriptors_map::iterator scpos = classes_map_.find(typeid(TSc).hash_code());
@@ -115,12 +110,12 @@ namespace sql_bridge
 
 #pragma mark - init
         
-        template<typename... Ts> inline static void _init(_t_data_section_descriptor& inst) {inst._init<Ts...>(_t_var_last_adapter<sizeof...(Ts)==1>());}
-        template<typename TPar> inline void _init(_t_var_last_adapter<true>) {_register_class<TPar>();}
-        template<typename TPar, typename... Ts> inline void _init(_t_var_last_adapter<false>)
+        template<typename... Ts> inline static void _init(_t_data_section_descriptor& inst) {inst._init<Ts...>(std::integral_constant<bool, sizeof...(Ts)==1>());}
+        template<typename TPar> inline void _init(std::true_type) {_register_class<TPar>();}
+        template<typename TPar, typename... Ts> inline void _init(std::false_type)
         {
-            _init<TPar>(_t_var_last_adapter<true>());
-            _init<Ts...>(_t_var_last_adapter<sizeof...(Ts)==1>());
+            _init<TPar>(std::true_type());
+            _init<Ts...>(std::integral_constant<bool,sizeof...(Ts)==1>());
         }
 
 #pragma mark - register classes
