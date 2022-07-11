@@ -178,6 +178,7 @@ namespace sql_bridge
             proc_thread_ = std::thread(std::bind(std::mem_fn(&local_storage::proc),this));
             proc_flush_thread_ = std::thread(std::bind(std::mem_fn(&local_storage::proc_flush),this));
             do {std::this_thread::yield();} while(ready_);
+            std::this_thread::yield();
         }
         
         ~local_storage()
