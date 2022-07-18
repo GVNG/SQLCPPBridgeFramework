@@ -38,10 +38,11 @@
 
 namespace sql_bridge
 {
-    template<typename TStrategy> class local_storage
+    template<typename Tdb> class local_storage
     {
         class sections_keeper;
-        using db_queue_entry = class _t_db_queue_entry<TStrategy>;
+        using t_strategy = Tdb;
+        using db_queue_entry = class _t_db_queue_entry<t_strategy>;
         using db_proc_queue_ptr = std::shared_ptr<db_queue_entry>;
         using db_proc_queue_weak_ptr = std::weak_ptr<db_queue_entry>;
         using sections_cache = std::map<std::string,sections_keeper>;
@@ -108,8 +109,9 @@ namespace sql_bridge
         template<typename T,typename TKey> class remove_task : public db_task
         {
             using _t_proc_type = typename std::decay<T>::type;
+            using _t_key_type = TKey;
         public:
-            remove_task(std::string const& tab, TKey const& key, db_proc_queue_ptr const& trg)
+            remove_task(std::string const& tab, _t_key_type const& key, db_proc_queue_ptr const& trg)
                 : db_task(data_sections_ptr())
                 , kvdb_(trg)
                 , table_name_(tab)
@@ -124,7 +126,7 @@ namespace sql_bridge
         private:
             db_proc_queue_weak_ptr kvdb_;
             std::string table_name_;
-            TKey key_;
+            _t_key_type key_;
         };
         
         class create_task : public db_task
@@ -173,11 +175,12 @@ namespace sql_bridge
             : ready_(2)
             , flush_shutdown_(false)
             , root_path_(path)
-            , proc_queue_(std::make_shared<db_queue_entry>(TStrategy::main_db_name(path)))
+            , proc_queue_(std::make_shared<db_queue_entry>(t_strategy::main_db_name(path)))
         {
             proc_thread_ = std::thread(std::bind(std::mem_fn(&local_storage::proc),this));
             proc_flush_thread_ = std::thread(std::bind(std::mem_fn(&local_storage::proc_flush),this));
             do {std::this_thread::yield();} while(ready_);
+            std::this_thread::yield();
             std::this_thread::yield();
         }
         
@@ -246,7 +249,6 @@ namespace sql_bridge
             proc_queue_->add(task);
             ret.wait();
             ret.get(); // exceptions check
-            data_sections_ptr sect(static_cast<create_task*>(task.get())->section());
             {
                 typename protected_data::access lk(data_);
                 data_sections_map::iterator pos(lk.mutable_data().sections_.find(nm));
@@ -259,6 +261,7 @@ namespace sql_bridge
                 }
                 else
                 {
+                    data_sections_ptr sect(static_cast<create_task*>(task.get())->section());
                     lk.mutable_data().sections_.erase(nm);
                     lk.mutable_data().sections_.insert({nm,sect});
                     lk.mutable_data().keepers_.insert({nm,sections_keeper(sect)});
