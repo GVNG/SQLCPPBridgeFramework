@@ -249,6 +249,8 @@ namespace sql_bridge
             proc_queue_->add(task);
             ret.wait();
             ret.get(); // exceptions check
+            data_sections_ptr sect(static_cast<create_task*>(task.get())->section());
+            task.reset();
             {
                 typename protected_data::access lk(data_);
                 data_sections_map::iterator pos(lk.mutable_data().sections_.find(nm));
@@ -261,7 +263,6 @@ namespace sql_bridge
                 }
                 else
                 {
-                    data_sections_ptr sect(static_cast<create_task*>(task.get())->section());
                     lk.mutable_data().sections_.erase(nm);
                     lk.mutable_data().sections_.insert({nm,sect});
                     lk.mutable_data().keepers_.insert({nm,sections_keeper(sect)});
