@@ -46,11 +46,7 @@ namespace sql_bridge
         using db_proc_queue_ptr = std::shared_ptr<db_queue_entry>;
         using db_proc_queue_weak_ptr = std::weak_ptr<db_queue_entry>;
         using sections_cache = std::map<std::string,sections_keeper>;
-        struct sections_data
-        {
-            data_sections_map sections_;
-            sections_cache keepers_;
-        };
+        struct sections_data {data_sections_map sections_;sections_cache keepers_;};
         using protected_data = protected_section<sections_data>;
     private:
         
@@ -64,7 +60,7 @@ namespace sql_bridge
                 , def_value_(src)
                 , key_(key)
                 {};
-            void run_task()
+            void run_task() override
             {
                 data_ = def_value_;
                 db_proc_queue_ptr db(kvdb_.lock());
@@ -94,7 +90,7 @@ namespace sql_bridge
                 , data_(std::move(src))
                 , key_(key)
                 {};
-            void run_task()
+            void run_task() override
             {
                 db_proc_queue_ptr db(kvdb_.lock());
                 if (db)
@@ -117,7 +113,7 @@ namespace sql_bridge
                 , table_name_(tab)
                 , key_(key)
                 {};
-            void run_task()
+            void run_task() override
             {
                 db_proc_queue_ptr db(kvdb_.lock());
                 if (db)
@@ -142,14 +138,14 @@ namespace sql_bridge
                 , kvdb_(trg)
                 , fn_change_(fn_change)
                 {};
-            void run_task()
+            void run_task() override
             {
                 db_proc_queue_ptr db(kvdb_.lock());
                 if (db)
                     section_ = db->create_section(name_,path_,fn_change_);
             };
             inline data_sections_ptr section() const {return section_;}
-            bool out_of_band() const {return true;}
+            bool out_of_band() const override {return true;}
         private:
             db_proc_queue_weak_ptr kvdb_;
             std::string name_;
