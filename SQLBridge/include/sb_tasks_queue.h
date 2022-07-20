@@ -128,8 +128,8 @@ namespace sql_bridge
         }
     private:
         bool shutdown_;
-        db_tasks_queue tasks_queue_;
         mt_event tasks_queue_access_;
+        db_tasks_queue tasks_queue_;
     };
     
 };
