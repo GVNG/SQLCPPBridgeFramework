@@ -87,7 +87,7 @@ namespace sql_bridge
             {}
         void add(db_task_ptr tsk) override
         {
-            tasks_queue_access_.under_guard([this,tsk]()
+            tasks_queue_access_.under_guard_and_fire([this,tsk]()
             {
                 if (tsk->out_of_band() && !tasks_queue_.empty())
                     tasks_queue_.insert(std::find_if(tasks_queue_.begin(),
@@ -97,7 +97,6 @@ namespace sql_bridge
                 else
                     tasks_queue_.push_back(std::move(tsk));
             });
-            tasks_queue_access_.fire();
         }
         void do_proc(interlocked<size_t>& ready)
         {

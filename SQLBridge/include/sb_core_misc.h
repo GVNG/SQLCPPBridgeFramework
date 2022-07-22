@@ -138,6 +138,7 @@ namespace sql_bridge
         template<typename T> inline bool wait_for(T const& dl) {locker lk(mtx_);return var_.wait_for(lk, dl)==std::cv_status::no_timeout;}
         inline void wait() {locker lk(mtx_);var_.wait(lk);}
         inline void under_guard(guarded_function fn) {lock_guard lk(mtx_);fn();}
+        inline void under_guard_and_fire(guarded_function fn) {lock_guard lk(mtx_);fn();var_.notify_one();}
     private:
         std::mutex mtx_;
         std::condition_variable var_;
