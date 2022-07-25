@@ -122,8 +122,7 @@ namespace sql_bridge
         
         void shutdown()
         {
-            shutdown_ = true;
-            tasks_queue_access_.fire();
+            tasks_queue_access_.under_guard_and_fire([this](){shutdown_ = true;});
         }
     private:
         bool shutdown_;
