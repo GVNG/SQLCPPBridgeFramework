@@ -100,23 +100,28 @@ namespace sql_bridge
         }
         void do_proc(interlocked<size_t>& ready)
         {
-            ready--;
-            for(;;)
+            bool leadin(true);
+            for(;!shutdown_;)
             {
-                db_task_ptr task;
-                tasks_queue_access_.under_guard([this,&task]()
+                for(;;)
                 {
-                    if (tasks_queue_.empty()) return;
-                    task = std::move(tasks_queue_.front());
-                    tasks_queue_.pop_front();
-                });
-                if (task!=nullptr)
+                    db_task_ptr task;
+                    tasks_queue_access_.under_guard([this,&task]()
+                    {
+                        if (tasks_queue_.empty()) return;
+                        task = std::move(tasks_queue_.front());
+                        tasks_queue_.pop_front();
+                    });
+                    if (!task) break;
                     task->operator()(task.get());
-                else
-                if (shutdown_)
-                    break;
-                else
-                    tasks_queue_access_.wait();
+                }
+                if (shutdown_) break;
+                if (leadin)
+                {
+                    leadin=false;
+                    ready--;
+                }
+                tasks_queue_access_.wait();
             }
         }
         

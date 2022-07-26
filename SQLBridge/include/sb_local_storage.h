@@ -172,9 +172,10 @@ namespace sql_bridge
             , flush_shutdown_(false)
             , root_path_(path)
             , proc_queue_(std::make_shared<db_queue_entry>(t_strategy::main_db_name(path)))
-            , proc_thread_(std::bind(std::mem_fn(&local_storage::proc),this))
-            , proc_flush_thread_(std::bind(std::mem_fn(&local_storage::proc_flush),this))
         {
+            std::this_thread::yield();
+            proc_thread_ = std::thread(std::bind(std::mem_fn(&local_storage::proc),this));
+            proc_flush_thread_ = std::thread(std::bind(std::mem_fn(&local_storage::proc_flush),this));
             do {std::this_thread::yield();} while(ready_);
             std::this_thread::yield();
         }
