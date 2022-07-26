@@ -217,10 +217,10 @@ namespace sql_bridge
         template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load(T* dst, std::string const& flt, size_t* num) const
         {
             db_task_ptr task(std::make_shared< load_task<T> >(dst,data_,flt,references_,root_data_));
-            std::future<void> ret(task->get_future());
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
             {
+                std::future<void> ret(task->get_future());
                 qp->add( task );
                 ret.get();
                 if (num)
@@ -235,10 +235,10 @@ namespace sql_bridge
         template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load_page(range pg, T* dst, std::string const& flt, size_t* num) const
         {
             db_task_ptr task(std::make_shared< load_page_task<T> >(dst,data_,flt,pg,references_,root_data_));
-            std::future<void> ret(task->get_future());
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
             {
+                std::future<void> ret(task->get_future());
                 qp->add( task );
                 ret.get();
                 if (num)
@@ -254,10 +254,10 @@ namespace sql_bridge
         template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _save(range pg, T const* src) const
         {
             db_task_ptr task(std::make_shared< save_task<T> >(src,data_,pg,references_,root_data_));
-            std::future<void> ret(task->get_future());
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
             {
+                std::future<void> ret(task->get_future());
                 qp->add( task );
                 ret.get();
             }
@@ -270,10 +270,10 @@ namespace sql_bridge
         template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _replace(T const* src) const
         {
             db_task_ptr task(std::make_shared< replace_task<T> >(src,data_,references_,root_data_));
-            std::future<void> ret(task->get_future());
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
             {
+                std::future<void> ret(task->get_future());
                 qp->add( task );
                 ret.get();
             }

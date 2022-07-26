@@ -72,7 +72,6 @@ namespace sql_bridge
         data_sections_ptr section_;
     private:
         static void execute(db_task* trg);
-        virtual void ready() {}
         virtual void error(base_sql_error const&) {}
     };
 
@@ -101,7 +100,7 @@ namespace sql_bridge
         void do_proc(interlocked<size_t>& ready)
         {
             bool leadin(true);
-            for(;!shutdown_;)
+            while(!shutdown_)
             {
                 for(;;)
                 {

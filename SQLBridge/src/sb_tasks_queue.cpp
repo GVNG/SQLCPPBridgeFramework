@@ -39,7 +39,6 @@ namespace sql_bridge
         try
         {
             trg->run_task();
-            trg->ready();
         }
         catch (base_sql_error& ex)
         {
