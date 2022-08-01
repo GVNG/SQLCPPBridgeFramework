@@ -34,6 +34,7 @@ CNAME_S := sqlcppbridge
 
 ifdef TOOLCHAIN
 	CC := $(CXX)
+	UNAME_S := Android
 else
 # CC
 ifeq ($(UNAME_S),Darwin)
