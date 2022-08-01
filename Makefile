@@ -53,8 +53,6 @@ TARGETDIR := out
 ifdef INST_ROOT
 	INST_DIR_INC := $(INST_ROOT)/include
 	INST_DIR_LIB := $(INST_ROOT)/lib
-	mkdir -p $(INST_DIR_LIB)
-	mkdir -p $(INST_DIR_IN)
 else
 	INST_DIR_INC := /usr/include
 	INST_DIR_LIB := /usr/lib
@@ -116,6 +114,7 @@ clean:
 
 install:
 	@echo "Installing..."
+	@mkdir -p $(INST_DIR_LIB)
 	@cp $(TARGET) $(INST_DIR_LIB)
 	@mkdir -p $(INST_DIR_INC)/$(CNAME_S)
 	@cp $(INCDIR)/* $(INST_DIR_INC)/$(CNAME_S)/
@@ -125,5 +124,5 @@ uninstall:
 	@rm $(INST_DIR_LIB)/lib$(CNAME_S).a
 	@rm -r $(INST_DIR_INC)/$(CNAME_S)/
 
-.PHONY: clean install
+.PHONY: clean install uninstall
 
