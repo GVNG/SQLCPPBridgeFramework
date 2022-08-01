@@ -96,7 +96,7 @@ ifdef ARCH
 endif
 
 ifdef ANDROID_NDK_ROOT
-	INC += -I $(INST_DIR_INC)
+	INC += -I $(INST_DIR_INC)/sqlite3
 endif
 
 # Platform Specific Compiler Flags
