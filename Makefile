@@ -106,7 +106,7 @@ $(TARGET): $(OBJECTS)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
-	@echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
+	echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 clean:
 	@echo "Cleaning...";
