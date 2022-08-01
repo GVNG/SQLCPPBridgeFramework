@@ -96,7 +96,7 @@ ifdef ARCH
 endif
 
 ifdef ANDROID_NDK_ROOT
-	INC += -I $(INST_DIR_INC)/sqlite3
+	INC += -I $(INST_DIR_INC)
 endif
 
 # Platform Specific Compiler Flags
@@ -117,7 +117,7 @@ $(TARGET): $(OBJECTS)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
-	echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
+	@echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 clean:
 	@echo "Cleaning...";
