@@ -50,6 +50,14 @@ SRCDIR := SQLBridge/src
 BUILDDIR := build
 TARGETDIR := out
 
+ifdef INST_ROOT
+	INST_DIR_INC := $(INST_ROOT)/include
+	INST_DIR_LIB := $(INST_ROOT)/lib
+else
+	INST_DIR_INC := /usr/include
+	INST_DIR_LIB := /usr/lib
+endif
+
 # Targets
 ifdef ARCH
 	TARGET := $(TARGETDIR)/$(CNAME_S)-$(TOS)-$(ARCH).a
@@ -106,14 +114,14 @@ clean:
 
 install:
 	@echo "Installing..."
-	@cp $(TARGET) /usr/lib/
-	@mkdir -p /usr/include/$(CNAME_S)
-	@cp $(INCDIR)/* /usr/include/$(CNAME_S)/
+	@cp $(TARGET) $(INST_DIR_LIB)
+	@mkdir -p $(INST_DIR_INC)/$(CNAME_S)
+	@cp $(INCDIR)/* $(INST_DIR_INC)/$(CNAME_S)/
 
 uninstall:
 	@echo "Uninstalling..."
-	@rm /usr/lib/lib$(CNAME_S).a
-	@rm -r /usr/include/$(CNAME_S)/
+	@rm $(INST_DIR_LIB)/lib$(CNAME_S).a
+	@rm -r $(INST_DIR_INC)/$(CNAME_S)/
 
 .PHONY: clean install
 
