@@ -53,8 +53,6 @@ TARGETDIR := out
 ifdef INST_ROOT
 	INST_DIR_INC := $(INST_ROOT)/include
 	INST_DIR_LIB := $(INST_ROOT)/lib
-	@mkdir -p $(INST_DIR_LIB)
-	@mkdir -p $(INST_DIR_INC)
 else
 	INST_DIR_INC := /usr/include
 	INST_DIR_LIB := /usr/lib
@@ -116,6 +114,10 @@ clean:
 
 install:
 	@echo "Installing..."
+	ifdef INST_ROOT
+		@mkdir -p $(INST_DIR_LIB)
+		@mkdir -p $(INST_DIR_IN)
+	endif
 	@cp $(TARGET) $(INST_DIR_LIB)
 	@mkdir -p $(INST_DIR_INC)/$(CNAME_S)
 	@cp $(INCDIR)/* $(INST_DIR_INC)/$(CNAME_S)/
