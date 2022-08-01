@@ -32,9 +32,10 @@
 UNAME_S := $(shell uname -s)
 CNAME_S := sqlcppbridge
 
-ifdef TOOLCHAIN
+ifdef ANDROID_NDK_ROOT
 	CC := $(CXX)
 	UNAME_S := Android
+	LIBTOOL := $(AR)
 else
 # CC
 ifeq ($(UNAME_S),Darwin)
@@ -92,6 +93,10 @@ ifdef ARCH
 	ifeq ($(TOS),osx)
 		CFLAGS += -mmacosx-version-min=10.7
 	endif
+endif
+
+ifdef ANDROID_NDK_ROOT
+	INC += -I $(INST_DIR_INC)
 endif
 
 # Platform Specific Compiler Flags
