@@ -32,7 +32,7 @@
 UNAME_S := $(shell uname -s)
 CNAME_S := sqlcppbridge
 
-ifdef NDK
+ifdef $(NDK)
 	CC := $(CXX)
 else
 # CC
@@ -55,7 +55,7 @@ SRCDIR := SQLBridge/src
 BUILDDIR := build
 TARGETDIR := out
 
-ifdef INST_ROOT
+ifdef $(INST_ROOT)
 	INST_DIR_INC := $(INST_ROOT)/include
 	INST_DIR_LIB := $(INST_ROOT)/lib
 else
