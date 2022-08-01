@@ -32,6 +32,9 @@
 UNAME_S := $(shell uname -s)
 CNAME_S := sqlcppbridge
 
+ifdef NDK
+	CC := $(CXX)
+else
 # CC
 ifeq ($(UNAME_S),Darwin)
 	CC := clang++
@@ -42,6 +45,8 @@ ifeq ($(UNAME_S),Darwin)
 else
 	CC := g++
 	LIBTOOL := ar
+endif
+
 endif
 
 # Folders
