@@ -85,6 +85,7 @@ INC := -I $(INCDIR)
 ifdef ARCH
 	CFLAGS += -arch $(ARCH)
 	ifeq ($(TOS),ios)
+		# iOS 10 is the maximum deployment target for 32-bit targets
 		CFLAGS += -mios-version-min=10.0
 	endif
 	ifeq ($(TOS),wos)
