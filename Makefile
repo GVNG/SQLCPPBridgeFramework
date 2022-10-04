@@ -105,7 +105,7 @@ ifeq ($(UNAME_S),Darwin)
     LDFLAGS := -static
     LINK_CMD :=  $(LIBTOOL) $(LDFLAGS) -o $(TARGET) $(OBJECTS)
 else
-    CFLAGS += -std=gnu++14 -O2
+    CFLAGS += -std=gnu++14 -O2 -fpic -fPIC
     LINK_CMD := $(LIBTOOL) -cr $(TARGET) $(OBJECTS)
 endif
 
