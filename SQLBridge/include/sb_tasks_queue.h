@@ -54,6 +54,7 @@ namespace sql_bridge
     class db_tasks_queue_interface
     {
     public:
+        virtual ~db_tasks_queue_interface() {};
         virtual void add(db_task_ptr) = 0;
     };
     
@@ -99,9 +100,10 @@ namespace sql_bridge
         }
         void do_proc(interlocked<size_t>& ready)
         {
-            bool leadin(true);
+            ready--;
             while(!shutdown_)
             {
+                tasks_queue_access_.wait();
                 for(;;)
                 {
                     db_task_ptr task;
@@ -114,13 +116,6 @@ namespace sql_bridge
                     if (!task) break;
                     task->operator()(task.get());
                 }
-                if (shutdown_) break;
-                if (leadin)
-                {
-                    leadin=false;
-                    ready--;
-                }
-                tasks_queue_access_.wait();
             }
         }
         
