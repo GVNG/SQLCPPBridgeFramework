@@ -47,6 +47,7 @@
 #include <condition_variable>
 #include <functional>
 #include <iomanip>
+#include <cstring>
 
 namespace sql_bridge
 {
