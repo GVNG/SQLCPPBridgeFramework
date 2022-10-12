@@ -74,15 +74,15 @@ namespace sql_bridge
             {}
         inline sql_value(std::string const& tx)
             : type_(e_key_type::String)
-            , tValue_(tx)
             , iValue_(0)
             , rValue_(0)
+            , tValue_(tx)
             {};
         inline sql_value(std::string const& tx, _t_real_adapter<false>)
             : type_(e_key_type::String)
-            , tValue_(tx)
             , iValue_(0)
             , rValue_(0)
+            , tValue_(tx)
             {};
         template<typename T> inline sql_value(T const& v) : sql_value(v,_t_optional_adapter<is_kind_of_optional<T>::value>()) {}
         template<typename T> inline sql_value(T const& v, _t_optional_adapter<true>) : sql_value(v.value(),_t_real_adapter<std::is_floating_point<typename T::value_type>::value>()) {if (v.empty()) type_=e_key_type::Empty;};
@@ -91,8 +91,8 @@ namespace sql_bridge
         template<typename T> inline sql_value(T const& v, _t_integral_adapter<false>) : sql_value(v,_t_chrono_adapter<is_chrono<T>::value>()) {}
         template<typename T> inline sql_value(T const& v, _t_real_adapter<true>)
             : type_(e_key_type::Real)
-            , rValue_(static_cast<double>(v))
             , iValue_(0)
+            , rValue_(static_cast<double>(v))
             {};
         template<typename T> inline sql_value(T const& iv, _t_integral_adapter<true>)
             : type_(e_key_type::Integer)
@@ -101,13 +101,13 @@ namespace sql_bridge
             {};
         template<typename T> inline sql_value(T const& rv, _t_chrono_adapter<true>)
             : type_(e_key_type::Real)
-            , rValue_(static_cast<double>(rv.time_since_epoch().count()) / T::clock::period::den * T::clock::period::num)
             , iValue_(0)
+            , rValue_(static_cast<double>(rv.time_since_epoch().count()) / T::clock::period::den * T::clock::period::num)
             {};
         template<typename T> inline sql_value(T const& rv, _t_chrono_adapter<false>)
             : type_(e_key_type::Empty)
-            , rValue_(0)
             , iValue_(0)
+            , rValue_(0)
             {};
         template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value,T>::type value() const
         {
