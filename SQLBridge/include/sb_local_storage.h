@@ -133,9 +133,9 @@ namespace sql_bridge
                         std::string const& path,
                         fn_change_file_name fn_change)
                 : db_task(data_sections_ptr())
+                , kvdb_(trg)
                 , name_(name)
                 , path_(path)
-                , kvdb_(trg)
                 , fn_change_(fn_change)
                 {};
             void run_task() override
