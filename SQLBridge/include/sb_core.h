@@ -32,6 +32,7 @@
 #ifndef sb_core_h
 #define sb_core_h
 
+#include <cassert>
 #include "sb_core_misc.h"
 #include "sb_traits.h"
 
