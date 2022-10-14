@@ -41,7 +41,7 @@ namespace sql_bridge
 {
     
     class data_section_descriptors_bare;
-    using data_section_descriptors_map = std::map<std::string,data_section_descriptors_ptr>;
+    using data_section_descriptors_map = std::unordered_map<std::string,data_section_descriptors_ptr>;
     using protected_data_section_descriptors_map = protected_section<data_section_descriptors_map>;
     using init_routine = std::function<void()>;
     using init_queue = std::queue<init_routine>;

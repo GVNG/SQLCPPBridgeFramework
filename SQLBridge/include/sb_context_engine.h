@@ -232,7 +232,9 @@ namespace sql_bridge
             if (usr.empty())
             {
                 to_string ret;
-                std::stable_sort(suffixes_.begin(),suffixes_.end(),[](suffix_bare_ptr lv,suffix_bare_ptr rv){return *lv < *rv;});
+                std::stable_sort(suffixes_.begin(),
+                                 suffixes_.end(),
+                                 [](suffix_bare_ptr lv,suffix_bare_ptr rv){return *lv < *rv;});
                 e_weight cw = e_weight::BASE;
                 bool repeat = false;
                 for(auto const& sfx : suffixes_)

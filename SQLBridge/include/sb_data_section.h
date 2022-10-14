@@ -39,7 +39,7 @@ namespace sql_bridge
     class data_section;
     using data_sections_ptr = std::shared_ptr<data_section>;
     using data_sections_weak_ptr = std::weak_ptr<data_section>;
-    using data_sections_map = std::map<std::string, data_sections_weak_ptr>;
+    using data_sections_map = std::unordered_map<std::string, data_sections_weak_ptr>;
     
     class data_section
     {

@@ -590,6 +590,7 @@ namespace sql_bridge
         }
 
 #pragma mark - remove sync
+        
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value ||
                                                             is_trivial_map<T>::value ||
                                                             is_trivial_container<T>::value>::type _remove_sync(T const&) const
@@ -611,6 +612,7 @@ namespace sql_bridge
         }
 
 #pragma mark - remove
+        
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _remove(T const&) const
         {
             throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);
@@ -688,6 +690,7 @@ namespace sql_bridge
         }
 
 #pragma mark - replace sync
+        
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _replace_sync(T const&) const
         {
             throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
@@ -705,6 +708,7 @@ namespace sql_bridge
         }
 
 #pragma mark - replace
+        
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _replace(T const&) const
         {
             throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);

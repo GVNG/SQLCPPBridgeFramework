@@ -45,7 +45,7 @@ namespace sql_bridge
         using db_queue_entry = class _t_db_queue_entry<t_strategy>;
         using db_proc_queue_ptr = std::shared_ptr<db_queue_entry>;
         using db_proc_queue_weak_ptr = std::weak_ptr<db_queue_entry>;
-        using sections_cache = std::map<std::string,sections_keeper>;
+        using sections_cache = std::unordered_map<std::string,sections_keeper>;
         struct sections_data {data_sections_map sections_;sections_cache keepers_;};
         using protected_data = protected_section<sections_data>;
     private:

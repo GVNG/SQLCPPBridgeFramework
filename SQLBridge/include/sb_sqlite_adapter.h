@@ -48,7 +48,7 @@ namespace sql_bridge
         
         class sql_file
         {
-            using _t_statements_map = std::map<std::string,sqlite3_stmt*>;
+            using _t_statements_map = std::unordered_map<std::string,sqlite3_stmt*>;
         public:
             ~sql_file();
             inline sqlite_int64 last_insert_id() const {return sqlite3_last_insert_rowid(base_);}
