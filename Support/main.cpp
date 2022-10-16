@@ -72,6 +72,59 @@
 #include "example37.h"
 #include "example38.h"
 #include "example39.h"
+#include "example40.h"
+
+using t_db_storage = sql_bridge::local_storage<sql_bridge::sqlite_adapter>;
+using t_threads_container = std::array<std::thread, 10>;
+using t_counter = sql_bridge::interlocked<size_t>;
+
+static bool shutdown(false);
+static std::mutex console_mutex;
+static t_counter thread_num(0);
+
+void write_data(t_db_storage* pst)
+{
+    size_t tid = ++thread_num;
+    sql_bridge::context cont((*pst)["case40"]);
+    {
+        std::lock_guard<std::mutex> gr(console_mutex);
+        std::cout << "Writer " << tid << " has started." << std::endl;
+    }
+    while(!shutdown)
+    {
+        Case40 val(tid);
+        cont.save(val);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    {
+        std::lock_guard<std::mutex> gr(console_mutex);
+        std::cout << "Writer " << tid << " has finised" << std::endl;
+    }
+}
+
+void read_data(t_db_storage* pst)
+{
+    size_t tid = ++thread_num;
+    sql_bridge::context cont((*pst)["case40"]);
+    {
+        std::lock_guard<std::mutex> gr(console_mutex);
+        std::cout << "Reader " << tid << " has started." << std::endl;
+    }
+    while(!shutdown)
+    {
+        Case40Container trg;
+        cont.limit(100).load(trg);
+        {
+            std::lock_guard<std::mutex> gr(console_mutex);
+            std::cout << trg.size() << " items loaded in reader " << tid << "..." << std::endl;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
+    {
+        std::lock_guard<std::mutex> gr(console_mutex);
+        std::cout << "Reader " << tid << " has finished" << std::endl;
+    }
+}
 
 int main(int argc, char** argv)
 {
@@ -79,7 +132,7 @@ int main(int argc, char** argv)
     try
     {
         mkdir("./DB", 0777);
-        sql_bridge::local_storage<sql_bridge::sqlite_adapter> storage("./DB");
+        t_db_storage storage("./DB");
         
 #if 1
 
@@ -798,6 +851,22 @@ int main(int argc, char** argv)
         }
 #endif
 
+        {
+            std::cout << "Case40 Multithreading..." << std::endl;
+            storage["case40"].replace(Case40Container());
+            t_threads_container writers,readers;
+            for(auto& w : writers)
+                w = std::thread(write_data,&storage);
+            for(auto& r: readers)
+                r = std::thread(read_data,&storage);
+            std::this_thread::sleep_for(std::chrono::seconds(30));
+            shutdown = true;
+            for(auto& w : writers)
+                w.join();
+            for(auto& r : readers)
+                r.join();
+        }
+        
     }
     catch (std::exception& ex)
     {
