@@ -580,29 +580,29 @@
 		93E60D7920558048009151ED /* include */ = {
 			isa = PBXGroup;
 			children = (
-				93E60DB12055816E009151ED /* sqlcppbridge.h */,
-				93E60DB42055838E009151ED /* sb_core.h */,
-				9336AAA0206A25B800DF00CA /* sb_core_misc.h */,
-				93B071F92058262E008D2FB6 /* sb_sqlite_adapter.h */,
-				93BEDCB92090DCF4004166EB /* sb_value.h */,
-				93E60DB220558320009151ED /* sb_exceptions.h */,
-				93E60DB320558320009151ED /* sb_traits.h */,
-				93E60DB520558658009151ED /* sb_local_storage.h */,
-				93E60DB82055895C009151ED /* sb_tasks_queue.h */,
-				93E60DBC20558B41009151ED /* sb_kv_storage.h */,
-				93B071FF20590A38008D2FB6 /* sb_context.h */,
-				937ADD1B2467029800FCC0DF /* sb_context_engine.h */,
-				937ADD1A2467014900FCC0DF /* sb_ref_context.h */,
-				93B07200205916B7008D2FB6 /* sb_data_section.h */,
-				936C65C120774AFF0033F0FB /* sb_links.h */,
-				9336AAAA206B692800DF00CA /* sb_foundation.h */,
-				93B0720120591817008D2FB6 /* sb_data_section_descriptor.h */,
-				93BEDCD720A2CCAE004166EB /* sb_trivial_members_descriptor.h */,
-				9336AA9C2069143200DF00CA /* sb_members_descriptor.h */,
-				93BEDCBD209F1402004166EB /* sb_inheritance_descriptor.h */,
 				93B07207205948DD008D2FB6 /* sb_class_descriptor.h */,
 				93857ED720B463AB0088B787 /* sb_container_descriptor.h */,
+				937ADD1B2467029800FCC0DF /* sb_context_engine.h */,
+				93B071FF20590A38008D2FB6 /* sb_context.h */,
+				9336AAA0206A25B800DF00CA /* sb_core_misc.h */,
+				93E60DB42055838E009151ED /* sb_core.h */,
+				93B0720120591817008D2FB6 /* sb_data_section_descriptor.h */,
+				93B07200205916B7008D2FB6 /* sb_data_section.h */,
+				93E60DB220558320009151ED /* sb_exceptions.h */,
+				9336AAAA206B692800DF00CA /* sb_foundation.h */,
+				93BEDCBD209F1402004166EB /* sb_inheritance_descriptor.h */,
+				93E60DBC20558B41009151ED /* sb_kv_storage.h */,
+				936C65C120774AFF0033F0FB /* sb_links.h */,
+				93E60DB520558658009151ED /* sb_local_storage.h */,
+				9336AA9C2069143200DF00CA /* sb_members_descriptor.h */,
+				937ADD1A2467014900FCC0DF /* sb_ref_context.h */,
+				93B071F92058262E008D2FB6 /* sb_sqlite_adapter.h */,
 				931D3BE0216E218100BCD515 /* sb_stm_builder.h */,
+				93E60DB82055895C009151ED /* sb_tasks_queue.h */,
+				93E60DB320558320009151ED /* sb_traits.h */,
+				93BEDCD720A2CCAE004166EB /* sb_trivial_members_descriptor.h */,
+				93BEDCB92090DCF4004166EB /* sb_value.h */,
+				93E60DB12055816E009151ED /* sqlcppbridge.h */,
 			);
 			path = include;
 			sourceTree = "<group>";
@@ -670,7 +670,7 @@
 		93E60D6420557F7A009151ED /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1200;
+				LastUpgradeCheck = 1400;
 				ORGANIZATIONNAME = DataArt;
 				TargetAttributes = {
 					937F848121DA2B4800DD82F8 = {
@@ -858,6 +858,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -880,6 +881,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -929,6 +931,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -986,6 +989,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1007,6 +1011,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -1023,6 +1028,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

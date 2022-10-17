@@ -8,11 +8,17 @@
 
 #include "t_db_fixture.h"
 
-TEST(Core,Misc)
+TEST(Core,ClockToString)
 {
     std::chrono::system_clock::time_point ts = std::chrono::system_clock::from_time_t(1554188000);
     std::string tt = sql_bridge::to_string() << ts;
     ASSERT_EQ(tt,"1554188000");
+    std::string txfm_empty = sql_bridge::to_string() << sql_bridge::to_string::chrono_formatter() << ts;
+    ASSERT_EQ(txfm_empty,"1554188000");
+    std::string txfm = sql_bridge::to_string() << sql_bridge::to_string::chrono_formatter("%d %b %Y") << ts;
+    ASSERT_EQ(txfm,"02 Apr 2019");
+    std::wstring txfm_w = sql_bridge::to_wstring() << sql_bridge::to_wstring::chrono_formatter(L"%d/%m/%y") << ts;
+    ASSERT_EQ(txfm_w,L"02/04/19");
 }
 
 TEST(Core,Optional)

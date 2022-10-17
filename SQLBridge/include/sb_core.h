@@ -45,6 +45,14 @@ namespace sql_bridge
         using type = T;
         using type_elem = typename T::value_type;
         using type_stream = std::basic_ostringstream<type_elem>;
+        struct chrono_formatter
+        {
+            chrono_formatter(type const& fmt, bool lc = false) : format_(fmt),local_(lc) {}
+            chrono_formatter() : local_(false) {};
+            inline bool empty() const {return format_.empty();}
+            type format_;
+            bool local_;
+        };
         
         template<typename TFn> inline _t_to_string& operator << (TFn const& src) {_write(src);return *this;}
         inline operator type() const {return str();}
@@ -53,9 +61,27 @@ namespace sql_bridge
         inline operator type_stream&() {return buf_;}
     private:
         mutable type_stream buf_;
+        chrono_formatter chrono_format_;
+        template<typename TFn> inline typename std::enable_if<is_chrono<TFn>::value>::type _write(TFn const& src)
+        {
+            if (chrono_format_.empty())
+            {
+                double pr = static_cast<double>(src.time_since_epoch().count()) / TFn::period::den * TFn::period::num;
+                buf_ << std::setprecision(15) << pr;
+            }
+            else
+            {
+                std::locale const& loc = std::locale::classic();
+                std::time_put<type_elem> const& tmput = std::use_facet < std::time_put<type_elem> > (loc);
+                std::time_t tt = TFn::clock::to_time_t(src);
+                tmput.put(buf_, buf_, ' ', std::localtime ( &tt ), chrono_format_.format_.data(), chrono_format_.format_.data()+chrono_format_.format_.length());
+            }
+        }
         template<typename TFn> inline typename std::enable_if<std::is_enum<TFn>::value>::type _write(TFn const& src) {buf_ << static_cast<typename std::underlying_type<TFn>::type>(src);}
-        template<typename TFn> inline typename std::enable_if<is_chrono<TFn>::value>::type _write(TFn const& src) {double pr = static_cast<double>(src.time_since_epoch().count()) / TFn::period::den * TFn::period::num; buf_ << std::setprecision(15) << pr;}
-        template<typename TFn> inline typename std::enable_if<!std::is_enum<TFn>::value && !is_chrono<TFn>::value>::type _write(TFn const& src) {buf_ << src;}
+        template<typename TFn> inline typename std::enable_if<std::is_same<TFn, chrono_formatter>::value>::type _write(TFn const& src) {chrono_format_ = src;}
+        template<typename TFn> inline typename std::enable_if<!std::is_enum<TFn>::value &&
+                                                              !is_chrono<TFn>::value &&
+                                                              !std::is_same<TFn,chrono_formatter>::value>::type _write(TFn const& src) {buf_ << src;}
     };
     
     using to_string = _t_to_string<std::string>;
