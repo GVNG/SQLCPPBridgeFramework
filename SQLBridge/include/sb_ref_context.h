@@ -210,6 +210,7 @@ namespace sql_bridge
 
     private:
 #pragma mark - load
+        
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load(T*, std::string const& flt, size_t* num) const
         {
             throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);
@@ -220,12 +221,14 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
             {
-                qp->add( task );
+                qp->add_for_sync( task );
                 if (num)
                     *num = static_cast<load_task<T>*>(task.get())->items_load();
             }
         }
+        
 #pragma mark - load page
+        
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load_page(range, T*, std::string const& flt, size_t* num) const
         {
             throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);
@@ -236,12 +239,14 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
             {
-                qp->add( task );
+                qp->add_for_sync( task );
                 if (num)
                     *num = static_cast<load_page_task<T>*>(task.get())->items_load();
             }
         }
+        
 #pragma mark - save
+        
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _save(range, T const*) const
         {
             throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);
@@ -254,7 +259,9 @@ namespace sql_bridge
             if (qp!=nullptr)
                 qp->add( task );
         }
+        
 #pragma mark - replace
+        
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _replace(T const*) const
         {
             throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);
@@ -264,7 +271,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< replace_task<T> >(src,data_,references_,root_data_));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-                qp->add( task );
+                qp->add_for_sync( task );
         }
 
         

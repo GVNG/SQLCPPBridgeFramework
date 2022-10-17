@@ -420,7 +420,7 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
             {
-                qp->add( task );
+                qp->add_for_sync( task );
                 return s_proxy(qp,data_,static_cast<resolve_link_task<T>*>(task.get())->references(),&src);
             }
             else
@@ -439,7 +439,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< save_sync_task<T> >(src,data_,pg));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-                qp->add( task );
+                qp->add_for_sync( task );
         }
 
 #pragma mark - save
@@ -525,7 +525,8 @@ namespace sql_bridge
         {
             db_task_ptr task(std::make_shared< async_load_page_task<T> >(dst,data_,pgsz,flt,fl,fs));
             db_tasks_queue_interface_ptr qp = queue_.lock();
-            if (qp!=nullptr) qp->add(task);
+            if (qp!=nullptr)
+                qp->add_for_sync(task);
         }
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load_page(range,T&,std::string const&,size_t*) const
         {
@@ -537,7 +538,7 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
             {
-                qp->add(task);
+                qp->add_for_sync(task);
                 if (num)
                     *num = static_cast<load_page_task<T>*>(task.get())->items_load();
             }
@@ -553,7 +554,8 @@ namespace sql_bridge
         {
             db_task_ptr task(std::make_shared< async_load_task<T> >(dst,data_,flt,fl,fs));
             db_tasks_queue_interface_ptr qp = queue_.lock();
-            if (qp!=nullptr) qp->add(task);
+            if (qp!=nullptr)
+                qp->add_for_sync(task);
         }
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load(T&,std::string const&,size_t*) const
         {
@@ -565,7 +567,7 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
             {
-                qp->add(task);
+                qp->add_for_sync(task);
                 if (num)
                     *num = static_cast<load_task<T>*>(task.get())->items_load();
             }
@@ -586,7 +588,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< remove_sync_task<T> >(src,data_));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-                qp->add( task );
+                qp->add_for_sync( task );
         }
 
 #pragma mark - remove
@@ -623,32 +625,38 @@ namespace sql_bridge
         template<typename T> inline typename std::enable_if<!is_pointer<T>::value && !is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _remove(T const& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
-            if (qp!=nullptr) qp->add( std::make_shared<remove_task<T> >(src,data_));
+            if (qp!=nullptr)
+                qp->add( std::make_shared<remove_task<T> >(src,data_));
         }
         template<typename T> inline typename std::enable_if<!is_trivial_container<T>::value && !is_pointer<typename T::value_type>::value>::type _remove_cont(T const& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
-            if (qp!=nullptr) qp->add( std::make_shared<remove_task<T> >(src,data_));
+            if (qp!=nullptr)
+                qp->add( std::make_shared<remove_task<T> >(src,data_));
         }
         template<typename T> inline typename std::enable_if<!is_trivial_map<T>::value && !is_pointer<typename T::mapped_type>::value>::type _remove_map(T const& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
-            if (qp!=nullptr) qp->add( std::make_shared<remove_task<T> >(src,data_));
+            if (qp!=nullptr)
+                qp->add( std::make_shared<remove_task<T> >(src,data_));
         }
         template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _remove_m(T&& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
-            if (qp!=nullptr) qp->add( std::make_shared<remove_task<T> >(std::move(src),data_));
+            if (qp!=nullptr)
+                qp->add( std::make_shared<remove_task<T> >(std::move(src),data_));
         }
         template<typename T> inline typename std::enable_if<!is_trivial_container<T>::value && !is_pointer<typename T::value_type>::value>::type _remove_cont_m(T&& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
-            if (qp!=nullptr) qp->add( std::make_shared<remove_task<T> >(std::move(src),data_));
+            if (qp!=nullptr)
+                qp->add( std::make_shared<remove_task<T> >(std::move(src),data_));
         }
         template<typename T> inline typename std::enable_if<!is_trivial_map<T>::value && !is_pointer<typename T::mapped_type>::value>::type _remove_map_m(T&& src) const
         {
             db_tasks_queue_interface_ptr qp = queue_.lock();
-            if (qp!=nullptr) qp->add( std::make_shared<remove_task<T> >(std::move(src),data_));
+            if (qp!=nullptr)
+                qp->add( std::make_shared<remove_task<T> >(std::move(src),data_));
         }
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _remove_if(std::string const&) const
         {
@@ -678,7 +686,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< replace_sync_task<T> >(src,data_));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-                qp->add( task );
+                qp->add_for_sync( task );
         }
 
 #pragma mark - replace
