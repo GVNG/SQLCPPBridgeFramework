@@ -220,9 +220,7 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
             {
-                std::future<void> ret(task->get_future());
                 qp->add( task );
-                ret.get();
                 if (num)
                     *num = static_cast<load_task<T>*>(task.get())->items_load();
             }
@@ -238,9 +236,7 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
             {
-                std::future<void> ret(task->get_future());
                 qp->add( task );
-                ret.get();
                 if (num)
                     *num = static_cast<load_page_task<T>*>(task.get())->items_load();
             }
@@ -256,11 +252,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< save_task<T> >(src,data_,pg,references_,root_data_));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-            {
-                std::future<void> ret(task->get_future());
                 qp->add( task );
-                ret.get();
-            }
         }
 #pragma mark - replace
         template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _replace(T const*) const
@@ -272,11 +264,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< replace_task<T> >(src,data_,references_,root_data_));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-            {
-                std::future<void> ret(task->get_future());
                 qp->add( task );
-                ret.get();
-            }
         }
 
         

@@ -420,9 +420,7 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
             {
-                std::future<void> ret(task->get_future());
                 qp->add( task );
-                ret.get();
                 return s_proxy(qp,data_,static_cast<resolve_link_task<T>*>(task.get())->references(),&src);
             }
             else
@@ -441,11 +439,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< save_sync_task<T> >(src,data_,pg));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-            {
-                std::future<void> ret(task->get_future());
                 qp->add( task );
-                ret.get();
-            }
         }
 
 #pragma mark - save
@@ -499,11 +493,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< save_task<T> >(std::move(src),data_,pg));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-            {
-                std::future<void> ret(task->get_future());
                 qp->add( task );
-                ret.get();
-            }
         }
         template<typename T> inline typename std::enable_if<!is_pointer<typename T::value_type>::value>::type _save_cont_m(range pg, T&& src) const
         {
@@ -522,11 +512,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< save_task<T> >(std::move(src),data_,pg));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-            {
-                std::future<void> ret(task->get_future());
                 qp->add( task );
-                ret.get();
-            }
         }
         
 #pragma mark - load page
@@ -551,9 +537,7 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
             {
-                std::future<void> ret(task->get_future());
                 qp->add(task);
-                ret.get();
                 if (num)
                     *num = static_cast<load_page_task<T>*>(task.get())->items_load();
             }
@@ -581,9 +565,7 @@ namespace sql_bridge
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
             {
-                std::future<void> ret(task->get_future());
                 qp->add(task);
-                ret.get();
                 if (num)
                     *num = static_cast<load_task<T>*>(task.get())->items_load();
             }
@@ -604,11 +586,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< remove_sync_task<T> >(src,data_));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-            {
-                std::future<void> ret(task->get_future());
                 qp->add( task );
-                ret.get();
-            }
         }
 
 #pragma mark - remove
@@ -700,11 +678,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< replace_sync_task<T> >(src,data_));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-            {
-                std::future<void> ret(task->get_future());
                 qp->add( task );
-                ret.get();
-            }
         }
 
 #pragma mark - replace
@@ -753,11 +727,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< replace_task<T> >(std::move(src),data_));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-            {
-                std::future<void> ret(task->get_future());
                 qp->add( task );
-                ret.get();
-            }
         }
         template<typename T> inline typename std::enable_if<!is_pointer<T>::value>::type _replace_cont_m(T&& src) const
         {
@@ -769,11 +739,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< replace_task<T> >(std::move(src),data_));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-            {
-                std::future<void> ret(task->get_future());
                 qp->add( task );
-                ret.get();
-            }
         }
         template<typename T> inline typename std::enable_if<!is_pointer<T>::value>::type _replace_map_m(T&& src) const
         {

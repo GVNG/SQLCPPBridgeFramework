@@ -200,10 +200,7 @@ namespace sql_bridge
         template<typename T> inline T load(std::string const& key, T const& def) const
         {
             db_task_ptr task(std::make_shared< load_task<T> >(def,key,proc_queue_));
-            std::future<void> ret(task->get_future());
-            proc_queue_->add(task);
-            ret.wait();
-            ret.get(); // exceptions check
+            proc_queue_->add_for_sync(task);
             return static_cast<load_task<T>*>(task.get())->data();
         }
         inline std::string load(std::string const& key) const {return load(key,std::string());}
@@ -240,10 +237,7 @@ namespace sql_bridge
                 lk.mutable_data().keepers_.erase(nm);
             }
             db_task_ptr task(std::make_shared< create_task >(nm,proc_queue_,root_path_,fn));
-            std::future<void> ret(task->get_future());
-            proc_queue_->add(task);
-            ret.wait();
-            ret.get(); // exceptions check
+            proc_queue_->add_for_sync(task);
             data_sections_ptr sect(static_cast<create_task*>(task.get())->section());
             task.reset();
             {

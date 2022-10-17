@@ -90,6 +90,7 @@ namespace sql_bridge
         
         void add(db_task_ptr tsk) override
         {
+            auto chk(tsk->get_future().share());
             tasks_queue_access_.under_guard_and_fire([this,tsk]()
             {
                 if (tsk->out_of_band() && !tasks_queue_.empty())
@@ -100,13 +101,13 @@ namespace sql_bridge
                 else
                     tasks_queue_.push_back(std::move(tsk));
             });
+            chk.get();
         }
         void add_for_sync(db_task_ptr tsk) override
         {
-            std::future<void> chk;
-            tasks_queue_access_.under_guard_and_fire([this,tsk,&chk]()
+            auto chk(tsk->get_future().share());
+            tasks_queue_access_.under_guard_and_fire([this,tsk]()
             {
-                chk = tsk->get_future();
                 if (tsk->out_of_band() && !tasks_queue_.empty())
                     tasks_queue_.insert(std::find_if(tasks_queue_.begin(),
                                                      tasks_queue_.end(),
@@ -116,6 +117,7 @@ namespace sql_bridge
                     tasks_queue_.push_back(std::move(tsk));
             });
             chk.wait();
+            chk.get();
         }
         
         void do_proc(interlocked<size_t>& ready)
