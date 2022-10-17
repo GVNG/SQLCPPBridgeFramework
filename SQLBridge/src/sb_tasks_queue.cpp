@@ -34,15 +34,15 @@ namespace sql_bridge
 {
 #pragma mark - db_task
     
-    void db_task::execute(sql_bridge::db_task *trg)
+    void db_task::execute()
     {
         try
         {
-            trg->run_task();
+            run_task();
         }
         catch (base_sql_error& ex)
         {
-            trg->error(ex);
+            error(ex);
             throw;
         }
     }

@@ -57,14 +57,15 @@ namespace sql_bridge
     public:
         virtual ~db_tasks_queue_interface() {};
         virtual void add(db_task_ptr) = 0;
+        virtual void add_for_sync(db_task_ptr) = 0;
     };
     
-    class db_task : public std::packaged_task<void(db_task*)>
+    class db_task : public std::packaged_task<void()>
     {
         friend class context_bare;
     public:
         db_task(data_sections_ptr sc)
-            : std::packaged_task<void(db_task*)>(execute)
+            : std::packaged_task<void()>(std::bind(std::mem_fn(&db_task::execute),this))
             , section_(sc)
             {}
         virtual ~db_task() {};
@@ -73,7 +74,7 @@ namespace sql_bridge
     protected:
         data_sections_ptr section_;
     private:
-        static void execute(db_task* trg);
+        void execute();
         virtual void error(base_sql_error const&) {}
     };
 
@@ -86,6 +87,7 @@ namespace sql_bridge
             : key_value_storage<TStrategy>(fn)
             , shutdown_(false)
             {}
+        
         void add(db_task_ptr tsk) override
         {
             tasks_queue_access_.under_guard_and_fire([this,tsk]()
@@ -99,6 +101,23 @@ namespace sql_bridge
                     tasks_queue_.push_back(std::move(tsk));
             });
         }
+        void add_for_sync(db_task_ptr tsk) override
+        {
+            std::future<void> chk;
+            tasks_queue_access_.under_guard_and_fire([this,tsk,&chk]()
+            {
+                chk = tsk->get_future();
+                if (tsk->out_of_band() && !tasks_queue_.empty())
+                    tasks_queue_.insert(std::find_if(tasks_queue_.begin(),
+                                                     tasks_queue_.end(),
+                                                     [](db_task_ptr const& ts){return !ts->out_of_band();}),
+                                        std::move(tsk));
+                else
+                    tasks_queue_.push_back(std::move(tsk));
+            });
+            chk.wait();
+        }
+        
         void do_proc(interlocked<size_t>& ready)
         {
             ready--;
@@ -115,7 +134,7 @@ namespace sql_bridge
                         tasks_queue_.pop_front();
                     });
                     if (!task) break;
-                    task->operator()(task.get());
+                    (*task)();
                 }
             }
         }
