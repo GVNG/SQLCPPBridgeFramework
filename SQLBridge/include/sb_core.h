@@ -45,10 +45,10 @@ namespace sql_bridge
         using type = T;
         using type_elem = typename T::value_type;
         using type_stream = std::basic_ostringstream<type_elem>;
+
         struct chrono_formatter
         {
-            chrono_formatter(type const& fmt, bool lc = false) : format_(fmt),local_(lc) {}
-            chrono_formatter() : local_(false) {};
+            chrono_formatter(type const& fmt = type(), bool lc = false) : format_(fmt),local_(lc) {}
             inline bool empty() const {return format_.empty();}
             type format_;
             bool local_;
@@ -71,10 +71,14 @@ namespace sql_bridge
             }
             else
             {
-                std::locale const& loc = std::locale::classic();
-                std::time_put<type_elem> const& tmput = std::use_facet < std::time_put<type_elem> > (loc);
+                auto const& tmput = std::use_facet < std::time_put<type_elem> > (std::locale::classic());
                 std::time_t tt = TFn::clock::to_time_t(src);
-                tmput.put(buf_, buf_, ' ', std::localtime ( &tt ), chrono_format_.format_.data(), chrono_format_.format_.data()+chrono_format_.format_.length());
+                tmput.put(buf_,
+                          buf_,
+                          ' ',
+                          chrono_format_.local_?std::localtime ( &tt ):std::gmtime( &tt ),
+                          chrono_format_.format_.data(),
+                          chrono_format_.format_.data()+chrono_format_.format_.length());
             }
         }
         template<typename TFn> inline typename std::enable_if<std::is_enum<TFn>::value>::type _write(TFn const& src) {buf_ << static_cast<typename std::underlying_type<TFn>::type>(src);}
