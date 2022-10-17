@@ -493,7 +493,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< save_task<T> >(std::move(src),data_,pg));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-                qp->add( task );
+                qp->add_for_sync( task );
         }
         template<typename T> inline typename std::enable_if<!is_pointer<typename T::value_type>::value>::type _save_cont_m(range pg, T&& src) const
         {
@@ -512,7 +512,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< save_task<T> >(std::move(src),data_,pg));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-                qp->add( task );
+                qp->add_for_sync( task );
         }
         
 #pragma mark - load page
@@ -735,7 +735,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< replace_task<T> >(std::move(src),data_));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-                qp->add( task );
+                qp->add_for_sync( task );
         }
         template<typename T> inline typename std::enable_if<!is_pointer<T>::value>::type _replace_cont_m(T&& src) const
         {
@@ -747,7 +747,7 @@ namespace sql_bridge
             db_task_ptr task(std::make_shared< replace_task<T> >(std::move(src),data_));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
-                qp->add( task );
+                qp->add_for_sync( task );
         }
         template<typename T> inline typename std::enable_if<!is_pointer<T>::value>::type _replace_map_m(T&& src) const
         {
