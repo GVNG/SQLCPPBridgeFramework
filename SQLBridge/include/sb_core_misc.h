@@ -182,12 +182,14 @@ namespace sql_bridge
         
         _t_data_block()
             : elements_(0)
+            , allocated_(0)
             {};
-        explicit _t_data_block(size_t sz)
-            : buffer_(sz?new type[sz]:nullptr)
-            , elements_(buffer_?sz:0)
+        explicit _t_data_block(size_t eln) // elements number
+            : buffer_(eln?new type[eln]:nullptr)
+            , elements_(buffer_?eln:0)
+            , allocated_(elements_)
             {}
-        explicit _t_data_block(void const* src, size_t sz)
+        explicit _t_data_block(void const* src, size_t sz) // memory buffer, size in bytes(!!!)
             : _t_data_block(sz/sizeof(type))
         {
             assert(elements_*sizeof(type)==sz);
@@ -199,9 +201,24 @@ namespace sql_bridge
         inline type* data() {return buffer_.get();}
         inline size_t elements() const {return elements_;}
         inline size_t size() const {return elements_*sizeof(type);}
+        void resize(size_t newel)
+        {
+            assert(newel);
+            if (newel<=allocated_)
+                elements_ = newel;
+            else
+            {
+                t_buffer nb(new type[newel]);
+                std::memcpy(nb.get(),buffer_.get(),allocated_*sizeof(type));
+                std::swap(buffer_,nb);
+                allocated_ = newel;
+                elements_ = newel;
+            }
+        }
     private:
         t_buffer buffer_;
         size_t elements_;
+        size_t allocated_;
     };
     using bytes_block = _t_data_block<unsigned char>;
 

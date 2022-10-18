@@ -62,6 +62,9 @@ TEST(Core, BytesBlock)
     sql_bridge::_t_data_block<short> blk2(10);
     ASSERT_EQ(blk.size(),100);
     ASSERT_EQ(blk.elements(),100);
+    blk.resize(50);
+    ASSERT_EQ(blk.elements(),50);
+    
     ASSERT_EQ(blk2.size(),20);
     ASSERT_EQ(blk2.elements(),10);
 }
