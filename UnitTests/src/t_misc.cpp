@@ -55,3 +55,13 @@ TEST(Core,TextQuotation)
     ASSERT_NE(t_test::quotation("test's"),"test's");
     ASSERT_EQ(t_test::quotation("aaa"),"'aaa'");
 }
+
+TEST(Core, BytesBlock)
+{
+    sql_bridge::bytes_block blk(100);
+    sql_bridge::_t_data_block<short> blk2(10);
+    ASSERT_EQ(blk.size(),100);
+    ASSERT_EQ(blk.elements(),100);
+    ASSERT_EQ(blk2.size(),20);
+    ASSERT_EQ(blk2.elements(),10);
+}
