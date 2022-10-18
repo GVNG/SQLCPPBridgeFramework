@@ -881,14 +881,26 @@ int main(int argc, char** argv)
             dst2 = storage.load("Content2",src);
             assert(dst2==src);
             
-            std::vector<sql_bridge::bytes_block> src3(50,sql_bridge::bytes_block(50)),dst3;
+            using block_vector = std::vector<sql_bridge::bytes_block>;
+            using block_map = std::map<std::string,sql_bridge::bytes_block>;
+            block_vector src3(50,sql_bridge::bytes_block(50)),dst3;
             for(auto& s : src3)
                 std::memset(s.data(), 'a', s.size());
             storage.save("blob_vector", src3);
-            dst3 = storage.load("blob_vector",std::vector<sql_bridge::bytes_block>());
+            dst3 = storage.load("blob_vector",block_vector());
             assert(dst3==src3);
 
-            
+            block_map src4,dst4;
+            src4 = {{"val50",sql_bridge::bytes_block(50)},
+                    {"val100",sql_bridge::bytes_block(100)}};
+            std::memset(src4["val50"].data(), 'f', src4["val50"].size());
+            std::memset(src4["val100"].data(), 's', src4["val100"].size());
+            storage.save("blob_map", src4);
+            storage.remove<block_map>("val50","blob_map");
+            dst4 = storage.load("blob_map", block_map());
+            src4.erase("val50");
+            assert(dst4==src4);
+
             std::cout << "is ok. ";
         }
         
