@@ -881,9 +881,13 @@ int main(int argc, char** argv)
             dst2 = storage.load("Content2",src);
             assert(dst2==src);
             
-            
-            
-            
+            std::vector<sql_bridge::bytes_block> src3(50,sql_bridge::bytes_block(50)),dst3;
+            for(auto& s : src3)
+                std::memset(s.data(), 'a', s.size());
+            storage.save("blob_vector", src3);
+            dst3 = storage.load("blob_vector",std::vector<sql_bridge::bytes_block>());
+            assert(dst3==src3);
+
             
             std::cout << "is ok. ";
         }
