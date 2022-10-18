@@ -82,16 +82,24 @@ namespace sql_bridge
         for(auto& vk : statements_cache_)
             sqlite3_finalize(vk.second);
         statements_cache_.clear();
+        created_tables_.clear();
     }
     
     sqlite_adapter::sql_file const& sqlite_adapter::sql_file::execute(const std::string & cmd) const
     {
-        reset_cache();
         char* errMsg = NULL;
         int code = sqlite3_exec(base_, cmd.c_str(), NULL, NULL, &errMsg);
         if (code!=SQLITE_OK)
             throw sql_error(errMsg,cmd,code);
         return *this;
+    }
+    
+    bool sqlite_adapter::sql_file::should_create_table(std::string const& tab) const
+    {
+        bool ret = created_tables_.find(tab)==created_tables_.end();
+        if (ret)
+            created_tables_.insert(tab);
+        return ret;
     }
     
     sqlite_adapter::sql_file::transactions_lock::transactions_lock(sql_file const& src)
@@ -285,11 +293,10 @@ namespace sql_bridge
     sqlite_adapter::sql_inserter_kv sqlite_adapter::create_table(sql_file const& db,
                                                                  std::string const& type)
     {
-        if (created_tables_.find(type)==created_tables_.end())
+        if (db.should_create_table(type))
         {
             db.execute(to_string() << "CREATE TABLE IF NOT EXISTS " << type << "_VAL (key TEXT, val " << type << ")");
             db.execute(to_string() << "CREATE UNIQUE INDEX IF NOT EXISTS ix_KEY_" << type << " ON " << type << "_VAL (key)");
-            created_tables_.insert(type);
         }
         return sql_inserter_kv(db,to_string() << type << "_VAL",true);
     }
@@ -297,11 +304,10 @@ namespace sql_bridge
     sqlite_adapter::sql_remove_kv sqlite_adapter::create_statement_for_remove_value(sql_file const& db,
                                                                                     std::string const& type)
     {
-        if (created_tables_.find(type)==created_tables_.end())
+        if (db.should_create_table(type))
         {
             db.execute(to_string() << "CREATE TABLE IF NOT EXISTS " << type << "_VAL (key TEXT, val " << type << ")");
             db.execute(to_string() << "CREATE UNIQUE INDEX IF NOT EXISTS ix_KEY_" << type << " ON " << type << "_VAL (key)");
-            created_tables_.insert(type);
         }
         return sql_remove_kv(db,to_string() << type << "_VAL");
     }
@@ -327,11 +333,10 @@ namespace sql_bridge
 
     size_t sqlite_adapter::create_table_for_versions(sql_file const& db, std::string const& name)
     {
-        if (created_tables_.find(g_versions_table_name)==created_tables_.end())
+        if (db.should_create_table(g_versions_table_name))
         {
             db.execute(to_string() << "CREATE TABLE IF NOT EXISTS " << g_versions_table_name << " (KEY TEXT, VAL INTEGER DEFAULT 0)");
             db.execute(to_string() << "CREATE UNIQUE INDEX IF NOT EXISTS ix_KEY" << g_versions_table_name << " ON " << g_versions_table_name << " (KEY)");
-            created_tables_.insert(g_versions_table_name);
         }
         sql_reader_kv rd(db,g_versions_table_name,name);
         size_t ret(0);

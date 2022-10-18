@@ -56,6 +56,8 @@ namespace sql_bridge
             inline int err_code() const {return err_code_;}
             const sql_file& execute(std::string const&) const;
             sqlite3_stmt* operator[](std::string const& txstm) const;
+            bool should_create_table(std::string const&) const;
+            void reset_cache() const;
 
             class transactions_lock
             {
@@ -82,11 +84,11 @@ namespace sql_bridge
             sql_file(sql_file const&) = delete;
             sql_file(sql_file&&) = delete;
         private:
-            void reset_cache() const;
             sqlite3* base_;
             std::string const file_name_;
             mutable _t_statements_map statements_cache_;
             mutable int err_code_;
+            mutable string_set created_tables_;
         };
         
 #pragma mark - sql_reader_kv
@@ -348,8 +350,6 @@ namespace sql_bridge
     private:
         static void create_statements(class_link&, std::string const& relfrom = "");
         size_t create_table_for_versions(sql_file const& db,std::string const& name); // return the version for the 'name'
-
-        string_set created_tables_;
     };
 };
 
