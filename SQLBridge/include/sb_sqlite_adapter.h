@@ -112,7 +112,7 @@ namespace sql_bridge
                 typename T::clock::duration ret(static_cast<int64_t>(val / T::clock::period::num * T::clock::period::den));
                 v = T(ret);
             }
-            template<typename T> inline typename std::enable_if<std::is_same<T, bytes_block>::value>::type read_value(T& v, int fld) const
+            template<typename T> inline typename std::enable_if<is_convertible_to_blob<T>::value>::type read_value(T& v, int fld) const
             {
                 int sz = sqlite3_column_bytes(state_, fld);
                 if (!sz)
@@ -195,7 +195,7 @@ namespace sql_bridge
                 double tv = static_cast<double>(val.time_since_epoch().count()) / T::period::den * T::period::num;
                 sqlite3_bind_double(state_, fld, tv);
             }
-            template<typename T> inline typename std::enable_if<std::is_same<T,bytes_block>::value>::type bind_value(T const& val, int fld)
+            template<typename T> inline typename std::enable_if<is_convertible_to_blob<T>::value>::type bind_value(T const& val, int fld)
             {
                 need_step_=true;
                 sqlite3_bind_blob64(state_, fld, val.data(), val.size(), SQLITE_TRANSIENT);
@@ -335,7 +335,7 @@ namespace sql_bridge
             template<typename TFn=T> static inline typename std::enable_if<is_convertible_to_float<TFn>::value,std::string>::type const& type_name() {static const std::string ret("REAL"); return ret;}
             template<typename TFn=T> static inline typename std::enable_if<is_convertible_to_int<TFn>::value,std::string>::type const& type_name() {static const std::string ret("INTEGER"); return ret;}
             template<typename TFn=T> static inline typename std::enable_if<is_convertible_to_text<TFn>::value,std::string>::type const& type_name() {static const std::string ret("TEXT"); return ret;}
-            template<typename TFn=T> static inline typename std::enable_if<std::is_same<TFn, bytes_block>::value,std::string>::type const& type_name() {static const std::string ret("BLOB"); return ret;}
+            template<typename TFn=T> static inline typename std::enable_if<is_convertible_to_blob<TFn>::value,std::string>::type const& type_name() {static const std::string ret("BLOB"); return ret;}
 
             template<typename TFn=T> static inline typename std::enable_if<is_trivial_container<TFn>::value, std::string>::type table_name() {return to_string() << "_" << type_name<typename TFn::value_type>() << "_table";}
             template<typename TFn=T> static inline typename std::enable_if<is_trivial_map<TFn>::value, std::string>::type table_name() {return to_string() << "_" << type_name<typename TFn::key_type>() << "_to_" << type_name<typename TFn::mapped_type>() << "_table";}

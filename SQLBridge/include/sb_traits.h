@@ -276,12 +276,17 @@ namespace sql_bridge
         typedef T2 type;
     };
     
+    template<typename T> struct is_convertible_to_blob
+        : std::integral_constant<bool,  std::is_same<T,bytes_block>::value>
+    {
+    };
+    
     template<typename T> struct is_sql_acceptable
         : std::integral_constant<bool,  is_convertible_to_int<T>::value ||
                                         is_convertible_to_float<T>::value ||
                                         is_convertible_to_text<T>::value ||
                                         is_chrono<T>::value ||
-                                        std::is_same<T,bytes_block>::value>
+                                        is_convertible_to_blob<T>::value>
     {
     };
 
