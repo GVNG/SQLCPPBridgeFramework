@@ -201,7 +201,7 @@ namespace sql_bridge
         inline type* data() {return buffer_.get();}
         inline size_t elements() const {return elements_;}
         inline size_t size() const {return elements_*sizeof(type);}
-        void resize(size_t newel)
+        void resize(size_t newel) // elements number
         {
             assert(newel);
             if (newel<=allocated_)
