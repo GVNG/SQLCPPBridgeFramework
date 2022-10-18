@@ -145,7 +145,7 @@ namespace sql_bridge
                     section_ = db->create_section(name_,path_,fn_change_);
             };
             inline data_sections_ptr section() const {return section_;}
-            bool out_of_band() const override {return true;}
+            bool out_of_queue() const override {return true;}
         private:
             db_proc_queue_weak_ptr kvdb_;
             std::string name_;
@@ -155,15 +155,17 @@ namespace sql_bridge
         
         class sections_keeper
         {
+            using clock = std::chrono::system_clock;
+            using timestamp = std::chrono::time_point<clock>;
         public:
             sections_keeper(data_sections_ptr sc)
                 : section_(sc)
-                , ts_(std::chrono::system_clock::now())
+                , ts_(clock::now())
                 {}
-            inline bool is_expired() const {return ts_+std::chrono::seconds(30)<std::chrono::system_clock::now();}
+            inline bool is_expired() const {return ts_+std::chrono::seconds(30)<clock::now();}
         private:
             data_sections_ptr section_;
-            std::chrono::time_point<std::chrono::system_clock> ts_;
+            timestamp ts_;
         };
         
     public:
@@ -173,11 +175,9 @@ namespace sql_bridge
             , root_path_(path)
             , proc_queue_(std::make_shared<db_queue_entry>(t_strategy::main_db_name(path)))
         {
-            std::this_thread::yield();
             proc_thread_ = std::thread(std::bind(std::mem_fn(&local_storage::proc),this));
             proc_flush_thread_ = std::thread(std::bind(std::mem_fn(&local_storage::proc_flush),this));
             do {std::this_thread::yield();} while(ready_);
-            std::this_thread::yield();
         }
         
         ~local_storage()

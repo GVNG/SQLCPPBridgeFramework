@@ -70,7 +70,7 @@ namespace sql_bridge
             {}
         virtual ~db_task() {};
         virtual void run_task() = 0;
-        virtual bool out_of_band() const {return false;}
+        virtual bool out_of_queue() const {return false;}
     protected:
         data_sections_ptr section_;
     private:
@@ -92,28 +92,20 @@ namespace sql_bridge
         {
             tasks_queue_access_.under_guard_and_fire([this,tsk]()
             {
-                if (tsk->out_of_band() && !tasks_queue_.empty())
+                if (tsk->out_of_queue() && !tasks_queue_.empty())
                     tasks_queue_.insert(std::find_if(tasks_queue_.begin(),
                                                      tasks_queue_.end(),
-                                                     [](db_task_ptr const& ts){return !ts->out_of_band();}),
+                                                     [](db_task_ptr const& ts){return !ts->out_of_queue();}),
                                         std::move(tsk));
                 else
                     tasks_queue_.push_back(std::move(tsk));
             });
         }
+        
         void add_for_sync(db_task_ptr tsk) override
         {
             auto chk(tsk->get_future().share());
-            tasks_queue_access_.under_guard_and_fire([this,tsk]()
-            {
-                if (tsk->out_of_band() && !tasks_queue_.empty())
-                    tasks_queue_.insert(std::find_if(tasks_queue_.begin(),
-                                                     tasks_queue_.end(),
-                                                     [](db_task_ptr const& ts){return !ts->out_of_band();}),
-                                        std::move(tsk));
-                else
-                    tasks_queue_.push_back(std::move(tsk));
-            });
+            add(tsk);
             chk.get();
         }
         
