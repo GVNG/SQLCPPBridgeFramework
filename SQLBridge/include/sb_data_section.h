@@ -801,21 +801,21 @@ namespace sql_bridge
             else
             switch (dst.type())
             {
-                case sql_value::e_key_type::Integer:
+                case sql_value::e_key_type::integer:
                     {
                         int64_t v;
                         reader_.read_value(v);
                         dst = sql_value(v);
                     }
                     break;
-                case sql_value::e_key_type::Real:
+                case sql_value::e_key_type::real:
                     {
                         double v;
                         reader_.read_value(v);
                         dst = sql_value(v);
                     }
                     break;
-                case sql_value::e_key_type::String:
+                case sql_value::e_key_type::string:
                     {
                         std::string v;
                         reader_.read_value(v);

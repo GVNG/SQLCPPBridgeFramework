@@ -133,13 +133,14 @@ int main(int argc, char** argv)
     {
         mkdir("./DB", 0777);
         t_db_storage storage("./DB");
-        
-#if 1
+     
+#if 0
 
         {
             std::cout << "Case KVDB ";
             time_tracker trk;
             // test kvdb
+            
             double src_rl(M_PI),dst_rl;
             std::string src_str("aaa"),src_str2("value"),dst_str,dst_str2;
             int src_int(100500),dst_int;
@@ -849,7 +850,6 @@ int main(int argc, char** argv)
             assert(src==dst);
             std::cout << "is ok. ";
         }
-#endif
 
         {
             std::cout << "Case40 Multithreading..." << std::endl;
@@ -859,12 +859,33 @@ int main(int argc, char** argv)
                 w = std::thread(write_data,&storage);
             for(auto& r: readers)
                 r = std::thread(read_data,&storage);
-            std::this_thread::sleep_for(std::chrono::seconds(30));
+            std::this_thread::sleep_for(std::chrono::seconds(10));
             shutdown = true;
             for(auto& w : writers)
                 w.join();
             for(auto& r : readers)
                 r.join();
+        }
+#endif
+
+        {
+            time_tracker trk;
+            std::cout << "BLOB in KVDB ";
+            sql_bridge::bytes_block src(100),dst,dst2;
+            std::memset(src.data(), 1, src.size());
+            storage.save("Content1",src);
+            storage.save("Content2",src);
+            dst = storage.load("Content1",sql_bridge::bytes_block());
+            assert(src==dst);
+            storage.remove<sql_bridge::bytes_block>("Content2");
+            dst2 = storage.load("Content2",src);
+            assert(dst2==src);
+            
+            
+            
+            
+            
+            std::cout << "is ok. ";
         }
         
     }

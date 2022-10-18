@@ -44,6 +44,8 @@
 #include <memory>
 #include <string>
 
+#include "sb_bytes_block.h"
+
 namespace sql_bridge
 {
     template<typename T> struct is_key_mapped
@@ -278,7 +280,8 @@ namespace sql_bridge
         : std::integral_constant<bool,  is_convertible_to_int<T>::value ||
                                         is_convertible_to_float<T>::value ||
                                         is_convertible_to_text<T>::value ||
-                                        is_chrono<T>::value>
+                                        is_chrono<T>::value ||
+                                        std::is_same<T,bytes_block>::value>
     {
     };
 

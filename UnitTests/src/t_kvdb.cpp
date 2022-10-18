@@ -105,3 +105,16 @@ TEST_F(DBFixture, Chrono)
 	auto dur = srcnow<dstnow?(dstnow-srcnow):(srcnow-dstnow);
 	ASSERT_LT(dur,std::chrono::microseconds(1));
 }
+
+TEST_F(DBFixture, Blob)
+{
+    sql_bridge::bytes_block src(100),dst,dst2;
+    std::memset(src.data(), 1, src.size());
+    storage().save("Content1",src);
+    storage().save("Content2",src);
+    dst = storage().load("Content1",sql_bridge::bytes_block());
+    ASSERT_EQ(src,dst);
+    storage().remove<sql_bridge::bytes_block>("Content2");
+    dst2 = storage().load("Content2",src);
+    ASSERT_EQ(dst2,src);
+}

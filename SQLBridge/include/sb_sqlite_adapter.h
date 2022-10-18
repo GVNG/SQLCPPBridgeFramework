@@ -112,6 +112,14 @@ namespace sql_bridge
                 typename T::clock::duration ret(static_cast<int64_t>(val / T::clock::period::num * T::clock::period::den));
                 v = T(ret);
             }
+            template<typename T> inline typename std::enable_if<std::is_same<T, bytes_block>::value>::type read_value(T& v, int fld) const
+            {
+                int sz = sqlite3_column_bytes(state_, fld);
+                if (!sz)
+                    v = bytes_block();
+                else
+                    v = bytes_block(sqlite3_column_blob(state_, fld),sz);
+            }
         protected:
         private:
             // data
@@ -187,6 +195,11 @@ namespace sql_bridge
                 double tv = static_cast<double>(val.time_since_epoch().count()) / T::period::den * T::period::num;
                 sqlite3_bind_double(state_, fld, tv);
             }
+            template<typename T> inline typename std::enable_if<std::is_same<T,bytes_block>::value>::type bind_value(T const& val, int fld)
+            {
+                need_step_=true;
+                sqlite3_bind_blob64(state_, fld, val.data(), val.size(), SQLITE_TRANSIENT);
+            }
         protected:
         private:
             // data
@@ -218,16 +231,19 @@ namespace sql_bridge
             {
                 switch(val.type())
                 {
-                    case sql_value::e_key_type::Integer:
+                    case sql_value::e_key_type::integer:
                         bind(val.value<int64_t>());
                         break;
-                    case sql_value::e_key_type::Real:
+                    case sql_value::e_key_type::real:
                         bind(val.value<double>());
                         break;
-                    case sql_value::e_key_type::String:
+                    case sql_value::e_key_type::string:
                         bind(val.value<std::string>());
                         break;
-                    case sql_value::e_key_type::Empty:
+                    case sql_value::e_key_type::blob:
+                        bind_blob(val.blob(), ++fld_num_);
+                        break;
+                    case sql_value::e_key_type::empty:
                         break;
                 }
             }
@@ -242,6 +258,11 @@ namespace sql_bridge
             template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value>::type bind_value(T const& val, int fld) {sqlite3_bind_double(statement_, fld, val);}
             template<typename T> inline typename std::enable_if<is_convertible_to_int<T>::value>::type bind_value(T const& val, int fld) {sqlite3_bind_int64(statement_, fld, static_cast<sqlite3_int64>(val));}
             template<typename T> inline typename std::enable_if<is_convertible_to_text<T>::value>::type bind_value(T const& val, int fld) {sqlite3_bind_text(statement_, fld, val.c_str(), (int)val.size(), SQLITE_TRANSIENT);}
+            void bind_blob(bytes_block const& blk, int fld)
+            {
+//                sqlite3_column_bytes(statement_, fld);
+//                sqlite3_bind_blob64(statement_, fld, blk.data(), blk.size(), SQLITE_TRANSIENT);
+            };
             void postponed_init();
         };
         
@@ -272,16 +293,19 @@ namespace sql_bridge
             {
                 switch(val.type())
                 {
-                    case sql_value::e_key_type::Integer:
+                    case sql_value::e_key_type::integer:
                         bind(val.value<int64_t>());
                         break;
-                    case sql_value::e_key_type::Real:
+                    case sql_value::e_key_type::real:
                         bind(val.value<double>());
                         break;
-                    case sql_value::e_key_type::String:
+                    case sql_value::e_key_type::string:
                         bind(val.value<std::string>());
                         break;
-                    case sql_value::e_key_type::Empty:
+                    case sql_value::e_key_type::blob:
+                        bind_blob(val.blob(), fld_num_++);
+                        break;
+                    case sql_value::e_key_type::empty:
                         bind_null(fld_num_++);
                         break;
                 }
@@ -297,6 +321,7 @@ namespace sql_bridge
             template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value>::type bind_value(T const& val, int fld) {need_step_=true;sqlite3_bind_double(statement_, fld, val);}
             template<typename T> inline typename std::enable_if<is_convertible_to_int<T>::value>::type bind_value(T const& val, int fld) {need_step_=true;sqlite3_bind_int64(statement_, fld, static_cast<sqlite3_int64>(val));}
             template<typename T> inline typename std::enable_if<is_convertible_to_text<T>::value>::type bind_value(T const& val, int fld) {need_step_=true;sqlite3_bind_text(statement_, fld, val.c_str(), (int)val.size(), SQLITE_TRANSIENT);}
+            inline void bind_blob(bytes_block const& blk,int fld) {need_step_=true;sqlite3_bind_blob64(statement_, fld, blk.data(), blk.size(), SQLITE_TRANSIENT);}
             inline void bind_null(int fld) {need_step_=true;sqlite3_bind_null(statement_, fld);}
         };
         
@@ -310,7 +335,8 @@ namespace sql_bridge
             template<typename TFn=T> static inline typename std::enable_if<is_convertible_to_float<TFn>::value,std::string>::type const& type_name() {static const std::string ret("REAL"); return ret;}
             template<typename TFn=T> static inline typename std::enable_if<is_convertible_to_int<TFn>::value,std::string>::type const& type_name() {static const std::string ret("INTEGER"); return ret;}
             template<typename TFn=T> static inline typename std::enable_if<is_convertible_to_text<TFn>::value,std::string>::type const& type_name() {static const std::string ret("TEXT"); return ret;}
-            
+            template<typename TFn=T> static inline typename std::enable_if<std::is_same<TFn, bytes_block>::value,std::string>::type const& type_name() {static const std::string ret("BLOB"); return ret;}
+
             template<typename TFn=T> static inline typename std::enable_if<is_trivial_container<TFn>::value, std::string>::type table_name() {return to_string() << "_" << type_name<typename TFn::value_type>() << "_table";}
             template<typename TFn=T> static inline typename std::enable_if<is_trivial_map<TFn>::value, std::string>::type table_name() {return to_string() << "_" << type_name<typename TFn::key_type>() << "_to_" << type_name<typename TFn::mapped_type>() << "_table";}
         };
