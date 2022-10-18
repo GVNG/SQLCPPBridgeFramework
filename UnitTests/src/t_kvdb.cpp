@@ -117,4 +117,25 @@ TEST_F(DBFixture, Blob)
     storage().remove<sql_bridge::bytes_block>("Content2");
     dst2 = storage().load("Content2",src);
     ASSERT_EQ(dst2,src);
+    
+    using block_vector = std::vector<sql_bridge::bytes_block>;
+    using block_map = std::map<std::string,sql_bridge::bytes_block>;
+    block_vector src3(50,sql_bridge::bytes_block(50)),dst3;
+    for(auto& s : src3)
+        std::memset(s.data(), 'a', s.size());
+    storage().save("blob_vector", src3);
+    dst3 = storage().load("blob_vector",block_vector());
+    ASSERT_EQ(dst3,src3);
+
+    block_map src4,dst4;
+    src4 = {{"val50",sql_bridge::bytes_block(50)},
+            {"val100",sql_bridge::bytes_block(100)}};
+    std::memset(src4["val50"].data(), 'f', src4["val50"].size());
+    std::memset(src4["val100"].data(), 's', src4["val100"].size());
+    storage().save("blob_map", src4);
+    storage().remove<block_map>("val50","blob_map");
+    dst4 = storage().load("blob_map", block_map());
+    src4.erase("val50");
+    ASSERT_EQ(dst4,src4);
+
 }
