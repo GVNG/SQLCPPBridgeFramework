@@ -40,8 +40,8 @@
 #include "sb_exceptions.h"
 #include "sb_local_storage.h"
 #include "sb_context.h"
-#include "sb_sqlite_adapter.h"
 #include "sb_data_section_descriptor.h"
+#include "sb_adapter_sqlite.h"
 
 #define DEFINE_SQL_DATABASE_EXT(STRAT,NAME,VERSION,...)\
     struct __t_sect_name_##NAME##_selector{};\
