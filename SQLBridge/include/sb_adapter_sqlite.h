@@ -116,9 +116,9 @@ namespace sql_bridge
             {
                 int sz = sqlite3_column_bytes(state_, fld);
                 if (!sz)
-                    v = bytes_block();
+                    v = T();
                 else
-                    v = bytes_block(sqlite3_column_blob(state_, fld),sz);
+                    v = T(sqlite3_column_blob(state_, fld),sz);
             }
         protected:
         private:
@@ -231,9 +231,9 @@ namespace sql_bridge
                 int fld = fld_num_++;
                 int sz = sqlite3_column_bytes(statement_, fld);
                 if (!sz)
-                    v = bytes_block();
+                    v = T();
                 else
-                    v = bytes_block(sqlite3_column_blob(statement_, fld),sz);
+                    v = T(sqlite3_column_blob(statement_, fld),sz);
             }
 
             template<typename T> inline void bind(T const& val) {bind_value(val,++fld_num_);}
