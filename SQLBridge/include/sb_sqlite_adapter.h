@@ -225,7 +225,17 @@ namespace sql_bridge
             template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value>::type read_value(T& v) {postponed_init();v=static_cast<T>(sqlite3_column_double(statement_, fld_num_++));}
             template<typename T> inline typename std::enable_if<is_convertible_to_text<T>::value>::type read_value(T& v) {postponed_init();v=reinterpret_cast<const char*>(sqlite3_column_text(statement_, fld_num_++));}
             template<typename T> inline typename std::enable_if<is_convertible_to_int<T>::value>::type read_value(T& v) {postponed_init();v=static_cast<T>(sqlite3_column_int64(statement_, fld_num_++));}
-           
+            template<typename T> inline typename std::enable_if<is_convertible_to_blob<T>::value>::type read_value(T& v)
+            {
+                postponed_init();
+                int fld = fld_num_++;
+                int sz = sqlite3_column_bytes(statement_, fld);
+                if (!sz)
+                    v = bytes_block();
+                else
+                    v = bytes_block(sqlite3_column_blob(statement_, fld),sz);
+            }
+
             template<typename T> inline void bind(T const& val) {bind_value(val,++fld_num_);}
             inline void bind(sql_value const& val)
             {
@@ -241,7 +251,7 @@ namespace sql_bridge
                         bind(val.value<std::string>());
                         break;
                     case sql_value::e_key_type::blob:
-                        bind_blob(val.blob(), ++fld_num_);
+                        bind(val.blob());
                         break;
                     case sql_value::e_key_type::empty:
                         break;
@@ -258,11 +268,7 @@ namespace sql_bridge
             template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value>::type bind_value(T const& val, int fld) {sqlite3_bind_double(statement_, fld, val);}
             template<typename T> inline typename std::enable_if<is_convertible_to_int<T>::value>::type bind_value(T const& val, int fld) {sqlite3_bind_int64(statement_, fld, static_cast<sqlite3_int64>(val));}
             template<typename T> inline typename std::enable_if<is_convertible_to_text<T>::value>::type bind_value(T const& val, int fld) {sqlite3_bind_text(statement_, fld, val.c_str(), (int)val.size(), SQLITE_TRANSIENT);}
-            void bind_blob(bytes_block const& blk, int fld)
-            {
-//                sqlite3_column_bytes(statement_, fld);
-//                sqlite3_bind_blob64(statement_, fld, blk.data(), blk.size(), SQLITE_TRANSIENT);
-            };
+            template<typename T> inline typename std::enable_if<is_convertible_to_blob<T>::value>::type bind_value(T const& val, int fld) {sqlite3_bind_blob64(statement_, fld, val.data(), val.size(), SQLITE_TRANSIENT);}
             void postponed_init();
         };
         
@@ -303,7 +309,7 @@ namespace sql_bridge
                         bind(val.value<std::string>());
                         break;
                     case sql_value::e_key_type::blob:
-                        bind_blob(val.blob(), fld_num_++);
+                        bind(val.blob());
                         break;
                     case sql_value::e_key_type::empty:
                         bind_null(fld_num_++);
@@ -321,7 +327,7 @@ namespace sql_bridge
             template<typename T> inline typename std::enable_if<is_convertible_to_float<T>::value>::type bind_value(T const& val, int fld) {need_step_=true;sqlite3_bind_double(statement_, fld, val);}
             template<typename T> inline typename std::enable_if<is_convertible_to_int<T>::value>::type bind_value(T const& val, int fld) {need_step_=true;sqlite3_bind_int64(statement_, fld, static_cast<sqlite3_int64>(val));}
             template<typename T> inline typename std::enable_if<is_convertible_to_text<T>::value>::type bind_value(T const& val, int fld) {need_step_=true;sqlite3_bind_text(statement_, fld, val.c_str(), (int)val.size(), SQLITE_TRANSIENT);}
-            inline void bind_blob(bytes_block const& blk,int fld) {need_step_=true;sqlite3_bind_blob64(statement_, fld, blk.data(), blk.size(), SQLITE_TRANSIENT);}
+            template<typename T> inline typename std::enable_if<is_convertible_to_blob<T>::value>::type bind_value(T const& val, int fld) {need_step_=true;sqlite3_bind_blob64(statement_, fld, val.data(), val.size(), SQLITE_TRANSIENT);}
             inline void bind_null(int fld) {need_step_=true;sqlite3_bind_null(statement_, fld);}
         };
         
