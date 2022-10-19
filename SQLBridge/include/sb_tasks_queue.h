@@ -39,7 +39,7 @@
 
 #include "sb_exceptions.h"
 #include "sb_kv_storage.h"
-#include "sb_adapter_sqlite.h"
+#include "sb_adapter.h"
 
 namespace sql_bridge
 {

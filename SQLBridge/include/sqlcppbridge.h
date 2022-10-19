@@ -41,44 +41,7 @@
 #include "sb_local_storage.h"
 #include "sb_context.h"
 #include "sb_data_section_descriptor.h"
-#include "sb_adapter_sqlite.h"
-
-#define DEFINE_SQL_DATABASE_EXT(STRAT,NAME,VERSION,...)\
-    struct __t_sect_name_##NAME##_selector{};\
-    static sql_bridge::_t_data_section_descriptors_creator<STRAT,__t_sect_name_##NAME##_selector,__VA_ARGS__> const g_db_##NAME##_init(#NAME,VERSION);\
-    template<> void sql_bridge::_t_data_section_descriptor<STRAT,__t_sect_name_##NAME##_selector,__VA_ARGS__>::updater
-
-#define DEFINE_SQL_TABLE_EXT(STRAT,NAME,CLASSNAME)\
-    template<> std::string const sql_bridge::_t_class_descriptor<STRAT,CLASSNAME>::table_name_ = #NAME;\
-    template<> sql_bridge::class_descriptors_container const sql_bridge::_t_class_descriptor<STRAT,CLASSNAME>::members_ =
-
-#define DEFINE_SQL_TRIVIAL_TABLE_EXT(STRAT,NAME,CLASSNAME)\
-    template<> std::string const sql_bridge::_t_container_descriptor<STRAT,CLASSNAME>::table_name_ = #NAME;\
-    template<> sql_bridge::class_descriptors_container const sql_bridge::_t_container_descriptor<STRAT,CLASSNAME>::members_ =\
-    sql_bridge::_t_container_descriptor<STRAT,CLASSNAME>::create_members();
-
-#define DECLARE_SQL_ACCESS_EXT(STRAT,CLASSNAME)\
-    friend class sql_bridge::_t_class_descriptor< STRAT,CLASSNAME >;
-
-#define DECLARE_SQL_INHERITANCE_ACCESS_EXT(STRAT,CLASSNAME,CLASSNAME_PARENT)\
-    friend class sql_bridge::_t_inheritance_descriptor< STRAT,CLASSNAME,CLASSNAME_PARENT >;
-
-// defines for the default strategy (sqlite)
-
-#define DEFINE_SQL_DATABASE(NAME,VERSION,...)\
-    DEFINE_SQL_DATABASE_EXT(sql_bridge::sqlite_adapter,NAME,VERSION,__VA_ARGS__)
-
-#define DEFINE_SQL_TABLE(NAME,CLASSNAME)\
-    DEFINE_SQL_TABLE_EXT(sql_bridge::sqlite_adapter,NAME,CLASSNAME)
-
-#define DEFINE_SQL_TRIVIAL_TABLE(NAME,CLASSNAME)\
-    DEFINE_SQL_TRIVIAL_TABLE_EXT(sql_bridge::sqlite_adapter,NAME,CLASSNAME)
-
-#define DECLARE_SQL_ACCESS(CLASSNAME)\
-    DECLARE_SQL_ACCESS_EXT(sql_bridge::sqlite_adapter,CLASSNAME)
-
-#define DECLARE_SQL_INHERITANCE_ACCESS(CLASSNAME,CLASSNAME_PARENT)\
-    DECLARE_SQL_INHERITANCE_ACCESS_EXT(sql_bridge::sqlite_adapter,CLASSNAME,CLASSNAME_PARENT)
+#include "sb_adapter.h"
 
 #ifdef _MSC_VER
 #pragma warning (pop)

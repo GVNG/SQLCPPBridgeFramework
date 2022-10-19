@@ -166,6 +166,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		931A169329003FF70057FA4F /* sb_adapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_adapter.h; sourceTree = "<group>"; };
 		931D3BE0216E218100BCD515 /* sb_stm_builder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_stm_builder.h; sourceTree = "<group>"; };
 		931D3CCD2170E38900BCD515 /* example23.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example23.h; sourceTree = "<group>"; };
 		931D3CCE2170E3AC00BCD515 /* example23.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example23.cpp; sourceTree = "<group>"; };
@@ -581,6 +582,9 @@
 		93E60D7920558048009151ED /* include */ = {
 			isa = PBXGroup;
 			children = (
+				931A169329003FF70057FA4F /* sb_adapter.h */,
+				93B071F92058262E008D2FB6 /* sb_adapter_sqlite.h */,
+				93250FCF28FEE3300097C19C /* sb_bytes_block.h */,
 				93B07207205948DD008D2FB6 /* sb_class_descriptor.h */,
 				93857ED720B463AB0088B787 /* sb_container_descriptor.h */,
 				937ADD1B2467029800FCC0DF /* sb_context_engine.h */,
@@ -597,13 +601,11 @@
 				93E60DB520558658009151ED /* sb_local_storage.h */,
 				9336AA9C2069143200DF00CA /* sb_members_descriptor.h */,
 				937ADD1A2467014900FCC0DF /* sb_ref_context.h */,
-				93B071F92058262E008D2FB6 /* sb_adapter_sqlite.h */,
 				931D3BE0216E218100BCD515 /* sb_stm_builder.h */,
 				93E60DB82055895C009151ED /* sb_tasks_queue.h */,
 				93E60DB320558320009151ED /* sb_traits.h */,
 				93BEDCD720A2CCAE004166EB /* sb_trivial_members_descriptor.h */,
 				93BEDCB92090DCF4004166EB /* sb_value.h */,
-				93250FCF28FEE3300097C19C /* sb_bytes_block.h */,
 				93E60DB12055816E009151ED /* sqlcppbridge.h */,
 			);
 			path = include;

@@ -1,5 +1,5 @@
 //
-//  sb_sqlite_adapter.h
+//  sb_adapter_sqlite.h
 //  SQLCPPBridgeFramework
 //
 //  Created by Roman Makhnenko on 13/03/2016.
@@ -29,8 +29,8 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
-#ifndef sb_sqlite_adapter_h
-#define sb_sqlite_adapter_h
+#ifndef sb_adapter_sqlite_h
+#define sb_adapter_sqlite_h
 
 #include <sqlite3.h>
 #include "sb_traits.h"
@@ -385,4 +385,4 @@ namespace sql_bridge
     };
 };
 
-#endif /* sb_sqlite_adapter_h */
+#endif /* sb_adapter_sqlite_h */

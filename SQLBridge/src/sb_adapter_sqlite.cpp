@@ -1,5 +1,5 @@
 //
-//  sb_sqlite_adapter.cpp
+//  sb_adapter_sqlite.cpp
 //  SQLCPPBridgeFramework
 //
 //  Created by Roman Makhnenko on 13/03/2016.
@@ -29,7 +29,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
-#include "sb_adapter_sqlite.h"
+#include "sb_adapter.h"
 #include "sb_exceptions.h"
 #include "sb_data_section.h"
 
