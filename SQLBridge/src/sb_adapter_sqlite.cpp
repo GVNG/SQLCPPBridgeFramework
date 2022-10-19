@@ -28,7 +28,10 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
+#ifdef DEBUG_CORE
+    #include <iostream>
+#endif
+
 #include "sb_adapter.h"
 #include "sb_exceptions.h"
 #include "sb_data_section.h"
@@ -126,7 +129,9 @@ namespace sql_bridge
         }
         catch(std::exception& ex)
         {
+#ifdef DEBUG_CORE
             std::cerr << "Unexpected SQL exception: " << ex.what();
+#endif
         }
     }
 

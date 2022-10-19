@@ -28,7 +28,9 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
+#ifdef DEBUG_CORE
+    #include <iostream>
+#endif
 #include "sb_data_section_descriptor.h"
 #include "sb_exceptions.h"
 
