@@ -135,7 +135,7 @@ int main(int argc, char** argv)
         mkdir("./DB", 0777);
         t_db_storage storage("./DB");
      
-#if 1
+#if 0
 
         {
             std::cout << "Case KVDB ";
@@ -853,22 +853,6 @@ int main(int argc, char** argv)
         }
 
         {
-            std::cout << "Case40 Multithreading..." << std::endl;
-            storage["case40"].replace(Case40Container());
-            t_threads_container writers,readers;
-            for(auto& w : writers)
-                w = std::thread(write_data,&storage);
-            for(auto& r: readers)
-                r = std::thread(read_data,&storage);
-            std::this_thread::sleep_for(std::chrono::seconds(10));
-            shutdown = true;
-            for(auto& w : writers)
-                w.join();
-            for(auto& r : readers)
-                r.join();
-        }
-
-        {
             time_tracker trk;
             std::cout << "BLOB in KVDB ";
             sql_bridge::bytes_block src(100),dst,dst2;
@@ -904,6 +888,22 @@ int main(int argc, char** argv)
             std::cout << "is ok. ";
         }
 #endif
+        
+        {
+            std::cout << "Case40 Multithreading..." << std::endl;
+            storage["case40"].replace(Case40Container());
+            t_threads_container writers,readers;
+            for(auto& w : writers)
+                w = std::thread(write_data,&storage);
+            for(auto& r: readers)
+                r = std::thread(read_data,&storage);
+            std::this_thread::sleep_for(std::chrono::seconds(10));
+            shutdown = true;
+            for(auto& w : writers)
+                w.join();
+            for(auto& r : readers)
+                r.join();
+        }
 
     }
     catch (std::exception& ex)
