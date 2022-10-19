@@ -44,6 +44,7 @@ namespace sql_bridge
     static std::string const g_err_cantopen("Can't open SQL-database");
     static std::string const g_err_cantupdate("Can't update the database");
     static std::string const g_err_cantread("Can't read the database");
+    static std::string const g_err_cantbegintransaction("Can't begin transaction");
 
     sqlite_adapter::sql_file::sql_file(std::string const& dbfname)
         : base_(nullptr)
@@ -85,7 +86,7 @@ namespace sql_bridge
         created_tables_.clear();
     }
     
-    sqlite_adapter::sql_file const& sqlite_adapter::sql_file::execute(const std::string & cmd) const
+    sqlite_adapter::sql_file const& sqlite_adapter::sql_file::execute(std::string const& cmd) const
     {
         char* errMsg = NULL;
         int code = sqlite3_exec(base_, cmd.c_str(), NULL, NULL, &errMsg);
@@ -103,19 +104,25 @@ namespace sql_bridge
     }
     
     sqlite_adapter::sql_file::transactions_lock::transactions_lock(sql_file const& src)
-        : parent_(src.execute("BEGIN TRANSACTION"))
+        : parent_(src)
         , rollback_(false)
     {
+        static std::string const cmd("BEGIN TRANSACTION");
+        sqlite3_stmt* begin = parent_[cmd];
+        int code = sqlite3_step(begin);
+        if (code!=SQLITE_DONE)
+            throw sql_error(g_err_cantbegintransaction,cmd,code);
     }
     
     sqlite_adapter::sql_file::transactions_lock::~transactions_lock()
     {
         try
         {
-            if (rollback_)
-                parent_.execute("ROLLBACK TRANSACTION");
-            else
-                parent_.execute("COMMIT TRANSACTION");
+            std::string cmd = rollback_?"ROLLBACK TRANSACTION":"COMMIT TRANSACTION";
+            sqlite3_stmt* res = parent_[cmd];
+            int code = sqlite3_step(res);
+            if (code!=SQLITE_DONE)
+                throw std::runtime_error(to_string() << cmd << " failed with code " << code);
         }
         catch(std::exception& ex)
         {

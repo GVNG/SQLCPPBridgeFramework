@@ -61,7 +61,9 @@ namespace sql_bridge
         template<typename T> inline void where_not_like(std::string const T::*mem_ptr, std::string const& val) {_where_not_like<T>(mem_ptr,val);}
 
     private:
+        
 #pragma mark - order
+        
         template<typename T,typename TFn> inline typename std::enable_if<!is_sql_acceptable<T>::value && !is_container<T>::value && !is_map<T>::value>::type _order(TFn const T::*mem_ptr)
         {
             std::string field = data_->field_name(mem_ptr);

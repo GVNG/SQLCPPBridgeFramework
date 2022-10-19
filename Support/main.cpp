@@ -95,7 +95,7 @@ void write_data(t_db_storage* pst)
         Case40 val(tid);
         cont.save(val);
 //        std::this_thread::yield();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
     {
         std::lock_guard<std::mutex> gr(console_mutex);
@@ -135,7 +135,7 @@ int main(int argc, char** argv)
         mkdir("./DB", 0777);
         t_db_storage storage("./DB");
      
-#if 0
+#if 1
 
         {
             std::cout << "Case KVDB ";
