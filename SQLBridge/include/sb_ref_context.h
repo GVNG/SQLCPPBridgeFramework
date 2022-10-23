@@ -56,7 +56,6 @@ namespace sql_bridge
                 , root_data_(rd)
                 {};
             inline void run_task() override {if (!page_size_.empty()) section_->save_page(page_size_,data_,references_,root_data_); else section_->save(data_,references_,root_data_);}
-            void error(base_sql_error const& err) override {throw err;}
         private:
             range page_size_;
             _t_base const* data_;
@@ -78,7 +77,6 @@ namespace sql_bridge
                 , root_data_(rd)
                 {};
             inline void run_task() override {section_->replace(data_,references_,root_data_);}
-            void error(base_sql_error const& err) override {throw err;}
         private:
             _t_base const* data_;
             void const* root_data_;
@@ -104,7 +102,6 @@ namespace sql_bridge
                 , items_load_(0)
                 {};
             inline void run_task() override {section_->load_page(page_size_,data_,filter_,items_load_,references_,root_data_);}
-            void error(base_sql_error const& err) override {throw err;}
             size_t items_load() const {return items_load_;}
         private:
             std::string filter_;
@@ -132,7 +129,6 @@ namespace sql_bridge
                 , items_load_(0)
                 {};
             inline void run_task() override {section_->load(data_,filter_,items_load_,references_,root_data_);}
-            void error(base_sql_error const& err) override {throw err;}
             size_t items_load() const {return items_load_;}
         private:
             std::string filter_;

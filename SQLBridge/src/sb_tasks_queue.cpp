@@ -42,8 +42,8 @@ namespace sql_bridge
         }
         catch (base_sql_error& ex)
         {
-            error(ex);
-            throw;
+            if (error(ex))
+                throw;
         }
     }
     

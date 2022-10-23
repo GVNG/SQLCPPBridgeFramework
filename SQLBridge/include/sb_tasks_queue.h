@@ -75,7 +75,7 @@ namespace sql_bridge
         data_sections_ptr section_;
     private:
         void execute();
-        virtual void error(base_sql_error const&) {}
+        virtual bool error(base_sql_error const&) {return true;}
     };
 
     template<typename TStrategy> class _t_db_queue_entry
