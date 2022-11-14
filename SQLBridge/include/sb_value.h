@@ -141,6 +141,12 @@ namespace sql_bridge
             typename T::clock::duration ret(static_cast<typename T::clock::rep>(rValue_ / T::clock::period::num * T::clock::period::den));
             return static_cast<T>(ret);
         }
+        template<typename T> inline typename std::enable_if<is_convertible_to_blob<T>::value,T const&>::type value() const
+        {
+            if (type_!=e_key_type::blob)
+                throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
+            return static_cast<T const&>(btValue_);
+        }
         bytes_block const& blob() const {return btValue_;}
     private:
         // data
