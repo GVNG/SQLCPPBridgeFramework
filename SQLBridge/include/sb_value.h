@@ -143,7 +143,7 @@ namespace sql_bridge
         }
         template<typename T> inline typename std::enable_if<is_convertible_to_blob<T>::value,T const&>::type value() const
         {
-            if (type_!=e_key_type::blob)
+            if (type_!=e_key_type::blob && type_!=e_key_type::empty)
                 throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
             return static_cast<T const&>(btValue_);
         }

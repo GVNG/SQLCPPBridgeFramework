@@ -909,10 +909,13 @@ int main(int argc, char** argv)
             time_tracker trk;
             sql_bridge::context cont(storage["case41"]);
             std::cout << "Case 41 ";
-            Case41Container dst,src(10,Case41(200));
+            Case41Container dst,src(10,Case41(200)),dst2;
             cont.replace(src);
             cont.load(dst);
             assert(src==dst);
+            cont.save(Case41());
+            cont.load(dst2);
+            assert(dst2.back().data_.empty());
             std::cout << "is ok. ";
         }
         

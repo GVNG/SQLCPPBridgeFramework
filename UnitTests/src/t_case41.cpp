@@ -12,9 +12,12 @@
 TEST_F(DBFixture, Case41)
 {
     sql_bridge::context cont(storage()["case41"]);
-    Case41Container dst,src(10,Case41(200));
+    Case41Container dst,src(10,Case41(200)),dst2;
     cont.replace(src);
     cont.load(dst);
     ASSERT_EQ(src,dst);
+    cont.save(Case41());
+    cont.load(dst2);
+    ASSERT_EQ(dst2.back().data_.empty(), true);
 }
 
