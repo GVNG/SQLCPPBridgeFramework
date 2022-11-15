@@ -822,6 +822,13 @@ namespace sql_bridge
                         dst = sql_value(v);
                     }
                     break;
+                case sql_value::e_key_type::blob:
+                    {
+                        bytes_block v;
+                        reader_.read_value(v);
+                        dst = sql_value(v);
+                    }
+                    break;
                 default:
                     throw sql_bridge_error(to_string() << "Table: " << table_name() <<". " << g_internal_error_text, g_architecture_error_text);
             }

@@ -93,6 +93,9 @@
 		9384441E246EF45600671F0D /* example36.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937ADA44245B199D00FCC0DF /* example36.cpp */; };
 		9384441F246EF45600671F0D /* example37.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 937ADD172467003300FCC0DF /* example37.cpp */; };
 		93844420246EF45600671F0D /* example38.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 938443CB246EC22A00671F0D /* example38.cpp */; };
+		9392E7842922AEBF00AD479B /* example41.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9392E7822922AEBF00AD479B /* example41.cpp */; };
+		9392E7852922AEBF00AD479B /* example41.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9392E7822922AEBF00AD479B /* example41.cpp */; };
+		9392E7872923791100AD479B /* t_case41.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9392E7862923791100AD479B /* t_case41.cpp */; };
 		939AC077232A7C8700575859 /* t_case28.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939AC076232A7C8700575859 /* t_case28.cpp */; };
 		939B69C72433858E0013068E /* example1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B072042059359C008D2FB6 /* example1.cpp */; };
 		939B69C82433858E0013068E /* example2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCBB209E0B2F004166EB /* example2.cpp */; };
@@ -242,6 +245,9 @@
 		93857EEA20BBD8C40088B787 /* example10.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = example10.cpp; sourceTree = "<group>"; };
 		93857EFF20BBDB000088B787 /* example11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = example11.h; sourceTree = "<group>"; };
 		93857F0020BBDB000088B787 /* example11.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = example11.cpp; sourceTree = "<group>"; };
+		9392E7822922AEBF00AD479B /* example41.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example41.cpp; sourceTree = "<group>"; };
+		9392E7832922AEBF00AD479B /* example41.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example41.h; sourceTree = "<group>"; };
+		9392E7862923791100AD479B /* t_case41.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case41.cpp; sourceTree = "<group>"; };
 		939AC057232A6EB500575859 /* example28.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example28.h; sourceTree = "<group>"; };
 		939AC058232A6ECE00575859 /* example28.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example28.cpp; sourceTree = "<group>"; };
 		939AC076232A7C8700575859 /* t_case28.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case28.cpp; sourceTree = "<group>"; };
@@ -431,6 +437,7 @@
 				938443A4246C1F0F00671F0D /* t_case37.cpp */,
 				938443CE246EC91B00671F0D /* t_case38.cpp */,
 				938443F9246EF3D200671F0D /* t_case39.cpp */,
+				9392E7862923791100AD479B /* t_case41.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -558,6 +565,8 @@
 				938443F5246ED0E900671F0D /* example39.h */,
 				9382B54128FC277F0042E124 /* example40.cpp */,
 				9382B54228FC277F0042E124 /* example40.h */,
+				9392E7822922AEBF00AD479B /* example41.cpp */,
+				9392E7832922AEBF00AD479B /* example41.h */,
 			);
 			path = Cases;
 			sourceTree = "<group>";
@@ -766,6 +775,7 @@
 				93718CAC227C589E00E22497 /* t_case12.cpp in Sources */,
 				93718CAB227C589E00E22497 /* t_case11.cpp in Sources */,
 				93718CAD227C589E00E22497 /* t_case13.cpp in Sources */,
+				9392E7852922AEBF00AD479B /* example41.cpp in Sources */,
 				937ADA202459947600FCC0DF /* t_case35.cpp in Sources */,
 				937F848E21DA367500DD82F8 /* sb_adapter_sqlite.cpp in Sources */,
 				939B69D72433858E0013068E /* example17.cpp in Sources */,
@@ -797,6 +807,7 @@
 				93718CA2227C589E00E22497 /* t_case2.cpp in Sources */,
 				93718CB6227C589E00E22497 /* t_case22.cpp in Sources */,
 				937ADA46245B199D00FCC0DF /* example36.cpp in Sources */,
+				9392E7872923791100AD479B /* t_case41.cpp in Sources */,
 				93718CB5227C589E00E22497 /* t_case21.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -810,6 +821,7 @@
 				93844416246EF45600671F0D /* example28.cpp in Sources */,
 				9384440A246EF45600671F0D /* example16.cpp in Sources */,
 				93844415246EF45600671F0D /* example27.cpp in Sources */,
+				9392E7842922AEBF00AD479B /* example41.cpp in Sources */,
 				93844420246EF45600671F0D /* example38.cpp in Sources */,
 				93844401246EF45600671F0D /* example7.cpp in Sources */,
 				9384441B246EF45600671F0D /* example33.cpp in Sources */,

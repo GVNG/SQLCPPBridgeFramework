@@ -68,3 +68,14 @@ TEST(Core, BytesBlock)
     ASSERT_EQ(blk2.size(),20);
     ASSERT_EQ(blk2.elements(),10);
 }
+
+TEST(Core, BytesBlockOperations)
+{
+    sql_bridge::bytes_block blk("test",4);
+    blk.append("-test", 5);
+    ASSERT_EQ(blk.size(),9);
+    ASSERT_EQ(blk.allocated(),18);
+    blk.trim();
+    ASSERT_EQ(blk.allocated(),9);
+    ASSERT_EQ(blk,sql_bridge::bytes_block("test-test",9));
+}

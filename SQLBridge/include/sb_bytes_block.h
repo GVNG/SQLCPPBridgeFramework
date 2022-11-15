@@ -65,6 +65,7 @@ namespace sql_bridge
         inline type* data() {return buffer_.get();}
         inline size_t elements() const {return elements_;}
         inline size_t size() const {return elements_*sizeof(type);}
+        inline size_t allocated() const {return allocated_*sizeof(type);}
         
         inline bool operator < (_t_data_block const& rv) const
         {
@@ -87,13 +88,50 @@ namespace sql_bridge
             else
             {
                 t_buffer nb(new type[newel]);
-                if (allocated_)
-                    std::memcpy(nb.get(),buffer_.get(),allocated_*sizeof(type));
+                if (elements_)
+                    std::memcpy(nb.get(),buffer_.get(),elements_*sizeof(type));
                 std::swap(buffer_,nb);
                 allocated_ = newel;
                 elements_ = newel;
             }
         }
+        
+        void append(void const* src, size_t sz) // memory buffer, size in bytes(!!!)
+        {
+            size_t newel = elements_+sz/sizeof(type);
+            assert(newel*sizeof(type)==size()+sz);
+            if (newel<=allocated_)
+            {
+                std::memcpy(data()+elements(),src,sz);
+                elements_ = newel;
+            }
+            else
+            {
+                size_t newalloc = newel*2;
+                t_buffer nb(new type[newalloc]);
+                if (elements_)
+                    std::memcpy(nb.get(),buffer_.get(),elements_*sizeof(type));
+                std::memcpy(nb.get()+elements(),src,sz);
+                std::swap(buffer_,nb);
+                allocated_ = newalloc;
+                elements_ = newel;
+            }
+        }
+        
+        void trim()
+        {
+            if (elements_==allocated_) return;
+            if (elements_)
+            {
+                t_buffer nb(new type[elements_]);
+                std::memcpy(nb.get(),buffer_.get(),elements_*sizeof(type));
+                std::swap(buffer_,nb);
+            }
+            else
+                buffer_ = t_buffer();
+            allocated_ = elements_;
+        }
+        
     private:
         t_buffer buffer_;
         size_t elements_;

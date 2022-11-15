@@ -73,6 +73,7 @@
 #include "example38.h"
 #include "example39.h"
 #include "example40.h"
+#include "example41.h"
 
 using t_db_storage = sql_bridge::local_storage<sql_bridge::sqlite_adapter>;
 using t_threads_container = std::array<std::thread, 10>;
@@ -887,7 +888,6 @@ int main(int argc, char** argv)
 
             std::cout << "is ok. ";
         }
-#endif
         
         {
             std::cout << "Case40 Multithreading..." << std::endl;
@@ -904,7 +904,18 @@ int main(int argc, char** argv)
             for(auto& r : readers)
                 r.join();
         }
-
+#endif
+        {
+            time_tracker trk;
+            sql_bridge::context cont(storage["case41"]);
+            std::cout << "Case 41 ";
+            Case41Container dst,src(10,Case41(200));
+            cont.replace(src);
+            cont.load(dst);
+            assert(src==dst);
+            std::cout << "is ok. ";
+        }
+        
     }
     catch (std::exception& ex)
     {
