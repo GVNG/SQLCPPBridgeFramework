@@ -114,15 +114,15 @@ namespace sql_bridge
             ready--;
             while(!shutdown_)
             {
-                tasks_queue_access_.wait();
                 for(;;)
                 {
                     db_task_ptr task;
-                    tasks_queue_access_.under_guard([this,&task]()
+                    tasks_queue_access_.wait_if([this,&task]()
                     {
-                        if (tasks_queue_.empty()) return;
+                        if (tasks_queue_.empty()) return true;
                         task = std::move(tasks_queue_.front());
                         tasks_queue_.pop_front();
+                        return false;
                     });
                     if (!task) break;
                     (*task)();
