@@ -331,6 +331,7 @@ namespace sql_bridge
 
     sqlite_adapter::sql_inserter_kv sqlite_adapter::create_table_for_array(sql_file const& db,std::string const& table, std::string const& type)
     {
+        db.reset_cache();
         db.execute(to_string() << "DROP TABLE IF EXISTS " << table);
         db.execute(to_string() << "CREATE TABLE " << table << " (key INTEGER PRIMARY KEY AUTOINCREMENT, val " << type << ")");
         return sql_inserter_kv(db,table,false);
@@ -338,6 +339,7 @@ namespace sql_bridge
     
     sqlite_adapter::sql_inserter_kv sqlite_adapter::create_table_for_map(sql_file const& db,std::string const& table, std::string const& typekey, std::string const& typeval)
     {
+        db.reset_cache();
         db.execute(to_string() << "DROP TABLE IF EXISTS " << table);
         db.execute(to_string() << "CREATE TABLE " << table << " (key " << typekey << ", val " << typeval << ")");
         return sql_inserter_kv(db,table,true);

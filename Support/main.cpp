@@ -153,7 +153,7 @@ int main(int argc, char** argv)
             storage.save("to_remove",src_str2);
 
             storage.remove<std::string>("to_remove");
-            
+
             dst_rl = storage.load("test",0.0);
             dst_str = storage.load("test");
             dst_str2 = storage.load("to_remove", std::string("def"));
@@ -184,7 +184,7 @@ int main(int argc, char** argv)
             storage.save("STAT", stat_src);
             stat_dst = storage.load("STAT", std::array<char,20>());
             assert(stat_src==stat_dst);
-            
+
             std::map<int,std::string> mapstr1_src,mapstr1_dst;
             for(int i=0; i<1000; i++)
                 mapstr1_src[i] = sql_bridge::to_string() << "Map: " << i+1;
@@ -193,15 +193,21 @@ int main(int argc, char** argv)
             mapstr1_src.erase(200);
             mapstr1_dst = storage.load("IntStringMap",std::map<int,std::string>());
             assert(mapstr1_src==mapstr1_dst);
-            
+
             std::chrono::system_clock::time_point srcnow(std::chrono::system_clock::now()),dstnow;
             storage.save("NOW", srcnow);
             dstnow = storage.load("NOW", std::chrono::system_clock::time_point());
             assert(srcnow==dstnow);
             
+            std::set<size_t> idset_src,idset_dst;
+            for(size_t i=0; i<2000; i++)
+                idset_src.insert(i+300);
+            storage.save("IdSet",idset_src);
+            idset_dst = storage.load("IdSet",std::set<size_t>());
+            assert(idset_src==idset_dst);
+            
             std::cout << "is ok. ";
         }
-
         {
             time_tracker trk;
             sql_bridge::context cont(storage["case1"]);
@@ -904,7 +910,6 @@ int main(int argc, char** argv)
             for(auto& r : readers)
                 r.join();
         }
-#endif
         {
             time_tracker trk;
             sql_bridge::context cont(storage["case41"]);
@@ -918,7 +923,8 @@ int main(int argc, char** argv)
             assert(dst2.back().data_.empty());
             std::cout << "is ok. ";
         }
-        
+#endif
+
     }
     catch (std::exception& ex)
     {
