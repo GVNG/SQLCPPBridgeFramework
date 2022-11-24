@@ -119,7 +119,7 @@ namespace sql_bridge
                     db_task_ptr task;
                     tasks_queue_access_.wait_if([this,&task]()
                     {
-                        if (tasks_queue_.empty()) return true;
+                        if (tasks_queue_.empty()) return !shutdown_;
                         task = std::move(tasks_queue_.front());
                         tasks_queue_.pop_front();
                         return false;
