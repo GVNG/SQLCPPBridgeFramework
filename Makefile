@@ -102,11 +102,11 @@ endif
 
 # Platform Specific Compiler Flags
 ifeq ($(UNAME_S),Darwin)
-    CFLAGS += -std=gnu++14 -stdlib=libc++ -O2 -fembed-bitcode -isysroot $(DEVPATH)
+    CFLAGS += -std=c++14 -O2 -fembed-bitcode -isysroot $(DEVPATH)
     LDFLAGS := -static
     LINK_CMD :=  $(LIBTOOL) $(LDFLAGS) -o $(TARGET) $(OBJECTS)
 else
-    CFLAGS += -std=gnu++14 -O2 -fpic -fPIC
+    CFLAGS += -std=c++14 -O2 -fpic -fPIC
     LINK_CMD := $(LIBTOOL) -cr $(TARGET) $(OBJECTS)
 endif
 
