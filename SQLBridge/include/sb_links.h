@@ -67,8 +67,8 @@ namespace sql_bridge
     class class_link
     {
     public:
-        class_link(size_t src, std::string const& tabname, std::string const& ref_fld_name)
-            : source_id_(src)
+        class_link(size_t sid, std::string const& tabname, std::string const& ref_fld_name)
+            : source_id_(sid)
             , table_name_(tabname)
             , ref_field_name_(ref_fld_name)
             , use_trivial_key_for_remove_(false)

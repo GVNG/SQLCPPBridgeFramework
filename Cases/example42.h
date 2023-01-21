@@ -17,6 +17,7 @@ using Case42Container = std::vector<Case42>;
 class Case42
 {
     DECLARE_SQL_ACCESS(Case42);
+    DECLARE_SQL_ACCESS(sql_bridge::recursion_ref<Case42>);
 public:
     Case42()
         : db_id_(0)

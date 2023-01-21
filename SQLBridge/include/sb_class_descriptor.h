@@ -94,6 +94,14 @@ namespace sql_bridge
             return ret;
         }
         
+        template<typename TMb, typename TCl> inline static typename std::enable_if<std::is_base_of<TCl, T>::value,class_descriptors_ptr>::type bind_recursive(std::string const& fn, TMb TCl::* m, e_db_index_type it = e_db_index_type::None)
+        {
+            using type = _t_member_descriptor<TStrategy,TCl,TMb>;
+            struct make_shared_enabler : public type {make_shared_enabler(std::string const& fn, TMb TCl::* m, e_db_index_type it, class_descriptors_ptr desc) : type(fn,m,it,desc){}};
+            std::shared_ptr<type> ret(std::make_shared<make_shared_enabler>(fn,m,it,_create_description_recursive<TMb>()));
+            return ret;
+        }
+
 #pragma mark - check for empty containers
         
         template<typename TFn> inline typename std::enable_if<is_container<TFn>::value ||
@@ -112,7 +120,22 @@ namespace sql_bridge
         
         template<typename TFn> inline static typename std::enable_if<is_sql_acceptable<TFn>::value,sql_value>::type _try_cast() {return sql_value(TFn());}
         template<typename TFn> inline static typename std::enable_if<!is_sql_acceptable<TFn>::value,sql_value>::type _try_cast() {return sql_value();}
+
+#pragma mark - create recursive description
         
+        template<typename TFn> inline static typename std::enable_if<!is_container<TFn>::value && !is_any_map<TFn>::value,class_descriptors_ptr>::type _create_description_recursive() {return _create_description<TFn>();}
+        template<typename TFn> inline static typename std::enable_if<is_container<TFn>::value,class_descriptors_ptr>::type _create_description_recursive()
+        {
+            using value_type = recursion_ref<typename TFn::value_type>;
+            return _create_description<value_type>();
+        }
+        template<typename TFn> inline static typename std::enable_if<is_any_map<TFn>::value,class_descriptors_ptr>::type _create_description_recursive()
+        {
+            using mapped = recursion_ref<typename TFn::mapped_type>;
+            using type = _t_class_descriptor<TStrategy,mapped>;
+            return std::make_shared<type>();
+        }
+
 #pragma mark - create description
         
         template<typename TFn> inline static typename std::enable_if<is_optional_or_trivial<TFn>::value,class_descriptors_ptr>::type _create_description() {return class_descriptors_ptr();}

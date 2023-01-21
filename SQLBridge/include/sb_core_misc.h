@@ -73,6 +73,8 @@ namespace sql_bridge
     using index_to_field_pair = std::pair<e_db_index_type,std::string>;
     using index_to_field_pairs_container = std::vector<index_to_field_pair>;
 
+    template<typename T> struct recursion_ref : T {};
+
     class range
     {
     public:
@@ -235,7 +237,6 @@ namespace sql_bridge
             return ret;
         }
     };
-
 };
 
 #endif /* sb_core_misc_h */
