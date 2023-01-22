@@ -56,7 +56,6 @@
 		9392E7852922AEBF00AD479B /* example41.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9392E7822922AEBF00AD479B /* example41.cpp */; };
 		9392E7872923791100AD479B /* t_case41.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9392E7862923791100AD479B /* t_case41.cpp */; };
 		9398AE42297AFB22008083F5 /* example42.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9398AE40297AFB22008083F5 /* example42.cpp */; };
-		9398AE43297AFB22008083F5 /* example42.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9398AE40297AFB22008083F5 /* example42.cpp */; };
 		939AC077232A7C8700575859 /* t_case28.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939AC076232A7C8700575859 /* t_case28.cpp */; };
 		939B69C72433858E0013068E /* example1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B072042059359C008D2FB6 /* example1.cpp */; };
 		939B69C82433858E0013068E /* example2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEDCBB209E0B2F004166EB /* example2.cpp */; };
@@ -769,7 +768,6 @@
 				939B69D82433858E0013068E /* example18.cpp in Sources */,
 				93718CA7227C589E00E22497 /* t_case7.cpp in Sources */,
 				938443CF246EC91B00671F0D /* t_case38.cpp in Sources */,
-				9398AE43297AFB22008083F5 /* example42.cpp in Sources */,
 				93718CA2227C589E00E22497 /* t_case2.cpp in Sources */,
 				93718CB6227C589E00E22497 /* t_case22.cpp in Sources */,
 				937ADA46245B199D00FCC0DF /* example36.cpp in Sources */,

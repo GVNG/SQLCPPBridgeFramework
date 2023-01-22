@@ -203,7 +203,7 @@ namespace sql_bridge
                 throw sql_bridge_error(g_internal_error_text,g_architecture_error_text);
             if (tids_in_proc.find(chl.source_id())!=tids_in_proc.end())
             {
-//                throw sql_bridge_error("Recursive dependencies don't support yet", "You should wait the next releases or simplificate your object model.");
+                throw sql_bridge_error("Recursive dependencies don't support yet", "You should wait the next releases or simplificate your object model.");
                 
 //                ret = member_for_index_ref(e_db_key_mode::None,to_string() << "sqlcpp_recursive_field");
 //                dp.add_field({ret.name(),def_recursive_type,false,true});
