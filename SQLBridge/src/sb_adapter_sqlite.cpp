@@ -391,7 +391,7 @@ namespace sql_bridge
         crts << ")";
         dp.update_for_create_statement(crts);
         
-        dp.update_for_drop_table_statement(to_string() << "DROP TABLE " << dp.table_name());
+        dp.update_for_drop_table_statement(to_string() << "DROP TABLE IF EXISTS " << dp.table_name());
         
         for(auto const& isr : dp.should_create_indexes())
         {
