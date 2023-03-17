@@ -88,6 +88,7 @@ namespace sql_bridge
             else
             {
                 t_buffer nb(new type[newel]);
+                if (!nb) return; // low memory, do nothing
                 if (elements_)
                     std::memcpy(nb.get(),buffer_.get(),elements_*sizeof(type));
                 std::swap(buffer_,nb);
@@ -109,6 +110,8 @@ namespace sql_bridge
             {
                 size_t newalloc = newel*2;
                 t_buffer nb(new type[newalloc]);
+                if (!nb)
+                    return; // low memory, do nothing
                 if (elements_)
                     std::memcpy(nb.get(),buffer_.get(),elements_*sizeof(type));
                 std::memcpy(nb.get()+elements(),src,sz);
@@ -124,6 +127,8 @@ namespace sql_bridge
             if (elements_)
             {
                 t_buffer nb(new type[elements_]);
+                if (!nb)
+                    return; // low memory, do nothing
                 std::memcpy(nb.get(),buffer_.get(),elements_*sizeof(type));
                 std::swap(buffer_,nb);
             }
