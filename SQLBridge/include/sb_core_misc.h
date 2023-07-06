@@ -145,6 +145,7 @@ namespace sql_bridge
         inline void wait_if(guarded_if_function fn) {locker lk(mtx_);if (fn()) var_.wait(lk); else lk.unlock();}
         inline void under_guard(guarded_function fn) {lock_guard lk(mtx_);fn();}
         inline void under_guard_and_fire(guarded_function fn) {lock_guard lk(mtx_);fn();var_.notify_one();}
+        inline void under_guard_and_fire_all(guarded_function fn) {lock_guard lk(mtx_);fn();var_.notify_all();}
     private:
         std::mutex mtx_;
         std::condition_variable var_;
