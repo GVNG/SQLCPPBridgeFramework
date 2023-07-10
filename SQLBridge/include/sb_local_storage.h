@@ -170,14 +170,12 @@ namespace sql_bridge
         
     public:
         local_storage(std::string const& path)
-            : ready_(2)
-            , flush_shutdown_(false)
+            : flush_shutdown_(false)
             , root_path_(path)
             , proc_queue_(std::make_shared<db_queue_entry>(t_strategy::main_db_name(path)))
         {
             proc_thread_ = std::thread(std::bind(std::mem_fn(&local_storage::proc),this));
             proc_flush_thread_ = std::thread(std::bind(std::mem_fn(&local_storage::proc_flush),this));
-            do {std::this_thread::yield();} while(ready_);
         }
         
         ~local_storage()
@@ -261,7 +259,6 @@ namespace sql_bridge
         }
     private:
         // data
-        interlocked<size_t> ready_;
         bool flush_shutdown_;
         mt_event flush_event_;
         std::string root_path_;
@@ -271,10 +268,9 @@ namespace sql_bridge
         // methods
         local_storage(local_storage const&) = delete;
         
-        void proc() {proc_queue_->do_proc(ready_);}
+        void proc() {proc_queue_->do_proc();}
         void proc_flush()
         {
-            ready_--;
             while(!flush_event_.wait_for(std::chrono::seconds(10)))
             {
                 typename protected_data::access lk(data_);

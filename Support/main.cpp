@@ -137,7 +137,7 @@ int main(int argc, char** argv)
         mkdir("./DB", 0777);
         t_db_storage storage("./DB");
      
-#if 0
+#if 1
 
         {
             std::cout << "Case KVDB ";
@@ -926,17 +926,17 @@ int main(int argc, char** argv)
         }
 #endif
         
-        {
-            time_tracker trk;
-            sql_bridge::context cont(storage["case42"]);
-            std::cout << "Case 42 ";
-            Case42 dst, src;
-            src.make_children(10);
-            cont.replace(src);
-            cont.load(dst);
-
-            std::cout << "is ok. ";
-        }
+//        {
+//            time_tracker trk;
+//            sql_bridge::context cont(storage["case42"]);
+//            std::cout << "Case 42 ";
+//            Case42 dst, src;
+//            src.make_children(10);
+//            cont.replace(src);
+//            cont.load(dst);
+//
+//            std::cout << "is ok. ";
+//        }
         
 
     }

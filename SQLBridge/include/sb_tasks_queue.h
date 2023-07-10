@@ -109,9 +109,8 @@ namespace sql_bridge
             chk.get();
         }
         
-        void do_proc(interlocked<size_t>& ready)
+        void do_proc()
         {
-            ready--;
             while(!shutdown_)
             {
                 for(;;)
