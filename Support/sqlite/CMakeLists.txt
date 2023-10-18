@@ -1,8 +1,9 @@
-PROJECT(sqlite3)
+PROJECT(SQLite3)
 cmake_minimum_required(VERSION 3.15)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 add_library(${PROJECT_NAME} STATIC sqlite3.c sqlite3.h sqlite3ext.h)
+add_library ( lib::sqlite3 ALIAS ${PROJECT_NAME} )
 
 #set_target_properties(sqlite PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 

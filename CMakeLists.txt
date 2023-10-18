@@ -1,29 +1,24 @@
 cmake_minimum_required ( VERSION 3.15...3.16.2 )
 
-set( CMAKE_PROJECT_INCLUDE_BEFORE 
-  "${CMAKE_CURRENT_LIST_DIR}/common-project-include.in" )
+set( project_version 1.1.14 )
+set( project_description "SQLite to C++ bridge written in modern C++" )
+set( project_homepage "https://github.com/GVNG/SQLCPPBridgeFramework" )
 
-project ( SQLCppBridge 
+cmake_policy(SET CMP0135 NEW)
+
+project ( SQLCppBridge
   VERSION      "${project_version}"
   DESCRIPTION  "${project_description}"
   HOMEPAGE_URL "${project_homepage}"
   LANGUAGES    C CXX )
 
-include(ExternalProject)
 set(SQLITE_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/sqlite)
 set(SQLITE_SCRIPT_FILE ${CMAKE_CURRENT_LIST_DIR}/Support/sqlite/CMakeLists.txt)
-set(SQLITE_LIB_NAME ${SQLITE_INSTALL_LOCATION}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}sqlite3${CMAKE_STATIC_LIBRARY_SUFFIX})
-
-ExternalProject_Add(sqlite
-    URL https://www.sqlite.org/2022/sqlite-amalgamation-3370200.zip
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${SQLITE_INSTALL_LOCATION} -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
-    PATCH_COMMAND ${CMAKE_COMMAND} -E copy "${SQLITE_SCRIPT_FILE}" "."
-)
 
 # possible options
 option ( BUILD_SHARED    "Build shared library instead of static" OFF )
 option ( BUILD_FRAMEWORK "Build framework" OFF )
-option ( REQUIRE_SQLITE  "Link against sqlite3" ON )
+option ( REQUIRE_SQLITE  "Link against sqlite3" OFF )
 
 # if the user specified a platform to build for (i.e. OS)
 # we assume the user wants a framework
@@ -54,8 +49,18 @@ MESSAGE ( STATUS "Build require sqlite:   " ${REQUIRE_SQLITE} )
 MESSAGE ( STATUS "----" )
 
 if ( REQUIRE_SQLITE )
+    include(FetchContent)
+    FetchContent_Declare(
+        sqlite_3430100
+        URL https://sqlite.org/2023/sqlite-amalgamation-3430100.zip
+        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${SQLITE_INSTALL_LOCATION} -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+        PATCH_COMMAND ${CMAKE_COMMAND} -E copy "${SQLITE_SCRIPT_FILE}" "."
+    )
+    FetchContent_MakeAvailable(sqlite_3430100)
     include_directories(${SQLITE_INSTALL_LOCATION}/include)
-    add_dependencies(${PROJECT_NAME} sqlite)
+    add_dependencies(${PROJECT_NAME} SQLite3)
+else()
+    find_package(SQLite3 REQUIRED)
 endif()
 
 add_library ( lib::SQLCppBridge ALIAS ${PROJECT_NAME} )
@@ -79,7 +84,7 @@ set_target_properties( ${PROJECT_NAME} PROPERTIES
 if ( REQUIRE_SQLITE )
 
   if ( BUILD_SHARED )
-    target_link_libraries (${PROJECT_NAME} ${SQLITE_LIB_NAME}) # link right into the shared library
+    target_link_libraries (${PROJECT_NAME} sqlite3) # link right into the shared library
   else()
     target_link_libraries (
       ${PROJECT_NAME}
@@ -90,8 +95,3 @@ endif()
 # installation
 install ( TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib
     PUBLIC_HEADER DESTINATION include/sqlcppbridge)
-
-if ( REQUIRE_SQLITE )
-    install (DIRECTORY ${SQLITE_INSTALL_LOCATION}/include/ DESTINATION include/sqlcppbridge)
-    install (DIRECTORY ${SQLITE_INSTALL_LOCATION}/lib/ DESTINATION lib)
-endif()
