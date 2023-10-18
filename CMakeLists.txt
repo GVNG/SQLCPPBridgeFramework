@@ -18,7 +18,7 @@ set(SQLITE_SCRIPT_FILE ${CMAKE_CURRENT_LIST_DIR}/Support/sqlite/CMakeLists.txt)
 # possible options
 option ( BUILD_SHARED    "Build shared library instead of static" OFF )
 option ( BUILD_FRAMEWORK "Build framework" OFF )
-option ( REQUIRE_SQLITE  "Link against sqlite3" OFF )
+option ( REQUIRE_SQLITE  "Fetch sqlite" ON )
 
 # if the user specified a platform to build for (i.e. OS)
 # we assume the user wants a framework
@@ -45,7 +45,7 @@ MESSAGE ( STATUS "${PROJECT_NAME} Options:" )
 MESSAGE ( STATUS "----" )
 MESSAGE ( STATUS "Build shared library:   " ${BUILD_SHARED} )
 MESSAGE ( STATUS "Build framework:        " ${BUILD_FRAMEWORK} )
-MESSAGE ( STATUS "Build require sqlite:   " ${REQUIRE_SQLITE} )
+MESSAGE ( STATUS "Fetch sqlite:           " ${REQUIRE_SQLITE} )
 MESSAGE ( STATUS "----" )
 
 if ( REQUIRE_SQLITE )
