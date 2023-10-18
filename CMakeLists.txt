@@ -51,12 +51,12 @@ MESSAGE ( STATUS "----" )
 if ( REQUIRE_SQLITE )
     include(FetchContent)
     FetchContent_Declare(
-        sqlite_3430100
+        sqlite3430100
         URL https://sqlite.org/2023/sqlite-amalgamation-3430100.zip
         CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${SQLITE_INSTALL_LOCATION} -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
         PATCH_COMMAND ${CMAKE_COMMAND} -E copy "${SQLITE_SCRIPT_FILE}" "."
     )
-    FetchContent_MakeAvailable(sqlite_3430100)
+    FetchContent_MakeAvailable(sqlite3430100)
     include_directories(${SQLITE_INSTALL_LOCATION}/include)
     add_dependencies(${PROJECT_NAME} SQLite3)
 else()
