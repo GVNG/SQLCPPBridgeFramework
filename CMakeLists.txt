@@ -84,14 +84,15 @@ set_target_properties( ${PROJECT_NAME} PROPERTIES
 if ( REQUIRE_SQLITE )
 
   if ( BUILD_SHARED )
-    target_link_libraries (${PROJECT_NAME} sqlite3) # link right into the shared library
+    target_link_libraries (${PROJECT_NAME}
+        SQLite3) # link right into the shared library
   else()
-    target_link_libraries (
-      ${PROJECT_NAME}
-        INTERFACE ${SQLITE_LIB_NAME} ) # just set as requirement for clients
+    target_link_libraries (${PROJECT_NAME}
+        PUBLIC SQLite3) # just set as requirement for clients
   endif()
 endif()
 
 # installation
-install ( TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib
+install ( TARGETS ${PROJECT_NAME}
+    LIBRARY DESTINATION lib
     PUBLIC_HEADER DESTINATION include/sqlcppbridge)
