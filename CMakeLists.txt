@@ -1,7 +1,7 @@
 cmake_minimum_required ( VERSION 3.15...3.16.2 )
 
 set( project_version 1.1.14 )
-set( project_description "SQLite to C++ bridge written in modern C++" )
+set( project_description "SQL to C++ bridge written in modern C++" )
 set( project_homepage "https://github.com/GVNG/SQLCPPBridgeFramework" )
 
 cmake_policy(SET CMP0135 NEW)
@@ -31,7 +31,7 @@ if ( PLATFORM_SPECIFIED )
 endif()
 
 file ( GLOB_RECURSE ALL_SRC "SQLBridge/src/*.cpp" )
-file ( GLOB_RECURSE HEADERS "SQLBridge/include/*.h" )
+file ( GLOB_RECURSE HEADERS "SQLBridge/include/sqlcppbridge/*.h" )
 
 if ( BUILD_SHARED )
   add_library ( ${PROJECT_NAME} SHARED "${ALL_SRC}" "${HEADERS}" )
@@ -45,7 +45,7 @@ MESSAGE ( STATUS "${PROJECT_NAME} Options:" )
 MESSAGE ( STATUS "----" )
 MESSAGE ( STATUS "Build shared library:   " ${BUILD_SHARED} )
 MESSAGE ( STATUS "Build framework:        " ${BUILD_FRAMEWORK} )
-MESSAGE ( STATUS "Fetch sqlite:           " ${REQUIRE_SQLITE} )
+MESSAGE ( STATUS "Fetch SQLite3:          " ${REQUIRE_SQLITE} )
 MESSAGE ( STATUS "----" )
 
 if ( REQUIRE_SQLITE )
@@ -69,9 +69,9 @@ target_compile_features ( ${PROJECT_NAME}
     PRIVATE  cxx_std_14 )
 
 target_include_directories ( ${PROJECT_NAME}
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/SQLBridge/src" 
-    PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/SQLBridge/include"
-    PUBLIC  "${SQLITE_INSTALL_LOCATION}/include"
+#    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/SQLBridge/src" 
+    PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/SQLBridge/include/sqlcppbridge"
+#    PUBLIC  "${SQLITE_INSTALL_LOCATION}/include"
 )
 
 set_target_properties( ${PROJECT_NAME} PROPERTIES

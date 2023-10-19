@@ -52,7 +52,7 @@ endif
 endif
 
 # Folders
-INCDIR := SQLBridge/include
+INCDIR := SQLBridge/include/sqlcppbridge
 SRCDIR := SQLBridge/src
 BUILDDIR := build
 TARGETDIR := out
@@ -61,8 +61,8 @@ ifdef INST_ROOT
 	INST_DIR_INC := $(INST_ROOT)/include
 	INST_DIR_LIB := $(INST_ROOT)/lib
 else
-	INST_DIR_INC := /usr/include
-	INST_DIR_LIB := /usr/lib
+	INST_DIR_INC := /usr/local/include
+	INST_DIR_LIB := /usr/local/lib
 endif
 
 # Targets

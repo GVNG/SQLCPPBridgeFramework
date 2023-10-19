@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 48;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -591,6 +591,34 @@
 		93E60D7920558048009151ED /* include */ = {
 			isa = PBXGroup;
 			children = (
+				93EF07882AE1573E00F52890 /* sqlcppbridge */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		93E60D7A20558052009151ED /* src */ = {
+			isa = PBXGroup;
+			children = (
+				93B071FA20582B0E008D2FB6 /* sb_adapter_sqlite.cpp */,
+				93E60DB9205589C4009151ED /* sb_tasks_queue.cpp */,
+				93B0720220591999008D2FB6 /* sb_data_section_descriptor.cpp */,
+				9336AAA1206A26EA00DF00CA /* sb_class_descriptor.cpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		93E60DBF20558D16009151ED /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				934A430E220DDE2900FEC1C9 /* libgtest.a */,
+				93E60DC020558D16009151ED /* libsqlite3.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		93EF07882AE1573E00F52890 /* sqlcppbridge */ = {
+			isa = PBXGroup;
+			children = (
 				931A169329003FF70057FA4F /* sb_adapter.h */,
 				93B071F92058262E008D2FB6 /* sb_adapter_sqlite.h */,
 				93250FCF28FEE3300097C19C /* sb_bytes_block.h */,
@@ -617,27 +645,7 @@
 				93BEDCB92090DCF4004166EB /* sb_value.h */,
 				93E60DB12055816E009151ED /* sqlcppbridge.h */,
 			);
-			path = include;
-			sourceTree = "<group>";
-		};
-		93E60D7A20558052009151ED /* src */ = {
-			isa = PBXGroup;
-			children = (
-				93B071FA20582B0E008D2FB6 /* sb_adapter_sqlite.cpp */,
-				93E60DB9205589C4009151ED /* sb_tasks_queue.cpp */,
-				93B0720220591999008D2FB6 /* sb_data_section_descriptor.cpp */,
-				9336AAA1206A26EA00DF00CA /* sb_class_descriptor.cpp */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
-		93E60DBF20558D16009151ED /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				934A430E220DDE2900FEC1C9 /* libgtest.a */,
-				93E60DC020558D16009151ED /* libsqlite3.tbd */,
-			);
-			name = Frameworks;
+			path = sqlcppbridge;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -683,7 +691,8 @@
 		93E60D6420557F7A009151ED /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1400;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1500;
 				ORGANIZATIONNAME = DataArt;
 				TargetAttributes = {
 					937F848121DA2B4800DD82F8 = {

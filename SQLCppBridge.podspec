@@ -58,7 +58,7 @@ intervention and any improvements on the outside.
   spec.source_files  = "SQLBridge/**/*.{h,cpp}"
   #spec.exclude_files = "Classes/Exclude"
 
-  spec.public_header_files = "SQLBridge/include/*.h"
+  spec.public_header_files = "SQLBridge/include/sqlcppbridge/*.h"
   spec.xcconfig = {"CLANG_CXX_LANGUAGE_STANDARD" => "c++14"}
 
   # ――― Project Linking ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #

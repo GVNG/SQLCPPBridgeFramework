@@ -55,7 +55,7 @@ endif
 # Folders
 INCDIR := include
 SRCDIR := src
-INCDIR_SB := ../SQLBridge/include
+INCDIR_SB := ../SQLBridge/include/sqlcppbridge
 SRCDIR_SB := ../SQLBridge/src
 INCDIR_GTEST := Lib/$(OSNAME)/googletest/include
 INCDIR_CASES := ../Cases
