@@ -93,7 +93,9 @@ namespace sql_bridge
 
     template<typename T> class protected_section
     {
+    public:
         using type = typename std::decay<typename std::remove_pointer<T>::type>::type;
+    private:
         template<bool,typename TInt> struct check_for_container {typedef TInt value_type;};
         template<typename TInt> struct check_for_container<true,TInt> {typedef typename TInt::value_type value_type;};
         using init_type = typename check_for_container<is_any_container<type>::value,type>::value_type;
