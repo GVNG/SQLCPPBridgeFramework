@@ -69,9 +69,7 @@ target_compile_features ( ${PROJECT_NAME}
     PRIVATE  cxx_std_14 )
 
 target_include_directories ( ${PROJECT_NAME}
-#    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/SQLBridge/src" 
-    PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/SQLBridge/include/sqlcppbridge"
-#    PUBLIC  "${SQLITE_INSTALL_LOCATION}/include"
+    PUBLIC  SQLBridge/include
 )
 
 set_target_properties( ${PROJECT_NAME} PROPERTIES
