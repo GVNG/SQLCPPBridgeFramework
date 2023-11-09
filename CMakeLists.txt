@@ -63,6 +63,7 @@ else()
     find_package(SQLite3 REQUIRED)
 endif()
 
+include_directories(SQLBridge/include/sqlcppbridge)
 add_library ( lib::SQLCppBridge ALIAS ${PROJECT_NAME} )
 
 target_compile_features ( ${PROJECT_NAME}
