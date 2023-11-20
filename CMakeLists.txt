@@ -12,13 +12,13 @@ project ( SQLCppBridge
   HOMEPAGE_URL "${project_homepage}"
   LANGUAGES    C CXX )
 
-set(SQLITE_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/sqlite)
+#set(SQLITE_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/sqlite)
 set(SQLITE_SCRIPT_FILE ${CMAKE_CURRENT_LIST_DIR}/Support/sqlite/CMakeLists.txt)
 
 # possible options
 option ( BUILD_SHARED    "Build shared library instead of static" OFF )
 option ( BUILD_FRAMEWORK "Build framework" OFF )
-option ( REQUIRE_SQLITE  "Fetch sqlite" ON )
+option ( FETCH_SQLITE  "Fetch sqlite" ON )
 
 # if the user specified a platform to build for (i.e. OS)
 # we assume the user wants a framework
@@ -35,7 +35,7 @@ file ( GLOB_RECURSE HEADERS "SQLBridge/include/sqlcppbridge/*.h" )
 
 if ( BUILD_SHARED )
   add_library ( ${PROJECT_NAME} SHARED "${ALL_SRC}" "${HEADERS}" )
-  set ( REQUIRE_SQLITE ON ) # sqlite linkage is required for shared library
+  set ( FETCH_SQLITE ON ) # sqlite linkage is required for shared library
 else()
   add_library ( ${PROJECT_NAME} STATIC "${ALL_SRC}" "${HEADERS}" )  
 endif()
@@ -45,10 +45,10 @@ MESSAGE ( STATUS "${PROJECT_NAME} Options:" )
 MESSAGE ( STATUS "----" )
 MESSAGE ( STATUS "Build shared library:   " ${BUILD_SHARED} )
 MESSAGE ( STATUS "Build framework:        " ${BUILD_FRAMEWORK} )
-MESSAGE ( STATUS "Fetch SQLite3:          " ${REQUIRE_SQLITE} )
+MESSAGE ( STATUS "Fetch SQLite3:          " ${FETCH_SQLITE} )
 MESSAGE ( STATUS "----" )
 
-if ( REQUIRE_SQLITE )
+if ( FETCH_SQLITE )
     include(FetchContent)
     FetchContent_Declare(
         sqlite3430100
@@ -57,8 +57,8 @@ if ( REQUIRE_SQLITE )
         PATCH_COMMAND ${CMAKE_COMMAND} -E copy "${SQLITE_SCRIPT_FILE}" "."
     )
     FetchContent_MakeAvailable(sqlite3430100)
-    include_directories(${SQLITE_INSTALL_LOCATION}/include)
-    add_dependencies(${PROJECT_NAME} SQLite3)
+    include_directories(${SQLite3_SOURCE_DIR}})
+    add_dependencies(${PROJECT_NAME} lib::SQLite3)
 else()
     find_package(SQLite3 REQUIRED)
 endif()
@@ -70,7 +70,8 @@ target_compile_features ( ${PROJECT_NAME}
     PRIVATE  cxx_std_14 )
 
 target_include_directories ( ${PROJECT_NAME}
-    PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/SQLBridge/include
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/SQLBridge/include
+    PUBLIC ${SQLite3_SOURCE_DIR}
 )
 
 set_target_properties( ${PROJECT_NAME} PROPERTIES
@@ -80,7 +81,7 @@ set_target_properties( ${PROJECT_NAME} PROPERTIES
   CXX_STANDARD      14
   PUBLIC_HEADER     "${HEADERS}" )
 
-if ( REQUIRE_SQLITE )
+if ( FETCH_SQLITE )
 
   if ( BUILD_SHARED )
     target_link_libraries (${PROJECT_NAME}

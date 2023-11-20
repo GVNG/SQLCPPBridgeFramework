@@ -183,7 +183,7 @@
 		9336AAA1206A26EA00DF00CA /* sb_class_descriptor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sb_class_descriptor.cpp; sourceTree = "<group>"; };
 		9336AAAA206B692800DF00CA /* sb_foundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_foundation.h; sourceTree = "<group>"; };
 		934A430E220DDE2900FEC1C9 /* libgtest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgtest.a; path = UnitTests/Lib/MacOS/googletest/lib/libgtest.a; sourceTree = "<group>"; };
-		935B07D92559411600CE0605 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		935B07D92559411600CE0605 /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = text.script.worksheet; path = CMakeLists.txt; sourceTree = "<group>"; };
 		936C65C120774AFF0033F0FB /* sb_links.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_links.h; sourceTree = "<group>"; };
 		937AD9EF2456FFEA00FCC0DF /* example34.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example34.h; sourceTree = "<group>"; };
 		937AD9F02457028700FCC0DF /* example34.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example34.cpp; sourceTree = "<group>"; };
