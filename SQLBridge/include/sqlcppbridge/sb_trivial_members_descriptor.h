@@ -84,7 +84,7 @@ namespace sql_bridge
         void bind_comp(void const*,data_update_context&,sql_value const&) override {};
         void bind_at(void const*,void const*,data_update_context&,sql_value const&) override {};
         void bind_inheritance(size_t,void const*,data_update_context&,sql_value const&) override {};
-        sql_value expand(void const*) override {return sql_value();}
+        sql_value expand(void const* dat) override {return sql_value(*static_cast<T const*>(dat));}
         sql_value try_cast() const override {return sql_value();}
         void read(void*,data_update_context&) override {}
         void read_comp(void* dst,data_update_context& cont,sql_value const& extkey) override {};

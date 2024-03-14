@@ -841,6 +841,13 @@ namespace sql_bridge
             return member_for_id_?member_for_id_->expand(dat):sql_value();
         }
 
+        sql_value id_for_read_members(void const* dat, bool wo_pk) const override
+        {
+            if (use_ext_primary_key_ && !wo_pk)
+                return sql_value(last_key_);
+            return sql_value();
+        }
+
         data_update_context_ptr context_for_member(size_t etid, sql_value const& extkey, std::string const& ref, range const& pgsz) override
         {
             for(auto const& tl : link_.target())
@@ -977,7 +984,16 @@ namespace sql_bridge
                 return member_for_id_->expand(dat);
             return use_last_id_?sql_value(last_insert_id_):sql_value();
         }
-        
+
+        sql_value id_for_read_members(void const* dat, bool) const override
+        {
+            if (update_mode_)
+                return member_for_id_->expand(dat);
+            if (member_for_id_ && !use_last_id_)
+                return member_for_id_->expand(dat);
+            return use_last_id_?sql_value(last_insert_id_):sql_value();
+        }
+
         void check_for_update_ability(void const* dat) override
         {
             update_mode_ = false;

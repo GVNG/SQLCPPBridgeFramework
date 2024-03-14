@@ -37,6 +37,6 @@
 #include <vector>
 
 typedef std::vector<std::string> Case5a;
-typedef std::map<std::string,long> Case5b;
+typedef std::unordered_map<std::string,long> Case5b;
 
 #endif /* example5_h */

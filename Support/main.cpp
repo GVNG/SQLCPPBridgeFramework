@@ -281,7 +281,7 @@ int main(int argc, char** argv)
             assert(src4==dst4);
             std::cout << "is ok. ";
         }
-
+        
         {
             time_tracker trk;
             sql_bridge::context cont(storage["case5"]);
@@ -296,6 +296,9 @@ int main(int argc, char** argv)
             cont.replace(src5a);
             cont.replace(src5b);
             
+            cont.remove<Case5b>("key: 100");
+            src5b.erase("key: 100");
+            
             cont.load(dst5a);
             cont.load(dst5b);
             assert(src5a==dst5a);
@@ -303,6 +306,7 @@ int main(int argc, char** argv)
 
             std::cout << "is ok. ";
         }
+
 
         {
             time_tracker trk;
@@ -926,6 +930,7 @@ int main(int argc, char** argv)
         }
 #endif
         
+
 //        {
 //            time_tracker trk;
 //            sql_bridge::context cont(storage["case42"]);

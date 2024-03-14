@@ -397,7 +397,7 @@ namespace sql_bridge
         {
             to_string idts;
             idts << "CREATE ";
-            if (isr.first==e_db_index_type::Unique)
+            if (isr.first==e_db_index_type::Unique && relfrom.empty())
                 idts << "UNIQUE ";
             idts << "INDEX IF NOT EXISTS ix_" << dp.table_name() << "_" << isr.second << " ON "
                  << dp.table_name() << " (" << isr.second << ")";

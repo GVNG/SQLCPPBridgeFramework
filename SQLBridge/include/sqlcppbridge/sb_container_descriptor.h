@@ -101,6 +101,7 @@ namespace sql_bridge
             return ret;
         }
         
+        
         template<typename TFn> inline static typename std::enable_if<is_trivial_container<TFn>::value,class_descriptors_container>::type _create_members_for_container()
         {
             using type = _t_trivial_member_descriptor<TStrategy, typename TFn::value_type>;
@@ -108,13 +109,16 @@ namespace sql_bridge
             return ret;
         }
 
+        template<typename TFn> inline static typename std::enable_if<is_multimap<TFn>::value,e_db_index_type>::type _index_type_for_map() {return e_db_index_type::Basic;}
+        template<typename TFn> inline static typename std::enable_if<!is_multimap<TFn>::value,e_db_index_type>::type _index_type_for_map() {return e_db_index_type::Unique;}
+
         template<typename TFn> inline static typename std::enable_if<!is_trivial_map<TFn>::value && is_pointer<typename TFn::mapped_type>::value,class_descriptors_container>::type _create_members_for_map()
         {
             using k_type = _t_trivial_member_descriptor<TStrategy, typename TFn::key_type>;
             using m_type = _t_link_member_descriptor<TStrategy, typename is_pointer<typename TFn::mapped_type>::type>;
             class_descriptors_container ret =
             {
-                std::make_shared<k_type>(g_key_field_name,e_db_index_type::Basic),
+                std::make_shared<k_type>(g_key_field_name,_index_type_for_map<TFn>()),
                 std::make_shared<m_type>(),
             };
             return ret;
@@ -126,7 +130,7 @@ namespace sql_bridge
             using m_type = _t_link_member_descriptor<TStrategy, typename TFn::mapped_type>;
             class_descriptors_container ret =
             {
-                std::make_shared<k_type>(g_key_field_name,e_db_index_type::Basic),
+                std::make_shared<k_type>(g_key_field_name,_index_type_for_map<TFn>()),
                 std::make_shared<m_type>(),
             };
             return ret;
@@ -138,7 +142,7 @@ namespace sql_bridge
             using m_type = _t_trivial_member_descriptor<TStrategy, typename TFn::mapped_type>;
             class_descriptors_container ret =
             {
-                std::make_shared<k_type>(g_key_field_name,e_db_index_type::Basic),
+                std::make_shared<k_type>(g_key_field_name,_index_type_for_map<TFn>()),
                 std::make_shared<m_type>(g_value_field_name),
             };
             return ret;
@@ -359,12 +363,12 @@ namespace sql_bridge
             {
                 cont.read(key);
                 cont.next(nullptr);
-                sql_value extid = cont.id_for_members(&dst);
-                if (extid.empty())
-                    throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
+                sql_value extid = cont.id_for_read_members(&dst);
+//                if (extid.empty())
+//                    throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
                 m_type v;
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
-                ncnt->read_comp(&v, extid);
+                data_update_context_ptr ncnt(cont.context_for_member(tid, extid.empty()?key:extid, refname, range()));
+                ncnt->read_comp(&v, extid.empty()?key:extid);
                 dst.insert(typename TFn::value_type(key.value<k_type>(),std::move(v)));
             }
         }
