@@ -692,7 +692,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1530;
 				ORGANIZATIONNAME = DataArt;
 				TargetAttributes = {
 					937F848121DA2B4800DD82F8 = {
