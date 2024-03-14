@@ -51,8 +51,8 @@ namespace sql_bridge
     template<typename T> struct is_key_mapped
     {
     private:
-        typedef char                      yes;
-        typedef struct { char array[2]; } no;
+        using yes = char;
+        using no = struct { char array[2]; };
         
         template<typename C> static yes ft(typename C::key_type*);
         template<typename C> static no  ft(...);
@@ -66,9 +66,9 @@ namespace sql_bridge
     template<typename T> struct is_kind_of_pair
     {
     private:
-        typedef char                      yes;
-        typedef struct { char array[2]; } no;
-        
+        using yes = char;
+        using no = struct { char array[2]; };
+
         template<typename C> static yes ft(typename C::first_type*);
         template<typename C> static yes st(typename C::second_type*);
         template<typename C> static no  ft(...);
@@ -81,36 +81,36 @@ namespace sql_bridge
     template<typename T> struct has_const_iterator
     {
     private:
-        typedef char                      yes;
-        typedef struct { char array[2]; } no;
-        
+        using yes = char;
+        using no = struct { char array[2]; };
+
         template<typename C> static yes test(typename C::const_iterator*);
         template<typename C> static no  test(...);
     public:
         static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
-        typedef T type;
+        using type = T;
     };
 
     template<typename T> struct has_element_type
     {
     private:
-        typedef char                      yes;
-        typedef struct { char array[2]; } no;
+        using yes = char;
+        using no = struct { char array[2]; };
         
         template<typename C> static yes test(typename C::element_type*);
         template<typename C> static no  test(...);
     public:
         static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
-        typedef T type;
+        using type = T;
     };
 
     template<bool,typename T> struct has_begin_end : std::integral_constant<bool, false>{};
     template <typename T> struct has_begin_end<true,T>
     {
     private:
-        typedef char                      yes;
-        typedef struct { char array[2]; } no;
-        typedef typename T::const_iterator (T::*mem_fn)() const;
+        using yes = char;
+        using no = struct { char array[2]; };
+        using mem_fn = typename T::const_iterator (T::*)() const;
 
         template<typename C> static typename std::enable_if<
             std::is_same<decltype(static_cast<mem_fn>(&C::begin)),mem_fn>::value,
@@ -126,15 +126,15 @@ namespace sql_bridge
     public:
         static constexpr bool const value = sizeof(test_b<T>(0)) == sizeof(yes) &&
                                             sizeof(test_e<T>(0)) == sizeof(yes);
-        typedef T type;
+        using type = T;
     };
     
     template<typename T> struct has_push_back
     {
     private:
-        typedef char                      yes;
-        typedef struct { char array[2]; } no;
-        typedef void (T::*mem_fn)(typename T::const_reference);
+        using yes = char;
+        using no = struct { char array[2]; };
+        using mem_fn = void (T::*)(typename T::const_reference);
         
         template<typename C> static typename std::enable_if<
             std::is_same<decltype(static_cast<mem_fn>(&C::push_back)),mem_fn>::value,
@@ -142,15 +142,15 @@ namespace sql_bridge
         template<typename C> static no test(...);
     public:
         static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
-        typedef T type;
+        using type = T;
     };
 
     template<typename T> struct has_at
     {
     private:
-        typedef char                      yes;
-        typedef struct { char array[2]; } no;
-        typedef typename T::mapped_type& (T::*mem_fn)(typename T::key_type const&);
+        using yes = char;
+        using no = struct { char array[2]; };
+        using mem_fn = typename T::mapped_type& (T::*)(typename T::key_type const&);
         
         template<typename C> static typename std::enable_if<
             std::is_same<decltype(static_cast<mem_fn>(&C::at)),mem_fn>::value,
@@ -158,15 +158,15 @@ namespace sql_bridge
         template<typename C> static no test(...);
     public:
         static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
-        typedef T type;
+        using type = T;
     };
     
     template<typename T> struct is_optional_bare
     {
     private:
-        typedef char                      yes;
-        typedef struct { char array[2]; } no;
-        
+        using yes = char;
+        using no = struct { char array[2]; };
+
         template<typename C> static yes ft(typename C::value_type*);
         template<typename C> static yes st(typename C::type_optional_flag*);
         template<typename C> static no  ft(...);
@@ -174,7 +174,7 @@ namespace sql_bridge
     public:
         static constexpr bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
                                       sizeof(st<T>(0)) == sizeof(yes);
-        typedef T type;
+        using type = T;
     };
 
     template<typename T> struct is_ordered_set
@@ -259,21 +259,21 @@ namespace sql_bridge
     {
     };
     
-    template<bool,typename T> struct is_smart_pointer : std::integral_constant<bool, false> {typedef T type;};
+    template<bool,typename T> struct is_smart_pointer : std::integral_constant<bool, false> {using type = T;};
     template<typename T> struct is_smart_pointer<true,T>
         : std::integral_constant<bool,  std::is_same<T,std::shared_ptr<typename T::element_type> >::value ||
                                         std::is_same<T,std::unique_ptr<typename T::element_type> >::value>
     {
-        typedef typename T::element_type type;
+        using type = typename T::element_type;
     };
     
     template<typename T> struct is_pointer
         : std::integral_constant<bool,  std::is_pointer<T>::value ||
                                         is_smart_pointer<has_element_type<T>::value,T>::value>
     {
-        typedef typename std::remove_pointer<T>::type T1;
-        typedef typename std::conditional<is_smart_pointer<has_element_type<T>::value,T>::value, typename is_smart_pointer<has_element_type<T>::value,T>::type, T1>::type T2;
-        typedef T2 type;
+        using T1 = typename std::remove_pointer<T>::type;
+        using T2 = typename std::conditional<is_smart_pointer<has_element_type<T>::value,T>::value, typename is_smart_pointer<has_element_type<T>::value,T>::type, T1>::type;
+        using type = T2;
     };
     
     template<typename T> struct is_convertible_to_blob
@@ -350,17 +350,17 @@ namespace sql_bridge
     {
     };
     
-    template<bool,typename T> struct map_type_check : std::integral_constant<bool, false>{typedef T type;};
-    template<typename T> struct map_type_check<true,T> : std::integral_constant<bool, !is_sql_acceptable<typename T::mapped_type>::value && !is_container<typename T::mapped_type>::value> {typedef typename T::mapped_type type;};
-    template<bool,typename T> struct container_type_check : std::integral_constant<bool, false>{typedef T type;};
-    template<typename T> struct container_type_check<true,T> : std::integral_constant<bool, !is_sql_acceptable<typename T::value_type>::value && !is_container<typename T::value_type>::value> {typedef typename T::value_type type;};
+    template<bool,typename T> struct map_type_check : std::integral_constant<bool, false>{using type = T;};
+    template<typename T> struct map_type_check<true,T> : std::integral_constant<bool, !is_sql_acceptable<typename T::mapped_type>::value && !is_container<typename T::mapped_type>::value> {using type = typename T::mapped_type;};
+    template<bool,typename T> struct container_type_check : std::integral_constant<bool, false>{using type = T;};
+    template<typename T> struct container_type_check<true,T> : std::integral_constant<bool, !is_sql_acceptable<typename T::value_type>::value && !is_container<typename T::value_type>::value> {using type = typename T::value_type;};
     
     template<typename T> struct types_selector
     {
-        typedef typename std::conditional<map_type_check<is_any_map<T>::value,T>::value, typename map_type_check<is_any_map<T>::value,T>::type, T>::type T1;
-        typedef typename std::conditional<container_type_check<is_container<T>::value,T>::value, typename container_type_check<is_container<T>::value, T>::type, T1>::type T2;
+        using T1 = typename std::conditional<map_type_check<is_any_map<T>::value,T>::value, typename map_type_check<is_any_map<T>::value,T>::type, T>::type;
+        using T2 = typename std::conditional<container_type_check<is_container<T>::value,T>::value, typename container_type_check<is_container<T>::value, T>::type, T1>::type;
         static_assert(!std::is_same<T2, void>::value,"No acceptable type selected");
-        typedef typename is_pointer<T2>::type type;
+        using type = typename is_pointer<T2>::type ;
         static constexpr size_t destination_id() {return typeid(type).hash_code();}
     };
     
