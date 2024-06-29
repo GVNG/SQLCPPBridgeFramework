@@ -131,8 +131,10 @@ TEST(Core,Chrono)
     ASSERT_EQ(sql_bridge::is_chrono<std::string>::value, false);
     ASSERT_EQ(sql_bridge::is_chrono<std::chrono::system_clock::time_point>::value, true);
     ASSERT_EQ(sql_bridge::is_chrono<std::chrono::steady_clock::time_point>::value, true);
+    ASSERT_EQ(sql_bridge::is_chrono<std::chrono::hours>::value, false);
     ASSERT_EQ(sql_bridge::is_duration<float>::value, false);
     ASSERT_EQ(sql_bridge::is_duration<long>::value, false);
     ASSERT_EQ(sql_bridge::is_duration<std::string>::value, false);
     ASSERT_EQ(sql_bridge::is_duration<std::chrono::seconds>::value, true);
+    ASSERT_EQ(sql_bridge::is_duration<std::chrono::system_clock::time_point>::value, false);
 }

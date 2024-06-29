@@ -48,6 +48,7 @@ namespace sql_bridge
         template<bool> struct _t_real_adapter {};
         template<bool> struct _t_integral_adapter {};
         template<bool> struct _t_chrono_adapter {};
+        template<bool> struct _t_duration_adapter {};
     public:
         enum class e_key_type {empty,integer,real,string,blob};
         
@@ -96,6 +97,7 @@ namespace sql_bridge
         template<typename T> inline sql_value(T const& v, _t_optional_adapter<false>) : sql_value(v,_t_real_adapter<std::is_floating_point<T>::value>()) {};
         template<typename T> inline sql_value(T const& v, _t_real_adapter<false>) : sql_value(v,_t_integral_adapter<is_convertible_to_int<T>::value>()) {}
         template<typename T> inline sql_value(T const& v, _t_integral_adapter<false>) : sql_value(v,_t_chrono_adapter<is_chrono<T>::value>()) {}
+        template<typename T> inline sql_value(T const& v, _t_chrono_adapter<false>) : sql_value(v,_t_duration_adapter<is_duration<T>::value>()) {};
         template<typename T> inline sql_value(T const& v, _t_real_adapter<true>)
             : type_(e_key_type::real)
             , iValue_(0)
@@ -111,7 +113,12 @@ namespace sql_bridge
             , iValue_(0)
             , rValue_(static_cast<double>(rv.time_since_epoch().count()) / T::clock::period::den * T::clock::period::num)
             {};
-        template<typename T> inline sql_value(T const& rv, _t_chrono_adapter<false>)
+        template<typename T> inline sql_value(T const& rv, _t_duration_adapter<true>)
+            : type_(e_key_type::real)
+            , iValue_(0)
+            , rValue_(static_cast<double>(rv.count()) / T::period::den * T::period::num)
+            {};
+        template<typename T> inline sql_value(T const& rv, _t_duration_adapter<false>)
             : type_(e_key_type::empty)
             , iValue_(0)
             , rValue_(0)
@@ -140,6 +147,13 @@ namespace sql_bridge
                 throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
             typename T::clock::duration ret(static_cast<typename T::clock::rep>(rValue_ / T::clock::period::num * T::clock::period::den));
             return static_cast<T>(ret);
+        }
+        template<typename T> inline typename std::enable_if<is_duration<T>::value,T>::type value() const
+        {
+            if (type_!=e_key_type::real)
+                throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
+            T ret(static_cast<typename T::rep>(rValue_ / T::period::num * T::period::den));
+            return ret;
         }
         template<typename T> inline typename std::enable_if<is_convertible_to_blob<T>::value,T const&>::type value() const
         {

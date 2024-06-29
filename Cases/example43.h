@@ -24,6 +24,12 @@ public:
         , delta_(i)
         , st_ts_(std::chrono::steady_clock::now()+delta_)
         {};
+    inline bool operator == (Case43 const& rv) const 
+    {
+        return ts_==rv.ts_ &&
+        delta_==rv.delta_ &&
+        st_ts_==rv.st_ts_;
+    }
 private:
     size_t db_id_;
     std::chrono::system_clock::time_point ts_;

@@ -12,8 +12,8 @@ DEFINE_SQL_TABLE(root,Case43)
 {
     bind("id",                  &Case43::db_id_,        sql_bridge::e_db_index_type::PrimaryKey),
     bind("ts",                  &Case43::ts_),
-    bind("st",                  &Case43::st_ts_),
     bind("delta",               &Case43::delta_),
+    bind("st_ts",               &Case43::st_ts_),
 };
 
 DEFINE_SQL_DATABASE(case43,1,Case43)::upgrade_structure(size_t from, size_t to)

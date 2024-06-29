@@ -338,6 +338,7 @@ namespace sql_bridge
             template<typename TFn=T> static inline typename std::enable_if<is_kind_of_optional<TFn>::value,std::string>::type const& type_name() {return type_name<typename TFn::value_type>();}
             
             template<typename TFn=T> static inline typename std::enable_if<is_chrono<TFn>::value,std::string>::type const& type_name() {static const std::string ret("REAL"); return ret;}
+            template<typename TFn=T> static inline typename std::enable_if<is_duration<TFn>::value,std::string>::type const& type_name() {static const std::string ret("REAL"); return ret;}
             template<typename TFn=T> static inline typename std::enable_if<is_convertible_to_float<TFn>::value,std::string>::type const& type_name() {static const std::string ret("REAL"); return ret;}
             template<typename TFn=T> static inline typename std::enable_if<is_convertible_to_int<TFn>::value,std::string>::type const& type_name() {static const std::string ret("INTEGER"); return ret;}
             template<typename TFn=T> static inline typename std::enable_if<is_convertible_to_text<TFn>::value,std::string>::type const& type_name() {static const std::string ret("TEXT"); return ret;}

@@ -285,7 +285,8 @@ namespace sql_bridge
     };
     
     template<typename T> struct is_duration
-        : std::integral_constant<bool, is_kind_of_duration<T>::value>
+        : std::integral_constant<bool, is_kind_of_duration<T>::value &&
+                                       !is_kind_of_time_point<T>::value>
     {
     };
 
@@ -321,6 +322,7 @@ namespace sql_bridge
                                         is_convertible_to_float<T>::value ||
                                         is_convertible_to_text<T>::value ||
                                         is_chrono<T>::value ||
+                                        is_duration<T>::value ||
                                         is_convertible_to_blob<T>::value>
     {
     };
