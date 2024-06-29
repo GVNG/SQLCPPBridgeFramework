@@ -141,6 +141,7 @@ namespace sql_bridge
         inline void fire() {lock_guard lk(mtx_);var_.notify_one();}
         inline void fire_all() {lock_guard lk(mtx_);var_.notify_all();}
         template<typename T> inline bool wait_for(T const& dl) {locker lk(mtx_);return var_.wait_for(lk, dl)==std::cv_status::no_timeout;}
+        template<typename T> inline bool wait_for_if(T const& dl,guarded_if_function fn) {locker lk(mtx_);if (fn()) return var_.wait_for(lk, dl)==std::cv_status::no_timeout; else {lk.unlock();return true;}}
         inline void wait(guarded_function fn=nullptr) {locker lk(mtx_);if (fn) fn(); var_.wait(lk);}
         inline void wait_if(guarded_if_function fn) {locker lk(mtx_);if (fn()) var_.wait(lk); else lk.unlock();}
         inline void under_guard(guarded_function fn) {lock_guard lk(mtx_);fn();}

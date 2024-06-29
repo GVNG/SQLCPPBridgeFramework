@@ -271,7 +271,7 @@ namespace sql_bridge
         void proc() {proc_queue_->do_proc();}
         void proc_flush()
         {
-            while(!flush_event_.wait_for(std::chrono::seconds(10)))
+            while(!flush_event_.wait_for_if(std::chrono::seconds(10),[this](){return !flush_shutdown_;}))
             {
                 typename protected_data::access lk(data_);
                 for(auto pos = lk.mutable_data().keepers_.begin();
@@ -282,7 +282,6 @@ namespace sql_bridge
                     else
                         pos++;
                 }
-                if (flush_shutdown_) break;
             }
         }
     };

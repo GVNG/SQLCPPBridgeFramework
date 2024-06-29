@@ -25,7 +25,7 @@ public:
         : key_(0)
         , ts_(std::chrono::system_clock::now())
         , log_string_(sql_bridge::to_string() << sql_bridge::to_string::chrono_formatter("%c") << "Log from " << w << " at " << ts_)
-    {};
+        {};
     size_t key_;
     std::chrono::time_point<std::chrono::system_clock> ts_;
     std::string log_string_;
