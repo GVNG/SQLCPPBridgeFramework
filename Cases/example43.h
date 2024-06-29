@@ -19,11 +19,16 @@ class Case43
 {
     DECLARE_SQL_ACCESS(Case43);
 public:
-    Case43()
+    Case43(size_t i = 0)
+        : ts_(std::chrono::system_clock::now())
+        , delta_(i)
+        , st_ts_(std::chrono::steady_clock::now()+delta_)
         {};
 private:
+    size_t db_id_;
     std::chrono::system_clock::time_point ts_;
     std::chrono::seconds delta_;
+    std::chrono::steady_clock::time_point st_ts_;
 };
 
 

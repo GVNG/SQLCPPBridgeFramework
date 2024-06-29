@@ -161,6 +161,38 @@ namespace sql_bridge
         using type = T;
     };
     
+    template<typename T> struct is_kind_of_time_point
+    {
+    private:
+        using yes = char;
+        using no = struct { char array[2]; };
+
+        template<typename C> static yes ft(typename C::clock*);
+        template<typename C> static yes st(typename C::duration*);
+        template<typename C> static no  ft(...);
+        template<typename C> static no  st(...);
+    public:
+        static constexpr bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
+                                      sizeof(st<T>(0)) == sizeof(yes);
+        using type = T;
+    };
+
+    template <class T> struct is_kind_of_duration
+    {
+    private:
+        using yes = char;
+        using no = struct { char array[2]; };
+
+        template<typename C> static yes ft(typename C::rep*);
+        template<typename C> static yes st(typename C::period*);
+        template<typename C> static no  ft(...);
+        template<typename C> static no  st(...);
+    public:
+        static constexpr bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
+                                      sizeof(st<T>(0)) == sizeof(yes);
+        using type = T;
+    };
+
     template<typename T> struct is_optional_bare
     {
     private:
@@ -252,10 +284,13 @@ namespace sql_bridge
     {
     };
     
+    template<typename T> struct is_duration
+        : std::integral_constant<bool, is_kind_of_duration<T>::value>
+    {
+    };
+
     template<typename T> struct is_chrono
-        : std::integral_constant<bool,  std::is_same<T, std::chrono::system_clock::time_point>::value ||
-                                        std::is_same<T, std::chrono::high_resolution_clock::time_point>::value ||
-                                        std::is_same<T, std::chrono::steady_clock::time_point>::value>
+        : std::integral_constant<bool, is_kind_of_time_point<T>::value>
     {
     };
     

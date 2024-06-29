@@ -123,3 +123,16 @@ TEST(Core,TraitsPointers)
     ASSERT_EQ(sql_bridge::is_pointer<_t_weak_int_pointer>::value, false); // doesn't support the operator *
     ASSERT_EQ(sql_bridge::is_pointer<_t_vector_int>::value, false);
 }
+
+TEST(Core,Chrono)
+{
+    ASSERT_EQ(sql_bridge::is_chrono<float>::value, false);
+    ASSERT_EQ(sql_bridge::is_chrono<long>::value, false);
+    ASSERT_EQ(sql_bridge::is_chrono<std::string>::value, false);
+    ASSERT_EQ(sql_bridge::is_chrono<std::chrono::system_clock::time_point>::value, true);
+    ASSERT_EQ(sql_bridge::is_chrono<std::chrono::steady_clock::time_point>::value, true);
+    ASSERT_EQ(sql_bridge::is_duration<float>::value, false);
+    ASSERT_EQ(sql_bridge::is_duration<long>::value, false);
+    ASSERT_EQ(sql_bridge::is_duration<std::string>::value, false);
+    ASSERT_EQ(sql_bridge::is_duration<std::chrono::seconds>::value, true);
+}
