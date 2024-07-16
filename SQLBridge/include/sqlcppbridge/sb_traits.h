@@ -61,6 +61,7 @@ namespace sql_bridge
     public:
         static constexpr const bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
                                             sizeof(st<T>(0)) == sizeof(yes);
+        using type = T;
     };
     
     template<typename T> struct is_kind_of_pair
@@ -76,6 +77,7 @@ namespace sql_bridge
     public:
         static constexpr const bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
                                             sizeof(st<T>(0)) == sizeof(yes);
+        using type = T;
     };
 
     template<typename T> struct has_const_iterator
@@ -112,13 +114,13 @@ namespace sql_bridge
         using no = struct { char array[2]; };
         using mem_fn = typename T::const_iterator (T::*)() const;
 
-        template<typename C> static typename std::enable_if<
+        template<typename C> static std::enable_if_t<
             std::is_same<decltype(static_cast<mem_fn>(&C::begin)),mem_fn>::value,
-            yes>::type test_b(void const*);
+            yes> test_b(void const*);
 
-        template<typename C> static typename std::enable_if<
+        template<typename C> static std::enable_if_t<
             std::is_same<decltype(static_cast<mem_fn>(&C::end)),mem_fn>::value,
-            yes>::type test_e(void const*);
+            yes> test_e(void const*);
         
         template<typename C> static no test_b(...);
         template<typename C> static no test_e(...);
@@ -136,9 +138,9 @@ namespace sql_bridge
         using no = struct { char array[2]; };
         using mem_fn = void (T::*)(typename T::const_reference);
         
-        template<typename C> static typename std::enable_if<
+        template<typename C> static std::enable_if_t<
             std::is_same<decltype(static_cast<mem_fn>(&C::push_back)),mem_fn>::value,
-            yes>::type test(void const*);
+            yes> test(void const*);
         template<typename C> static no test(...);
     public:
         static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
@@ -152,9 +154,9 @@ namespace sql_bridge
         using no = struct { char array[2]; };
         using mem_fn = typename T::mapped_type& (T::*)(typename T::key_type const&);
         
-        template<typename C> static typename std::enable_if<
+        template<typename C> static std::enable_if_t<
             std::is_same<decltype(static_cast<mem_fn>(&C::at)),mem_fn>::value,
-            yes>::type test(void const*);
+            yes> test(void const*);
         template<typename C> static no test(...);
     public:
         static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
