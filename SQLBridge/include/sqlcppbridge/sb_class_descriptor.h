@@ -86,7 +86,7 @@ namespace sql_bridge
         }
         
     private:
-        template<typename TMb, typename TCl> inline static typename std::enable_if<std::is_base_of<TCl, T>::value,class_descriptors_ptr>::type bind(std::string const& fn, TMb TCl::* m, e_db_index_type it = e_db_index_type::None)
+        template<typename TMb, typename TCl> inline static std::enable_if_t<std::is_base_of<TCl, T>::value,class_descriptors_ptr> bind(std::string const& fn, TMb TCl::* m, e_db_index_type it = e_db_index_type::None)
         {
             using type = _t_member_descriptor<TStrategy,TCl,TMb>;
             struct make_shared_enabler : public type {make_shared_enabler(std::string const& fn, TMb TCl::* m, e_db_index_type it, class_descriptors_ptr desc) : type(fn,m,it,desc){}};
@@ -94,7 +94,7 @@ namespace sql_bridge
             return ret;
         }
         
-        template<typename TMb, typename TCl> inline static typename std::enable_if<std::is_base_of<TCl, T>::value,class_descriptors_ptr>::type bind_recursive(std::string const& fn, TMb TCl::* m, e_db_index_type it = e_db_index_type::None)
+        template<typename TMb, typename TCl> inline static std::enable_if_t<std::is_base_of<TCl, T>::value,class_descriptors_ptr> bind_recursive(std::string const& fn, TMb TCl::* m, e_db_index_type it = e_db_index_type::None)
         {
             using type = _t_member_descriptor<TStrategy,TCl,TMb>;
             struct make_shared_enabler : public type {make_shared_enabler(std::string const& fn, TMb TCl::* m, e_db_index_type it, class_descriptors_ptr desc) : type(fn,m,it,desc){}};
@@ -104,32 +104,32 @@ namespace sql_bridge
 
 #pragma mark - check for empty containers
         
-        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value ||
-                                                              is_map<TFn>::value,bool>::type _is_not_empty_container(T const& el) const
+        template<typename TFn> inline std::enable_if_t<is_container<TFn>::value ||
+                                                       is_map<TFn>::value,bool> _is_not_empty_container(T const& el) const
         {
             return !el.empty();
         }
 
-        template<typename TFn> inline typename std::enable_if<!is_container<TFn>::value &&
-                                                              !is_map<TFn>::value,bool>::type _is_not_empty_container(T const& el) const
+        template<typename TFn> inline std::enable_if_t<!is_container<TFn>::value &&
+                                                       !is_map<TFn>::value,bool> _is_not_empty_container(T const& el) const
         {
             return false;
         }
 
 #pragma mark - try cast
         
-        template<typename TFn> inline static typename std::enable_if<is_sql_acceptable<TFn>::value,sql_value>::type _try_cast() {return sql_value(TFn());}
-        template<typename TFn> inline static typename std::enable_if<!is_sql_acceptable<TFn>::value,sql_value>::type _try_cast() {return sql_value();}
+        template<typename TFn> inline static std::enable_if_t<is_sql_acceptable<TFn>::value,sql_value> _try_cast() {return sql_value(TFn());}
+        template<typename TFn> inline static std::enable_if_t<!is_sql_acceptable<TFn>::value,sql_value> _try_cast() {return sql_value();}
 
 #pragma mark - create recursive description
         
-        template<typename TFn> inline static typename std::enable_if<!is_container<TFn>::value && !is_any_map<TFn>::value,class_descriptors_ptr>::type _create_description_recursive() {return _create_description<TFn>();}
-        template<typename TFn> inline static typename std::enable_if<is_container<TFn>::value,class_descriptors_ptr>::type _create_description_recursive()
+        template<typename TFn> inline static std::enable_if_t<!is_container<TFn>::value && !is_any_map<TFn>::value,class_descriptors_ptr> _create_description_recursive() {return _create_description<TFn>();}
+        template<typename TFn> inline static std::enable_if_t<is_container<TFn>::value,class_descriptors_ptr> _create_description_recursive()
         {
             using value_type = recursion_ref<typename TFn::value_type>;
             return _create_description<value_type>();
         }
-        template<typename TFn> inline static typename std::enable_if<is_any_map<TFn>::value,class_descriptors_ptr>::type _create_description_recursive()
+        template<typename TFn> inline static std::enable_if_t<is_any_map<TFn>::value,class_descriptors_ptr> _create_description_recursive()
         {
             using mapped = recursion_ref<typename TFn::mapped_type>;
             using type = _t_class_descriptor<TStrategy,mapped>;
@@ -138,55 +138,55 @@ namespace sql_bridge
 
 #pragma mark - create description
         
-        template<typename TFn> inline static typename std::enable_if<is_optional_or_trivial<TFn>::value,class_descriptors_ptr>::type _create_description() {return class_descriptors_ptr();}
-        template<typename TFn> inline static typename std::enable_if<is_optional_or_trivial<TFn>::value,class_descriptors_ptr>::type _create_description_pub() {return class_descriptors_ptr();}
-        template<typename TFn> inline static typename std::enable_if<is_container<TFn>::value || is_map<TFn>::value,class_descriptors_ptr>::type _create_description() {return _create_containers_description<TFn>();}
-        template<typename TFn> inline static typename std::enable_if<!is_trivial_container<TFn>::value && !is_trivial_map<TFn>::value && !is_container_of_containers<TFn>::value,class_descriptors_ptr>::type _create_containers_description() {return _create_nt_containers_description<TFn>();}
-        template<typename TFn> inline static typename std::enable_if<is_container<TFn>::value || is_any_map<TFn>::value,class_descriptors_ptr>::type _create_description_pub()
+        template<typename TFn> inline static std::enable_if_t<is_optional_or_trivial<TFn>::value,class_descriptors_ptr> _create_description() {return class_descriptors_ptr();}
+        template<typename TFn> inline static std::enable_if_t<is_optional_or_trivial<TFn>::value,class_descriptors_ptr> _create_description_pub() {return class_descriptors_ptr();}
+        template<typename TFn> inline static std::enable_if_t<is_container<TFn>::value || is_map<TFn>::value,class_descriptors_ptr> _create_description() {return _create_containers_description<TFn>();}
+        template<typename TFn> inline static std::enable_if_t<!is_trivial_container<TFn>::value && !is_trivial_map<TFn>::value && !is_container_of_containers<TFn>::value,class_descriptors_ptr> _create_containers_description() {return _create_nt_containers_description<TFn>();}
+        template<typename TFn> inline static std::enable_if_t<is_container<TFn>::value || is_any_map<TFn>::value,class_descriptors_ptr> _create_description_pub()
         {
             using type = _t_container_descriptor<TStrategy,TFn>;
             return std::make_shared<type>();
         }
         
-        template<typename TFn> inline static typename std::enable_if<!is_optional_or_trivial<TFn>::value && !is_container<TFn>::value && !is_map<TFn>::value,class_descriptors_ptr>::type _create_description_pub()
+        template<typename TFn> inline static std::enable_if_t<!is_optional_or_trivial<TFn>::value && !is_container<TFn>::value && !is_map<TFn>::value,class_descriptors_ptr> _create_description_pub()
         {
             using type = _t_class_descriptor<TStrategy,TFn>;
             return std::make_shared<type>();
         }
         
-        template<typename TFn> inline static typename std::enable_if<!is_optional_or_trivial<TFn>::value && !is_container<TFn>::value && !is_map<TFn>::value,class_descriptors_ptr>::type _create_description()
+        template<typename TFn> inline static std::enable_if_t<!is_optional_or_trivial<TFn>::value && !is_container<TFn>::value && !is_map<TFn>::value,class_descriptors_ptr> _create_description()
         {
             using type = _t_class_descriptor<TStrategy,TFn>;
             return std::make_shared<type>();
         }
         
-        template<typename TFn> inline static typename std::enable_if<is_trivial_container<TFn>::value ||
-                                                                     is_trivial_map<TFn>::value ||
-                                                                     is_container_of_containers<TFn>::value,class_descriptors_ptr>::type _create_containers_description()
+        template<typename TFn> inline static std::enable_if_t<is_trivial_container<TFn>::value ||
+                                                              is_trivial_map<TFn>::value ||
+                                                              is_container_of_containers<TFn>::value,class_descriptors_ptr> _create_containers_description()
         {
             using type = _t_container_descriptor<TStrategy,TFn>;
             return std::make_shared<type>();
         }
         
-        template<typename TFn> inline static typename std::enable_if<is_container<TFn>::value &&
-                                                                     is_pointer<typename TFn::value_type>::value &&
-                                                                     !is_container_of_containers<TFn>::value,class_descriptors_ptr>::type _create_nt_containers_description()
+        template<typename TFn> inline static std::enable_if_t<is_container<TFn>::value &&
+                                                              is_pointer<typename TFn::value_type>::value &&
+                                                              !is_container_of_containers<TFn>::value,class_descriptors_ptr> _create_nt_containers_description()
         {
             using type = _t_class_descriptor<TStrategy, typename is_pointer<typename TFn::value_type>::type>;
             return std::make_shared<type>(true);
         }
         
-        template<typename TFn> inline static typename std::enable_if<is_container<TFn>::value &&
-                                                                     !is_pointer<typename TFn::value_type>::value &&
-                                                                     !is_container_of_containers<TFn>::value,class_descriptors_ptr>::type _create_nt_containers_description()
+        template<typename TFn> inline static std::enable_if_t<is_container<TFn>::value &&
+                                                              !is_pointer<typename TFn::value_type>::value &&
+                                                              !is_container_of_containers<TFn>::value,class_descriptors_ptr> _create_nt_containers_description()
         {
             using type = _t_class_descriptor<TStrategy, typename TFn::value_type>;
             return std::make_shared<type>();
         }
 
-        template<typename TFn> inline static typename std::enable_if<is_any_map<TFn>::value &&
-                                                                     is_pointer<typename TFn::mapped_type>::value &&
-                                                                     !is_container_of_containers<TFn>::value, class_descriptors_ptr>::type _create_nt_containers_description()
+        template<typename TFn> inline static std::enable_if_t<is_any_map<TFn>::value &&
+                                                              is_pointer<typename TFn::mapped_type>::value &&
+                                                              !is_container_of_containers<TFn>::value, class_descriptors_ptr> _create_nt_containers_description()
         {
             using key = typename TFn::key_type;
             using mapped = typename is_pointer<typename TFn::mapped_type>::type;
@@ -195,9 +195,9 @@ namespace sql_bridge
             return std::make_shared<type>(true);
         }
 
-        template<typename TFn> inline static typename std::enable_if<is_any_map<TFn>::value &&
-                                                                     !is_pointer<typename TFn::mapped_type>::value &&
-                                                                     !is_container_of_containers<TFn>::value, class_descriptors_ptr>::type _create_nt_containers_description()
+        template<typename TFn> inline static std::enable_if_t<is_any_map<TFn>::value &&
+                                                              !is_pointer<typename TFn::mapped_type>::value &&
+                                                              !is_container_of_containers<TFn>::value, class_descriptors_ptr> _create_nt_containers_description()
         {
             using key = typename TFn::key_type;
             using mapped = typename TFn::mapped_type;
@@ -208,8 +208,8 @@ namespace sql_bridge
 
 #pragma mark - bind inheritance
 
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _bind_inheritance(TFn const&,size_t,data_update_context&,sql_value const&) {}
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _bind_inheritance(TFn const& el,size_t tid,data_update_context& cont,sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _bind_inheritance(TFn const&,size_t,data_update_context&,sql_value const&) {}
+        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _bind_inheritance(TFn const& el,size_t tid,data_update_context& cont,sql_value const& extkey)
         {
             for(auto const& inh : cont.inheritances())
                 if (inh->type_id()==tid)
@@ -218,8 +218,8 @@ namespace sql_bridge
 
 #pragma mark - bind at
         
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _bind_at(TFn const&,void const*,data_update_context&,sql_value const&) {}
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _bind_at(TFn const& el,void const* memb,data_update_context& cont,sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _bind_at(TFn const&,void const*,data_update_context&,sql_value const&) {}
+        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _bind_at(TFn const& el,void const* memb,data_update_context& cont,sql_value const& extkey)
         {
             for(auto const& md : cont.members())
                 if (md->is_this_mem_ptr(&el, memb))
@@ -228,8 +228,8 @@ namespace sql_bridge
 
 #pragma mark - bind
         
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _bind_comp(TFn const&,data_update_context&,sql_value const&) {}
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _bind_comp(TFn const& el,data_update_context& cont,sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _bind_comp(TFn const&,data_update_context&,sql_value const&) {}
+        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _bind_comp(TFn const& el,data_update_context& cont,sql_value const& extkey)
         {
             if (cont.use_pages())
             {
@@ -260,8 +260,8 @@ namespace sql_bridge
 
 #pragma mark - read inheritance
 
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _read_inheritance(T& dst, size_t tid, data_update_context& cont, sql_value const& extkey) {}
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _read_inheritance(T& dst, size_t tid, data_update_context& cont, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _read_inheritance(T& dst, size_t tid, data_update_context& cont, sql_value const& extkey) {}
+        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _read_inheritance(T& dst, size_t tid, data_update_context& cont, sql_value const& extkey)
         {
             for(auto const& inh : cont.inheritances())
                 if (inh->type_id()==tid)
@@ -270,8 +270,8 @@ namespace sql_bridge
 
 #pragma mark - read at
 
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _read_at(T& dst, void* memb, data_update_context& cont, sql_value const& extkey, std::string const&) {}
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _read_at(T& dst, void* memb, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _read_at(T& dst, void* memb, data_update_context& cont, sql_value const& extkey, std::string const&) {}
+        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _read_at(T& dst, void* memb, data_update_context& cont, sql_value const& extkey, std::string const& flt)
         {
             for(auto const& md : cont.members())
                 if (md->is_this_mem_ptr(&dst, memb))
@@ -280,10 +280,10 @@ namespace sql_bridge
         
 #pragma mark - read
         
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _read(T&, data_update_context&) {}
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _read(T& dst, data_update_context& cont) {_read_comp<TFn>(dst,cont,sql_value());}
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _read_comp(T&, data_update_context&, sql_value const&) {}
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _read(T&, data_update_context&) {}
+        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _read(T& dst, data_update_context& cont) {_read_comp<TFn>(dst,cont,sql_value());}
+        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _read_comp(T&, data_update_context&, sql_value const&) {}
+        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             cont.read_counter_inc();
             cont.page().enable();
@@ -305,8 +305,8 @@ namespace sql_bridge
 
 #pragma mark - remove at
         
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _remove_at(TFn const&,void const*,data_update_context&,sql_value const&) {}
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _remove_at(TFn const& el,void const* memb,data_update_context& cont,sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _remove_at(TFn const&,void const*,data_update_context&,sql_value const&) {}
+        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _remove_at(TFn const& el,void const* memb,data_update_context& cont,sql_value const& extkey)
         {
             for(auto const& md : cont.members())
                 if (md->is_this_mem_ptr(&el, memb))
@@ -315,8 +315,8 @@ namespace sql_bridge
 
 #pragma mark - remove inheritance
         
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _remove_inheritance(TFn const&,void const*,data_update_context&,sql_value const&) {}
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _remove_inheritance(TFn const& el,size_t tid,data_update_context& cont,sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _remove_inheritance(TFn const&,void const*,data_update_context&,sql_value const&) {}
+        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _remove_inheritance(TFn const& el,size_t tid,data_update_context& cont,sql_value const& extkey)
         {
             for(auto const& inh : cont.inheritances())
                 if (inh->type_id()==tid)

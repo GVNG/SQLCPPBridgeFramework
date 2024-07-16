@@ -176,9 +176,9 @@ namespace sql_bridge
 
 #pragma mark - allocator
         
-        template<typename TFn> inline typename std::enable_if<std::is_pointer<TFn>::value,std::unique_ptr<typename is_pointer<TFn>::type> >::type _allocate_object() const {return std::make_unique<typename is_pointer<TFn>::type>();}
-        template<typename TFn> inline typename std::enable_if<std::is_same<TFn,std::shared_ptr<typename is_pointer<TFn>::type> >::value,TFn>::type _allocate_object() const {return std::make_shared<typename is_pointer<TFn>::type>();}
-        template<typename TFn> inline typename std::enable_if<std::is_same<TFn,std::unique_ptr<typename is_pointer<TFn>::type> >::value,TFn>::type _allocate_object() const {return std::make_unique<typename is_pointer<TFn>::type>();}
+        template<typename TFn> inline std::enable_if_t<std::is_pointer<TFn>::value,std::unique_ptr<typename is_pointer<TFn>::type> > _allocate_object() const {return std::make_unique<typename is_pointer<TFn>::type>();}
+        template<typename TFn> inline std::enable_if_t<std::is_same<TFn,std::shared_ptr<typename is_pointer<TFn>::type> >::value,TFn> _allocate_object() const {return std::make_shared<typename is_pointer<TFn>::type>();}
+        template<typename TFn> inline std::enable_if_t<std::is_same<TFn,std::unique_ptr<typename is_pointer<TFn>::type> >::value,TFn> _allocate_object() const {return std::make_unique<typename is_pointer<TFn>::type>();}
     };
     
     class data_update_context

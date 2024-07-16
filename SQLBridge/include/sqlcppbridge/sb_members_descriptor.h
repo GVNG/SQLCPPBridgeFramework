@@ -81,42 +81,42 @@ namespace sql_bridge
         
 #pragma mark - check for empty containers
         
-        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value ||
-                                                              is_map<TFn>::value,bool>::type _is_not_empty_container(T const& el) const
+        template<typename TFn> inline std::enable_if_t<is_container<TFn>::value ||
+                                                       is_map<TFn>::value,bool> _is_not_empty_container(T const& el) const
         {
             return !(el.*member_).empty();
         }
 
-        template<typename TFn> inline typename std::enable_if<!is_container<TFn>::value &&
-                                                              !is_map<TFn>::value,bool>::type _is_not_empty_container(T const& el) const
+        template<typename TFn> inline std::enable_if_t<!is_container<TFn>::value &&
+                                                       !is_map<TFn>::value,bool> _is_not_empty_container(T const& el) const
         {
             return false;
         }
 
 #pragma mark - prefix for member
         
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value ||
-                                                              is_container_of_containers<TFn>::value ||
-                                                              is_trivial_container<TFn>::value ||
-                                                              is_trivial_map<TFn>::value,class_descriptors_pair>::type _prefix() const
+        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value ||
+                                                       is_container_of_containers<TFn>::value ||
+                                                       is_trivial_container<TFn>::value ||
+                                                       is_trivial_map<TFn>::value,class_descriptors_pair> _prefix() const
         {
             return empty_descriptors_pair;
         }
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value &&
-                                                              !is_container<TFn>::value &&
-                                                              !is_map<TFn>::value,class_descriptors_pair>::type _prefix() const
+        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value &&
+                                                       !is_container<TFn>::value &&
+                                                       !is_map<TFn>::value,class_descriptors_pair> _prefix() const
         {
             return empty_descriptors_pair;
         }
-        template<typename TFn> inline typename std::enable_if<!is_container_of_containers<TFn>::value &&
-                                                              is_container<TFn>::value &&
-                                                              !is_trivial_container<TFn>::value,class_descriptors_pair>::type _prefix() const
+        template<typename TFn> inline std::enable_if_t<!is_container_of_containers<TFn>::value &&
+                                                       is_container<TFn>::value &&
+                                                       !is_trivial_container<TFn>::value,class_descriptors_pair> _prefix() const
         {
             return empty_descriptors_pair;
         }
-        template<typename TFn> inline typename std::enable_if<!is_container_of_containers<TFn>::value &&
-                                                              is_map<TFn>::value &&
-                                                              !is_trivial_map<TFn>::value,class_descriptors_pair>::type _prefix() const
+        template<typename TFn> inline std::enable_if_t<!is_container_of_containers<TFn>::value &&
+                                                       is_map<TFn>::value &&
+                                                       !is_trivial_map<TFn>::value,class_descriptors_pair> _prefix() const
         {
             using k_type = _t_trivial_member_descriptor<TStrategy, typename TMb::key_type>;
             return class_descriptors_pair(typeid(typename TMb::key_type).hash_code(),
@@ -132,30 +132,30 @@ namespace sql_bridge
             return ret;
         }
 
-        template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value ||
-                                                              is_container_of_containers<TFn>::value ||
-                                                              is_trivial_map<TFn>::value ||
-                                                              is_trivial_container<TFn>::value, class_descriptors_container const&>::type _members() const
+        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value ||
+                                                       is_container_of_containers<TFn>::value ||
+                                                       is_trivial_map<TFn>::value ||
+                                                       is_trivial_container<TFn>::value, class_descriptors_container const&> _members() const
         {
             static const class_descriptors_container ret;
             return ret;
         }
-        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value &&
-                                                              !is_trivial_container<TFn>::value &&
-                                                              !is_container_of_containers<TFn>::value,class_descriptors_container const&>::type _members() const
+        template<typename TFn> inline std::enable_if_t<is_container<TFn>::value &&
+                                                       !is_trivial_container<TFn>::value &&
+                                                       !is_container_of_containers<TFn>::value,class_descriptors_container const&> _members() const
         {
             return description_->members();
         }
-        template<typename TFn> inline typename std::enable_if<is_map<TFn>::value &&
-                                                              !is_trivial_map<TFn>::value &&
-                                                              !is_container_of_containers<TFn>::value,class_descriptors_container const&>::type _members() const
+        template<typename TFn> inline std::enable_if_t<is_map<TFn>::value &&
+                                                       !is_trivial_map<TFn>::value &&
+                                                       !is_container_of_containers<TFn>::value,class_descriptors_container const&> _members() const
         {
             static const class_descriptors_container ret(_join_desc());
             return ret;
         }
-        template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value &&
-                                                              !is_container<TFn>::value &&
-                                                              !is_map<TFn>::value, class_descriptors_container const&>::type _members() const
+        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value &&
+                                                       !is_container<TFn>::value &&
+                                                       !is_map<TFn>::value, class_descriptors_container const&> _members() const
         {
             return description_->members();
         }
@@ -163,12 +163,12 @@ namespace sql_bridge
 
 #pragma mark - sql types
         
-        template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value,std::string const&>::type _sql_type() const
+        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value,std::string const&> _sql_type() const
         {
             using type = typename TStrategy::template sql_types<TFn>;
             return type::template type_name<TFn>();
         };
-        template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value,std::string const&>::type _sql_type() const
+        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value,std::string const&> _sql_type() const
         {
             static std::string const def;
             return def;
@@ -176,8 +176,8 @@ namespace sql_bridge
         
 #pragma mark - remove at
 
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _remove_at(T const&, void const*, data_update_context&,sql_value const&) {};
-        template<typename TFn> inline typename std::enable_if<!is_sql_acceptable<TFn>::value>::type _remove_at(T const& el, void const* memb, data_update_context& dst,sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _remove_at(T const&, void const*, data_update_context&,sql_value const&) {};
+        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _remove_at(T const& el, void const* memb, data_update_context& dst,sql_value const& extkey)
         {
             size_t elemt = types_selector<TFn>::destination_id();
             data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
@@ -186,21 +186,21 @@ namespace sql_bridge
         
 #pragma mark - bind
         
-        template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value>::type _bind_elem(T const& el, data_update_context& dst) {dst.add(sql_value(el.*member_));}
-        template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value>::type _bind_elem(T const& el, data_update_context& dst) {}
-        template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value>::type _bind_comp_elem(T const& el, data_update_context& dst, sql_value const&) {}
-        template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value>::type _bind_comp_elem(T const& el, data_update_context& dst, sql_value const& extkey) {_bind_comp<TMb>(el.*member_,dst,extkey);}
+        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value> _bind_elem(T const& el, data_update_context& dst) {dst.add(sql_value(el.*member_));}
+        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value> _bind_elem(T const& el, data_update_context& dst) {}
+        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value> _bind_comp_elem(T const& el, data_update_context& dst, sql_value const&) {}
+        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value> _bind_comp_elem(T const& el, data_update_context& dst, sql_value const& extkey) {_bind_comp<TMb>(el.*member_,dst,extkey);}
 
-        template<typename TFn> inline typename std::enable_if<is_trivial_container<TFn>::value || is_trivial_map<TFn>::value>::type _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<is_trivial_container<TFn>::value || is_trivial_map<TFn>::value> _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
             data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
             ncnt->bind_comp(&el, extkey);
         }
 
-        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value && !is_trivial_container<TFn>::value>::type _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey) {_bind_comp_cont<TFn>(el,dst,extkey);}
+        template<typename TFn> inline std::enable_if_t<is_container<TFn>::value && !is_trivial_container<TFn>::value> _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey) {_bind_comp_cont<TFn>(el,dst,extkey);}
 
-        template<typename TFn> inline typename std::enable_if<!is_container_of_containers<TFn>::value && is_pointer<typename TFn::value_type>::value>::type _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<!is_container_of_containers<TFn>::value && is_pointer<typename TFn::value_type>::value> _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             size_t elemt = types_selector<TFn>::destination_id();
             data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
@@ -236,7 +236,7 @@ namespace sql_bridge
             }
         }
         
-        template<typename TFn> inline typename std::enable_if<!is_container_of_containers<TFn>::value && !is_pointer<typename TFn::value_type>::value>::type _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<!is_container_of_containers<TFn>::value && !is_pointer<typename TFn::value_type>::value> _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             using type = typename TFn::value_type;
             using iterator = typename TFn::const_iterator;
@@ -260,24 +260,24 @@ namespace sql_bridge
             }
         }
 
-        template<typename TFn> inline typename std::enable_if<is_container_of_containers<TFn>::value>::type _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<is_container_of_containers<TFn>::value> _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
             data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
             ncnt->bind_comp(&el, extkey);
         }
         
-        template<typename TFn> inline typename std::enable_if<is_map<TFn>::value && !is_trivial_map<TFn>::value>::type _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey) {_bind_comp_map<TFn>(el,dst,extkey);}
+        template<typename TFn> inline std::enable_if_t<is_map<TFn>::value && !is_trivial_map<TFn>::value> _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey) {_bind_comp_map<TFn>(el,dst,extkey);}
 
-        template<typename TFn> inline typename std::enable_if<is_container_of_containers<TFn>::value>::type _bind_comp_map(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<is_container_of_containers<TFn>::value> _bind_comp_map(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
             data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
             ncnt->bind_comp(&el, extkey);
         }
 
-        template<typename TFn> inline typename std::enable_if<!is_container_of_containers<TFn>::value &&
-                                                              !is_pointer<typename TFn::mapped_type>::value>::type _bind_comp_map(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<!is_container_of_containers<TFn>::value &&
+                                                       !is_pointer<typename TFn::mapped_type>::value> _bind_comp_map(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             using k_type = typename TFn::key_type;
             using m_type = typename is_pointer<typename TFn::mapped_type>::type;
@@ -290,8 +290,8 @@ namespace sql_bridge
             }
         }
 
-        template<typename TFn> inline typename std::enable_if<!is_container_of_containers<TFn>::value &&
-                                                              is_pointer<typename TFn::mapped_type>::value>::type _bind_comp_map(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<!is_container_of_containers<TFn>::value &&
+                                                       is_pointer<typename TFn::mapped_type>::value> _bind_comp_map(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             using k_type = typename TFn::key_type ;
             using m_type = typename is_pointer<typename TFn::mapped_type>::type;
@@ -321,8 +321,8 @@ namespace sql_bridge
             }
         }
 
-        template<typename TFn> inline typename std::enable_if<!is_container<TFn>::value &&
-                                                              !is_map<TFn>::value>::type _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<!is_container<TFn>::value &&
+                                                       !is_map<TFn>::value> _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
             data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
@@ -331,36 +331,36 @@ namespace sql_bridge
 
 #pragma mark - expand
         
-        template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value,sql_value>::type _expand(T const& el) {return sql_value(el.*member_);}
-        template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value,sql_value>::type _expand(T const& el) {return sql_value();}
+        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value,sql_value> _expand(T const& el) {return sql_value(el.*member_);}
+        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value,sql_value> _expand(T const& el) {return sql_value();}
 
 #pragma mark - read at
 
-        template<typename TFn> inline typename std::enable_if<!is_container<TFn>::value &&
-                                                              !is_any_map<TFn>::value>::type _read_at(T& dst, data_update_context& cont, sql_value const& extkey, std::string const&) {_read_comp<TFn>(dst,cont,extkey);}
-        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value>::type _read_at(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        template<typename TFn> inline std::enable_if_t<!is_container<TFn>::value &&
+                                                       !is_any_map<TFn>::value> _read_at(T& dst, data_update_context& cont, sql_value const& extkey, std::string const&) {_read_comp<TFn>(dst,cont,extkey);}
+        template<typename TFn> inline std::enable_if_t<is_container<TFn>::value> _read_at(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
         {
             if (flt.empty())
                 _read_comp<TFn>(dst,cont,extkey);
             else
                 _read_at_cont<TFn>(dst,cont,extkey,flt);
         }
-        template<typename TFn> inline typename std::enable_if<is_any_map<TFn>::value>::type _read_at(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        template<typename TFn> inline std::enable_if_t<is_any_map<TFn>::value> _read_at(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
         {
             if (flt.empty())
                 _read_comp<TFn>(dst,cont,extkey);
             else
                 _read_at_map<TFn>(dst,cont,extkey,flt);
         }
-        template<typename TFn> inline typename std::enable_if<is_trivial_container<TFn>::value>::type _read_at_cont(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        template<typename TFn> inline std::enable_if_t<is_trivial_container<TFn>::value> _read_at_cont(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
         {
             size_t elemt = typeid(TFn).hash_code();
             _clear(dst.*member_);
             data_update_context_ptr ncnt(cont.context_for_filtered_member(elemt,extkey,field_name(),flt));
             ncnt->read_comp(&(dst.*member_), extkey);
         }
-        template<typename TFn> inline typename std::enable_if<!is_trivial_container<TFn>::value &&
-                                                              !is_pointer<typename TFn::value_type>::value>::type _read_at_cont(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        template<typename TFn> inline std::enable_if_t<!is_trivial_container<TFn>::value &&
+                                                       !is_pointer<typename TFn::value_type>::value> _read_at_cont(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
         {
             using type = typename TFn::value_type;
             size_t elemt = types_selector<TFn>::destination_id();
@@ -374,8 +374,8 @@ namespace sql_bridge
                 cont.read_counter_inc();
             }
         }
-        template<typename TFn> inline typename std::enable_if<!is_trivial_container<TFn>::value &&
-                                                              is_pointer<typename TFn::value_type>::value>::type _read_at_cont(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        template<typename TFn> inline std::enable_if_t<!is_trivial_container<TFn>::value &&
+                                                       is_pointer<typename TFn::value_type>::value> _read_at_cont(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
         {
             using type = typename TFn::value_type;
             using obj_type = std::conditional_t<std::is_pointer<type>::value, std::unique_ptr<typename is_pointer<type>::type>, type>;
@@ -420,15 +420,15 @@ namespace sql_bridge
                 }
             }
         }
-        template<typename TFn> inline typename std::enable_if<is_trivial_map<TFn>::value>::type _read_at_map(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        template<typename TFn> inline std::enable_if_t<is_trivial_map<TFn>::value> _read_at_map(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
         {
             size_t elemt = typeid(TFn).hash_code();
             _clear(dst.*member_);
             data_update_context_ptr ncnt(cont.context_for_filtered_member(elemt,extkey,field_name(),flt));
             ncnt->read_comp(&(dst.*member_), extkey);
         }
-        template<typename TFn> inline typename std::enable_if<!is_trivial_map<TFn>::value &&
-                                                              !is_pointer<typename TFn::mapped_type>::value>::type _read_at_map(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        template<typename TFn> inline std::enable_if_t<!is_trivial_map<TFn>::value &&
+                                                       !is_pointer<typename TFn::mapped_type>::value> _read_at_map(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
         {
             using k_type = typename TFn::key_type;
             using m_type = typename TFn::mapped_type;
@@ -446,8 +446,8 @@ namespace sql_bridge
                 cont.read_counter_inc();
             }
         }
-        template<typename TFn> inline typename std::enable_if<!is_trivial_map<TFn>::value &&
-                                                              is_pointer<typename TFn::mapped_type>::value>::type _read_at_map(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
+        template<typename TFn> inline std::enable_if_t<!is_trivial_map<TFn>::value &&
+                                                       is_pointer<typename TFn::mapped_type>::value> _read_at_map(T& dst, data_update_context& cont, sql_value const& extkey, std::string const& flt)
         {
             using k_type = typename TFn::key_type;
             using m_type = typename TFn::mapped_type;
@@ -503,16 +503,16 @@ namespace sql_bridge
 
 #pragma mark - read
         
-        template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value>::type _read(T& dst, data_update_context& cont) {}
-        template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const&) {}
-        template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value>::type _read(T& dst, data_update_context& cont) {_read_trivial<TFn>(dst,cont);}
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _read_trivial(T& dst, data_update_context& cont)
+        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value> _read(T& dst, data_update_context& cont) {}
+        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const&) {}
+        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value> _read(T& dst, data_update_context& cont) {_read_trivial<TFn>(dst,cont);}
+        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _read_trivial(T& dst, data_update_context& cont)
         {
             sql_value vr(dst.*member_);
             cont.read(vr);
             dst.*member_ = vr.value<TMb>();
         }
-        template<typename TFn> inline typename std::enable_if<is_kind_of_optional<TFn>::value>::type _read_trivial(T& dst, data_update_context& cont)
+        template<typename TFn> inline std::enable_if_t<is_kind_of_optional<TFn>::value> _read_trivial(T& dst, data_update_context& cont)
         {
             sql_value vr((dst.*member_).value());
             cont.read(vr);
@@ -522,23 +522,23 @@ namespace sql_bridge
                 dst.*member_ = vr.value<typename TMb::value_type>();
         }
 
-        template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value &&
-                                                              !is_container<TFn>::value && !is_map<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value &&
+                                                       !is_container<TFn>::value && !is_map<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
             data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
             ncnt->read_comp(&(dst.*member_), extkey);
         }
 
-        template<typename TFn> inline typename std::enable_if<is_container_of_containers<TFn>::value &&
-                                                              !is_trivial_container<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<is_container_of_containers<TFn>::value &&
+                                                       !is_trivial_container<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
             data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
             ncnt->read_comp(&(dst.*member_), extkey);
         }
 
-        template<typename TFn> inline typename std::enable_if<is_trivial_container<TFn>::value || is_trivial_map<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<is_trivial_container<TFn>::value || is_trivial_map<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             size_t elemt = typeid(TFn).hash_code();
             _clear(dst.*member_);
@@ -546,11 +546,11 @@ namespace sql_bridge
             ncnt->read_comp(&(dst.*member_), extkey);
         }
 
-        template<typename TFn> inline typename std::enable_if<is_map<TFn>::value &&
-                                                              !is_trivial_map<TFn>::value &&
-                                                              !is_container_of_containers<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey) {_read_comp_map<TFn>(dst,cont,extkey);}
+        template<typename TFn> inline std::enable_if_t<is_map<TFn>::value &&
+                                                       !is_trivial_map<TFn>::value &&
+                                                       !is_container_of_containers<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const& extkey) {_read_comp_map<TFn>(dst,cont,extkey);}
 
-        template<typename TFn> inline typename std::enable_if<is_pointer<typename TFn::mapped_type>::value>::type _read_comp_map(T& dst, data_update_context& cont, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<is_pointer<typename TFn::mapped_type>::value> _read_comp_map(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             using k_type = typename TFn::key_type;
             using m_type = typename TFn::mapped_type;
@@ -603,7 +603,7 @@ namespace sql_bridge
             }
         }
 
-        template<typename TFn> inline typename std::enable_if<!is_pointer<typename TFn::mapped_type>::value>::type _read_comp_map(T& dst, data_update_context& cont, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<!is_pointer<typename TFn::mapped_type>::value> _read_comp_map(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             using k_type = typename TFn::key_type;
             using m_type = typename TFn::mapped_type;
@@ -622,12 +622,12 @@ namespace sql_bridge
             }
         }
 
-        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value &&
-                                                              !is_trivial_container<TFn>::value &&
-                                                              !is_container_of_containers<TFn>::value>::type _read_comp(T& dst, data_update_context& cont, sql_value const& extkey) {_read_comp_cont<TFn>(dst,cont,extkey);}
+        template<typename TFn> inline std::enable_if_t<is_container<TFn>::value &&
+                                                       !is_trivial_container<TFn>::value &&
+                                                       !is_container_of_containers<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const& extkey) {_read_comp_cont<TFn>(dst,cont,extkey);}
 
-        template<typename TFn> inline typename std::enable_if<is_kind_of_array<TFn>::value &&
-                                                              !is_pointer<typename TFn::value_type>::value>::type _read_comp_cont(T& dst, data_update_context& cont, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<is_kind_of_array<TFn>::value &&
+                                                       !is_pointer<typename TFn::value_type>::value> _read_comp_cont(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             using type = typename TFn::value_type;
             using iterator = typename TFn::iterator;
@@ -647,8 +647,8 @@ namespace sql_bridge
                                        g_replace_static_recommendation);
         }
 
-        template<typename TFn> inline typename std::enable_if<!is_kind_of_array<TFn>::value &&
-                                                              is_pointer<typename TFn::value_type>::value>::type _read_comp_cont(T& dst, data_update_context& cont, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<!is_kind_of_array<TFn>::value &&
+                                                       is_pointer<typename TFn::value_type>::value> _read_comp_cont(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             using type = typename TFn::value_type;
             using obj_type = std::conditional_t<std::is_pointer<type>::value, std::unique_ptr<typename is_pointer<type>::type>, type>;
@@ -694,8 +694,8 @@ namespace sql_bridge
             }
         }
 
-        template<typename TFn> inline typename std::enable_if<!is_kind_of_array<TFn>::value &&
-                                                              !is_pointer<typename TFn::value_type>::value>::type _read_comp_cont(T& dst, data_update_context& cont, sql_value const& extkey)
+        template<typename TFn> inline std::enable_if_t<!is_kind_of_array<TFn>::value &&
+                                                       !is_pointer<typename TFn::value_type>::value> _read_comp_cont(T& dst, data_update_context& cont, sql_value const& extkey)
         {
             using type = typename TFn::value_type;
             size_t elemt = types_selector<TFn>::destination_id();
@@ -722,19 +722,19 @@ namespace sql_bridge
 
 #pragma mark - clear container
         
-        template<typename TFn> inline typename std::enable_if<is_kind_of_array<TFn>::value>::type _clear(TFn& el) {}
-        template<typename TFn> inline typename std::enable_if<!is_kind_of_array<TFn>::value>::type _clear(TFn& el) {el.clear();}
+        template<typename TFn> inline std::enable_if_t<is_kind_of_array<TFn>::value> _clear(TFn& el) {}
+        template<typename TFn> inline std::enable_if_t<!is_kind_of_array<TFn>::value> _clear(TFn& el) {el.clear();}
 
 #pragma mark - containers inserter
         
-        template<typename TFn, typename TKey, typename TArg> inline typename std::enable_if<std::is_pointer<typename TFn::mapped_type>::value>::type add_to_map(TFn& ct, TKey const& k, TArg&& ar) {ct.insert(typename TFn::value_type(k,ar.release()));}
-        template<typename TFn, typename TKey, typename TArg> inline typename std::enable_if<!std::is_pointer<typename TFn::mapped_type>::value>::type add_to_map(TFn& ct, TKey const& k, TArg&& ar) {ct.insert(typename TFn::value_type(k,std::move(ar)));}
-        template<typename TFn, typename TArg> inline typename std::enable_if<!std::is_pointer<typename TFn::value_type>::value>::type add_to_container(TFn& ct, TArg&& ar) {_add_to_container(ct,std::move(ar));}
-        template<typename TFn, typename TArg> inline typename std::enable_if<std::is_pointer<typename TFn::value_type>::value>::type add_to_container(TFn& ct, TArg&& ar) {_add_to_container_ptr(ct,std::move(ar));}
-        template<typename TFn, typename TArg> inline typename std::enable_if<is_back_pushable_container<TFn>::value>::type _add_to_container(TFn& ct, TArg&& ar) {ct.push_back(std::move(ar));}
-        template<typename TFn, typename TArg> inline typename std::enable_if<!is_back_pushable_container<TFn>::value>::type _add_to_container(TFn& ct, TArg&& ar) {ct.insert(ct.end(),std::move(ar));}
-        template<typename TFn, typename TArg> inline typename std::enable_if<is_back_pushable_container<TFn>::value>::type _add_to_container_ptr(TFn& ct, TArg&& ar) {ct.push_back(ar.release());}
-        template<typename TFn, typename TArg> inline typename std::enable_if<!is_back_pushable_container<TFn>::value>::type _add_to_container_ptr(TFn& ct, TArg&& ar) {ct.insert(ct.end(),ar.release());}
+        template<typename TFn, typename TKey, typename TArg> inline std::enable_if_t<std::is_pointer<typename TFn::mapped_type>::value> add_to_map(TFn& ct, TKey const& k, TArg&& ar) {ct.insert(typename TFn::value_type(k,ar.release()));}
+        template<typename TFn, typename TKey, typename TArg> inline std::enable_if_t<!std::is_pointer<typename TFn::mapped_type>::value> add_to_map(TFn& ct, TKey const& k, TArg&& ar) {ct.insert(typename TFn::value_type(k,std::move(ar)));}
+        template<typename TFn, typename TArg> inline std::enable_if_t<!std::is_pointer<typename TFn::value_type>::value> add_to_container(TFn& ct, TArg&& ar) {_add_to_container(ct,std::move(ar));}
+        template<typename TFn, typename TArg> inline std::enable_if_t<std::is_pointer<typename TFn::value_type>::value> add_to_container(TFn& ct, TArg&& ar) {_add_to_container_ptr(ct,std::move(ar));}
+        template<typename TFn, typename TArg> inline std::enable_if_t<is_back_pushable_container<TFn>::value> _add_to_container(TFn& ct, TArg&& ar) {ct.push_back(std::move(ar));}
+        template<typename TFn, typename TArg> inline std::enable_if_t<!is_back_pushable_container<TFn>::value> _add_to_container(TFn& ct, TArg&& ar) {ct.insert(ct.end(),std::move(ar));}
+        template<typename TFn, typename TArg> inline std::enable_if_t<is_back_pushable_container<TFn>::value> _add_to_container_ptr(TFn& ct, TArg&& ar) {ct.push_back(ar.release());}
+        template<typename TFn, typename TArg> inline std::enable_if_t<!is_back_pushable_container<TFn>::value> _add_to_container_ptr(TFn& ct, TArg&& ar) {ct.insert(ct.end(),ar.release());}
 
         TMb T::*member_;
         class_descriptors_ptr description_;

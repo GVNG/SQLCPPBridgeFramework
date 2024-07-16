@@ -42,7 +42,7 @@ namespace sql_bridge
     template<typename T> class _t_to_string
     {
     public:
-        using type = T;
+        using type = std::decay_t<T>;
         using type_elem = typename T::value_type;
         using type_stream = std::basic_ostringstream<type_elem>;
 
@@ -62,7 +62,7 @@ namespace sql_bridge
     private:
         mutable type_stream buf_;
         chrono_formatter chrono_format_;
-        template<typename TFn> inline typename std::enable_if<is_chrono<TFn>::value>::type _write(TFn const& src)
+        template<typename TFn> inline std::enable_if_t<is_chrono<TFn>::value> _write(TFn const& src)
         {
             if (chrono_format_.empty())
             {
@@ -76,16 +76,16 @@ namespace sql_bridge
                 tmput.put(buf_,
                           buf_,
                           ' ',
-                          chrono_format_.local_?std::localtime ( &tt ):std::gmtime( &tt ),
+                          chrono_format_.local_ ? std::localtime(&tt) : std::gmtime(&tt),
                           chrono_format_.format_.data(),
                           chrono_format_.format_.data()+chrono_format_.format_.length());
             }
         }
-        template<typename TFn> inline typename std::enable_if<std::is_enum<TFn>::value>::type _write(TFn const& src) {buf_ << static_cast<typename std::underlying_type<TFn>::type>(src);}
-        template<typename TFn> inline typename std::enable_if<std::is_same<TFn, chrono_formatter>::value>::type _write(TFn const& src) {chrono_format_ = src;}
-        template<typename TFn> inline typename std::enable_if<!std::is_enum<TFn>::value &&
-                                                              !is_chrono<TFn>::value &&
-                                                              !std::is_same<TFn,chrono_formatter>::value>::type _write(TFn const& src) {buf_ << src;}
+        template<typename TFn> inline std::enable_if_t<std::is_enum<TFn>::value> _write(TFn const& src) {buf_ << static_cast< std::underlying_type_t<TFn> >(src);}
+        template<typename TFn> inline std::enable_if_t<std::is_same<TFn, chrono_formatter>::value> _write(TFn const& src) {chrono_format_ = src;}
+        template<typename TFn> inline std::enable_if_t<!std::is_enum<TFn>::value &&
+                                                       !is_chrono<TFn>::value &&
+                                                       !std::is_same<TFn,chrono_formatter>::value> _write(TFn const& src) {buf_ << src;}
     };
     
     using to_string = _t_to_string<std::string>;
@@ -133,9 +133,6 @@ namespace sql_bridge
         explicit inline protected_section(type&& src)
             : pointer_(std::make_unique<type>(std::forward(src)))
             {}
-//        explicit inline protected_section(type const& src)
-//            : pointer_(std::make_unique<type>(src))
-//            {}
         inline protected_section(std::initializer_list<init_type> src)
             : pointer_(std::make_unique<type>(src))
             {}

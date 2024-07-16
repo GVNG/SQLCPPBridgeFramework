@@ -41,7 +41,7 @@ namespace sql_bridge
     template<typename T> class _t_data_block
     {
     public:
-        using type = T;
+        using type = std::decay_t<T>;
         using t_buffer = std::shared_ptr<type>;
         
         _t_data_block()
@@ -142,6 +142,7 @@ namespace sql_bridge
         size_t elements_;
         size_t allocated_;
     };
+    
     using bytes_block = _t_data_block<unsigned char>;
 };
 

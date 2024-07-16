@@ -98,12 +98,12 @@ namespace sql_bridge
 
     private:
 #pragma mark - sql types
-        template<typename TFn> inline typename std::enable_if<is_optional_or_trivial<TFn>::value,std::string const&>::type _sql_type() const
+        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value,std::string const&> _sql_type() const
         {
             using type = typename TStrategy::template sql_types<TFn>;
             return type::template type_name<TFn>();
         };
-        template<typename TFn> inline typename std::enable_if<!is_optional_or_trivial<TFn>::value,std::string const&>::type _sql_type() const
+        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value,std::string const&> _sql_type() const
         {
             static std::string const def;
             return def;

@@ -52,7 +52,7 @@ namespace sql_bridge
         
         template<typename T> class load_task : public db_task
         {
-            using _t_base = typename std::decay<T>::type;
+            using _t_base = std::decay_t<T>;
         public:
             load_task(T const& src, std::string const& key, db_proc_queue_ptr const& trg)
                 : db_task(data_sections_ptr())
@@ -76,7 +76,7 @@ namespace sql_bridge
         
         template<typename T> class save_task : public db_task
         {
-            using _t_base = typename std::decay<T>::type;
+            using _t_base = std::decay_t<T>;
         public:
             save_task(T const& src, std::string const& key, db_proc_queue_ptr const& trg)
                 : db_task(data_sections_ptr())
@@ -104,7 +104,7 @@ namespace sql_bridge
 
         template<typename T,typename TKey> class remove_task : public db_task
         {
-            using _t_proc_type = typename std::decay<T>::type;
+            using _t_proc_type = std::decay_t<T>;
             using _t_key_type = TKey;
         public:
             remove_task(std::string const& tab, _t_key_type const& key, db_proc_queue_ptr const& trg)
@@ -205,11 +205,11 @@ namespace sql_bridge
 
 #pragma mark - remove
         
-        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type remove(std::string const& key) const
+        template<typename T> inline std::enable_if_t<is_sql_acceptable<T>::value> remove(std::string const& key) const
         {
             proc_queue_->add(std::make_shared< remove_task<T,std::string> >("",key,proc_queue_));
         }
-        template<typename T> inline typename std::enable_if<is_trivial_map<T>::value>::type remove(typename T::key_type const& key, std::string const& tab) const
+        template<typename T> inline std::enable_if_t<is_trivial_map<T>::value> remove(typename T::key_type const& key, std::string const& tab) const
         {
             proc_queue_->add(std::make_shared< remove_task<T,typename T::key_type> >(tab,key,proc_queue_));
         }

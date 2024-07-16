@@ -42,7 +42,7 @@ namespace sql_bridge
 
         template<typename T> class save_task : public db_task
         {
-            using _t_base = typename std::decay<T>::type;
+            using _t_base = std::decay_t<T>;
         public:
             save_task(_t_base const* src,
                       data_sections_ptr section,
@@ -65,7 +65,7 @@ namespace sql_bridge
 
         template<typename T> class replace_task : public db_task
         {
-            using _t_base = typename std::decay<T>::type;
+            using _t_base = std::decay_t<T>;
         public:
             replace_task(_t_base const* src,
                          data_sections_ptr section,
@@ -85,7 +85,7 @@ namespace sql_bridge
 
         template<typename T> class load_page_task : public db_task
         {
-            using _t_base = typename std::decay<T>::type;
+            using _t_base = std::decay_t<T>;
         public:
             load_page_task(_t_base* src,
                            data_sections_ptr section,
@@ -114,7 +114,7 @@ namespace sql_bridge
         
         template<typename T> class load_task : public db_task
         {
-            using _t_base = typename std::decay<T>::type;
+            using _t_base = std::decay_t<T>;
         public:
             load_task(_t_base* src,
                       data_sections_ptr section,
@@ -207,11 +207,11 @@ namespace sql_bridge
     private:
 #pragma mark - load
         
-        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load(T*, std::string const& flt, size_t* num) const
+        template<typename T> inline std::enable_if_t<is_sql_acceptable<T>::value> _load(T*, std::string const& flt, size_t* num) const
         {
             throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);
         }
-        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load(T* dst, std::string const& flt, size_t* num) const
+        template<typename T> inline std::enable_if_t<!is_sql_acceptable<T>::value> _load(T* dst, std::string const& flt, size_t* num) const
         {
             db_task_ptr task(std::make_shared< load_task<T> >(dst,data_,flt,references_,root_data_));
             db_tasks_queue_interface_ptr qp = queue_.lock();
@@ -225,11 +225,11 @@ namespace sql_bridge
         
 #pragma mark - load page
         
-        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _load_page(range, T*, std::string const& flt, size_t* num) const
+        template<typename T> inline std::enable_if_t<is_sql_acceptable<T>::value> _load_page(range, T*, std::string const& flt, size_t* num) const
         {
             throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);
         }
-        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _load_page(range pg, T* dst, std::string const& flt, size_t* num) const
+        template<typename T> inline std::enable_if_t<!is_sql_acceptable<T>::value> _load_page(range pg, T* dst, std::string const& flt, size_t* num) const
         {
             db_task_ptr task(std::make_shared< load_page_task<T> >(dst,data_,flt,pg,references_,root_data_));
             db_tasks_queue_interface_ptr qp = queue_.lock();
@@ -243,12 +243,12 @@ namespace sql_bridge
         
 #pragma mark - save
         
-        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _save(range, T const*) const
+        template<typename T> inline std::enable_if_t<is_sql_acceptable<T>::value> _save(range, T const*) const
         {
             throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);
         }
 
-        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _save(range pg, T const* src) const
+        template<typename T> inline std::enable_if_t<!is_sql_acceptable<T>::value> _save(range pg, T const* src) const
         {
             db_task_ptr task(std::make_shared< save_task<T> >(src,data_,pg,references_,root_data_));
             db_tasks_queue_interface_ptr qp = queue_.lock();
@@ -258,19 +258,17 @@ namespace sql_bridge
         
 #pragma mark - replace
         
-        template<typename T> inline typename std::enable_if<is_sql_acceptable<T>::value>::type _replace(T const*) const
+        template<typename T> inline std::enable_if_t<is_sql_acceptable<T>::value> _replace(T const*) const
         {
             throw sql_bridge_error(g_internal_error_text, g_incorrect_operation_err_text);
         }
-        template<typename T> inline typename std::enable_if<!is_sql_acceptable<T>::value>::type _replace(T const* src) const
+        template<typename T> inline std::enable_if_t<!is_sql_acceptable<T>::value> _replace(T const* src) const
         {
             db_task_ptr task(std::make_shared< replace_task<T> >(src,data_,references_,root_data_));
             db_tasks_queue_interface_ptr qp = queue_.lock();
             if (qp!=nullptr)
                 qp->add_for_sync( task );
         }
-
-        
         
     };
 };

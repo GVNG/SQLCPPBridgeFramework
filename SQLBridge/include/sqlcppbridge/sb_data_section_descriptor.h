@@ -100,8 +100,8 @@ namespace sql_bridge
         template<typename TFs, typename TSc> inline void _proc_inheritance(std::false_type) {};
         template<typename TFs, typename TSc> inline void _proc_inheritance(std::true_type)
         {
-            class_descriptors_map::iterator fspos = classes_map_.find(typeid(TFs).hash_code());
-            class_descriptors_map::iterator scpos = classes_map_.find(typeid(TSc).hash_code());
+            auto fspos = classes_map_.find(typeid(TFs).hash_code());
+            auto scpos = classes_map_.find(typeid(TSc).hash_code());
             if (fspos==classes_map_.end() || scpos==classes_map_.end())
                 throw sql_bridge_error(g_internal_error_text,g_architecture_error_text);
             class_descriptors_ptr desc = _t_class_descriptor<TStrategy,TFs>::template create_inheritance<TSc>(scpos->second);
@@ -120,9 +120,9 @@ namespace sql_bridge
 
 #pragma mark - register classes
         
-        template<typename TFn> inline typename std::enable_if<is_sql_acceptable<TFn>::value>::type _register_class() {};
-        template<typename TFn> inline typename std::enable_if<is_container<TFn>::value || is_map<TFn>::value>::type _register_class() {_register_container<TFn>();}
-        template<typename TFn> inline typename std::enable_if<!is_container<TFn>::value && !is_map<TFn>::value && !is_sql_acceptable<TFn>::value>::type _register_class()
+        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _register_class() {};
+        template<typename TFn> inline std::enable_if_t<is_container<TFn>::value || is_map<TFn>::value> _register_class() {_register_container<TFn>();}
+        template<typename TFn> inline std::enable_if_t<!is_container<TFn>::value && !is_map<TFn>::value && !is_sql_acceptable<TFn>::value> _register_class()
         {
             class_descriptors_ptr desc = _t_class_descriptor<TStrategy,TFn>::template create_description<TFn>();
             if (!desc)
@@ -137,14 +137,14 @@ namespace sql_bridge
             }
         }
         
-        template<typename TFn> inline typename std::enable_if<is_trivial_container<TFn>::value || is_trivial_map<TFn>::value>::type _register_container()
+        template<typename TFn> inline std::enable_if_t<is_trivial_container<TFn>::value || is_trivial_map<TFn>::value> _register_container()
         {
             using type = _t_container_descriptor<TStrategy,TFn>;
             size_t code = typeid(TFn).hash_code();
             classes_map_.insert({code,std::make_shared<type>()});
         }
         
-        template<typename TFn> inline typename std::enable_if<!is_trivial_container<TFn>::value && !is_trivial_map<TFn>::value>::type _register_container()
+        template<typename TFn> inline std::enable_if_t<!is_trivial_container<TFn>::value && !is_trivial_map<TFn>::value> _register_container()
         {
             class_descriptors_ptr desc = _t_class_descriptor<TStrategy,TFn>::template create_description<TFn>();
             if (!desc)
@@ -163,7 +163,7 @@ namespace sql_bridge
             : TStrategy::sql_file
             , TStrategy::sql_file::transactions_lock
         {
-            updater(std::string const& fname,string_container const& drps)
+            updater(std::string const& fname, string_container const& drps)
                 : TStrategy::sql_file(fname)
                 , TStrategy::sql_file::transactions_lock((typename TStrategy::sql_file const&)*this)
                 , drop_statements_(drps)
