@@ -51,8 +51,8 @@ private:
     int val2_;
 };
 
-typedef std::vector<Case11Elem> Case11Arr;
-typedef std::map<std::string,Case11Arr> Case11Member;
+using Case11Arr = std::vector<Case11Elem>;
+using Case11Member = std::map<std::string,Case11Arr>;
 
 class Case11
 {

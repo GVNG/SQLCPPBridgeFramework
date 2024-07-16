@@ -12,7 +12,7 @@
 #include "sqlcppbridge.h"
 
 class Case41;
-typedef std::vector<Case41> Case41Container;
+using Case41Container = std::vector<Case41>;
 
 class Case41
 {

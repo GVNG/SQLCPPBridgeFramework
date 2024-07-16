@@ -34,8 +34,8 @@
 
 #include "sqlcppbridge.h"
 
-typedef std::map<std::string,float> Case7Member;
-typedef std::set<float> Case7Alt;
+using Case7Member = std::map<std::string,float>;
+using Case7Alt = std::set<float>;
 
 class Case7
 {

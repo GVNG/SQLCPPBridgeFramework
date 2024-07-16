@@ -35,7 +35,7 @@
 #include "sqlcppbridge.h"
 
 class Case20;
-typedef std::vector<Case20> Case20Container;
+using Case20Container = std::vector<Case20>;
 
 class Case20
 {

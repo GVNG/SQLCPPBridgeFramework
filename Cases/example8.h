@@ -36,8 +36,8 @@
 #include <chrono>
 #include <array>
 
-typedef std::deque<float> Case8Member;
-typedef std::array<int,20> Case8Static;
+using Case8Member = std::deque<float>;
+using Case8Static = std::array<int,20>;
 
 class Case8
 {

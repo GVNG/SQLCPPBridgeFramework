@@ -36,7 +36,7 @@
 #include <cmath>
 
 class Case29;
-typedef std::vector<Case29> Case29Container;
+using Case29Container = std::vector<Case29>;
 
 class Case29
 {

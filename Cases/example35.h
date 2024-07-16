@@ -36,8 +36,8 @@
 
 class Case35;
 class Case35Log;
-typedef std::vector<Case35Log> Case35LogContainer;
-typedef std::vector<Case35> Case35Container;
+using Case35LogContainer = std::vector<Case35Log>;
+using Case35Container = std::vector<Case35>;
 
 class Case35Log
 {

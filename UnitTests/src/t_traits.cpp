@@ -10,13 +10,13 @@
 
 TEST(Core, Traits)
 {
-    typedef std::map<long,long> _t_map;
-    typedef std::pair<bool,bool> _t_pair;
-    typedef std::set<int> _t_set;
-    typedef std::vector<float> _t_vector;
-    typedef std::array<char, 20> _t_array;
-    typedef std::unordered_map<int,int> _tunorderedmap;
-    typedef std::vector<bool> _t_bool_vector;
+    using _t_map = std::map<long,long>;
+    using _t_pair = std::pair<bool,bool>;
+    using _t_set = std::set<int>;
+    using _t_vector = std::vector<float>;
+    using _t_array = std::array<char, 20>;
+    using _tunorderedmap = std::unordered_map<int,int>;
+    using _t_bool_vector = std::vector<bool>;
     struct _t_set_inheritance : _t_set {};
     struct _t_set_priv_inheritance : private _t_set {};
     struct _t_vector_inheritance : _t_vector {};
@@ -52,12 +52,12 @@ TEST(Core, Traits)
 
 TEST(Core,Traits2)
 {
-    typedef std::map<int,int> _tmap;
-    typedef std::multimap<int, int> _tmultimap;
-    typedef std::vector<int> _tvector;
-    typedef std::set<int> _tset;
-    typedef std::unordered_map<int,int> _tunorderedmap;
-    typedef std::vector<bool> _t_bool_vector;
+    using _tmap = std::map<int,int>;
+    using _tmultimap = std::multimap<int, int>;
+    using _tvector = std::vector<int>;
+    using _tset = std::set<int>;
+    using _tunorderedmap = std::unordered_map<int,int>;
+    using _t_bool_vector = std::vector<bool>;
 
     ASSERT_EQ(sql_bridge::is_map<_tmap>::value,true);
     ASSERT_EQ(sql_bridge::is_map<_tunorderedmap>::value,true);
@@ -94,10 +94,10 @@ TEST(Core,Traits2)
 
 TEST(Core,TraitsOptional)
 {
-    typedef std::pair<bool,bool> _t_pair;
-    typedef std::vector<float> _t_vector;
-    typedef sql_bridge::optional_value<int> _t_optional_int;
-    typedef sql_bridge::optional_value<_t_vector> _t_optional_vector;
+    using _t_pair = std::pair<bool,bool>;
+    using _t_vector = std::vector<float>;
+    using _t_optional_int = sql_bridge::optional_value<int>;
+    using _t_optional_vector = sql_bridge::optional_value<_t_vector>;
     
     ASSERT_EQ(sql_bridge::is_optional_or_trivial<_t_optional_int>::value, true);
     ASSERT_EQ(sql_bridge::is_optional_or_trivial<_t_vector>::value, false);
@@ -108,12 +108,12 @@ TEST(Core,TraitsOptional)
 
 TEST(Core,TraitsPointers)
 {
-    typedef int* _t_simple_int_pointer;
-    typedef int const* _t_simple_int_const_pointer;
-    typedef std::shared_ptr<int> _t_shared_int_pointer;
-    typedef std::unique_ptr<int> _t_unique_int_pointer;
-    typedef std::weak_ptr<int> _t_weak_int_pointer;
-    typedef std::vector<int> _t_vector_int;
+    using _t_simple_int_pointer = int*;
+    using _t_simple_int_const_pointer = int const*;
+    using _t_shared_int_pointer = std::shared_ptr<int>;
+    using _t_unique_int_pointer = std::unique_ptr<int>;
+    using _t_weak_int_pointer = std::weak_ptr<int>;
+    using _t_vector_int = std::vector<int> ;
 
     ASSERT_EQ(sql_bridge::is_pointer<_t_simple_int_pointer>::value, true);
     ASSERT_EQ(sql_bridge::is_pointer<_t_simple_int_const_pointer>::value, true);

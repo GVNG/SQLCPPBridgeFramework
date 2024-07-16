@@ -38,7 +38,7 @@ class Case18;
 class Case18Member;
 class Case18Par1;
 class Case18Par2;
-typedef std::vector<Case18Member> _TCase18Members;
+using _TCase18Members = std::vector<Case18Member>;
 
 class Case18Par1
 {

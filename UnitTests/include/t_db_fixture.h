@@ -43,7 +43,7 @@ static char const* db_path = "./DBTest";
 
 class DBFixture : public ::testing::Test
 {
-    typedef sql_bridge::local_storage<sql_bridge::sqlite_adapter> _t_storage;
+    using _t_storage = sql_bridge::local_storage<sql_bridge::sqlite_adapter>;
 protected:
     DBFixture()
     {

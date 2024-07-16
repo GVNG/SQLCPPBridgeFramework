@@ -36,7 +36,7 @@
 
 class Case19;
 
-typedef std::multimap<std::string, Case19> Case19Map;
+using Case19Map = std::multimap<std::string, Case19>;
 
 class Case19
 {

@@ -35,9 +35,9 @@
 #include "sqlcppbridge.h"
 
 class Case33;
-typedef Case33* Case33Ptr;
-typedef std::vector<Case33Ptr> Case33Container; // bad style!!! Don't repeat it!
-typedef std::map<long,Case33Ptr> Case33Map; // bad style!!! Don't repeat it!
+using Case33Ptr = Case33*;
+using Case33Container = std::vector<Case33Ptr>; // bad style!!! Don't repeat it!
+using Case33Map = std::map<long,Case33Ptr>; // bad style!!! Don't repeat it!
 
 class Case33
 {

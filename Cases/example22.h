@@ -36,7 +36,7 @@
 
 class Case22;
 class Case22Ext;
-typedef std::map<std::string,Case22> Case22Container;
+using Case22Container = std::map<std::string,Case22>;
 
 class Case22Ext
 {

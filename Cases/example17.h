@@ -37,9 +37,9 @@
 class Case17;
 class Case17Extra;
 
-typedef std::map<std::string,long long> _TStringToLongMap;
-typedef std::map<long,Case17Extra> _TCase17ExtraMap;
-typedef std::map<long,Case17> _TLongToCase17Map;
+using _TStringToLongMap = std::map<std::string,long long>;
+using _TCase17ExtraMap = std::map<long,Case17Extra>;
+using _TLongToCase17Map = std::map<long,Case17>;
 
 class Case17Extra
 {

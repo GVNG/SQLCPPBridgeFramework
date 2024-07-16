@@ -36,8 +36,8 @@
 
 class Case36;
 class Case36Item;
-typedef std::deque<Case36Item> Case36ItemsContainer;
-typedef std::vector<Case36Item> Case36ItemsAltContainer;
+using Case36ItemsContainer = std::deque<Case36Item>;
+using Case36ItemsAltContainer = std::vector<Case36Item>;
 
 class Case36Item
 {

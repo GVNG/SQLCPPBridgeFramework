@@ -35,9 +35,9 @@
 #include "sqlcppbridge.h"
 
 class Case25;
-typedef std::set<std::string> _TCase25Strings;
-typedef std::map<int,int> _TCase25Map;
-typedef std::vector<Case25> Case25Container;
+using _TCase25Strings = std::set<std::string>;
+using _TCase25Map = std::map<int,int>;
+using Case25Container = std::vector<Case25>;
 
 class Case25
     : protected _TCase25Strings

@@ -34,7 +34,7 @@
 
 #include "sqlcppbridge.h"
 
-typedef std::vector<int> Case10Element;
-typedef std::vector<Case10Element> Case10;
+using Case10Element = std::vector<int>;
+using Case10 = std::vector<Case10Element>;
 
 #endif /* example10_h */

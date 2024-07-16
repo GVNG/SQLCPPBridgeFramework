@@ -64,7 +64,7 @@ private:
     long val_;
 };
 
-typedef std::map<std::string, Case12Member> Case12Map;
+using Case12Map = std::map<std::string, Case12Member>;
 
 class Case12
 {

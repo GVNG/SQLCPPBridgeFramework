@@ -37,7 +37,7 @@
 
 class Case21;
 class Case21Ext;
-typedef std::vector<Case21Ext> Case21Container;
+using Case21Container = std::vector<Case21Ext>;
 
 class Case21Ext
 {

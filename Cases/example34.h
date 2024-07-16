@@ -36,9 +36,9 @@
 
 class Case34Extra;
 class Case34;
-typedef std::shared_ptr<Case34Extra> Case34ExtraPtr;
-typedef std::map<std::string,Case34ExtraPtr> Case34ExtraContainer;
-typedef std::vector<Case34> Case34Container;
+using Case34ExtraPtr = std::shared_ptr<Case34Extra>;
+using Case34ExtraContainer = std::map<std::string,Case34ExtraPtr>;
+using Case34Container = std::vector<Case34>;
 
 class Case34Extra
 {

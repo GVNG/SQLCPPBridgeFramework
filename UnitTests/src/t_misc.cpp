@@ -23,7 +23,7 @@ TEST(Core,ClockToString)
 
 TEST(Core,Optional)
 {
-    typedef sql_bridge::optional_value<int> _t_opt_int;
+    using _t_opt_int = sql_bridge::optional_value<int>;
 
     _t_opt_int v1,v2,v3,v4;
     v3 = 10;

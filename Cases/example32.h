@@ -35,8 +35,8 @@
 #include "sqlcppbridge.h"
 
 class Case32;
-typedef std::vector<Case32> Case32Container;
-typedef std::vector<bool> Case32BoolVector;
+using Case32Container = std::vector<Case32>;
+using Case32BoolVector = std::vector<bool>;
 
 class Case32
 {

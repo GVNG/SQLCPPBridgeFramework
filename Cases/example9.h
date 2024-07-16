@@ -52,7 +52,7 @@ private:
     int val2_;
 };
 
-typedef std::vector<Case9Member> Case9Element;
-typedef std::map<int,Case9Element> Case9;
+using Case9Element = std::vector<Case9Member>;
+using Case9 = std::map<int,Case9Element>;
 
 #endif /* example9_h */

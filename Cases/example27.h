@@ -35,7 +35,7 @@
 #include "sqlcppbridge.h"
 
 class Case27;
-typedef std::map<int,Case27> Case27Container;
+using Case27Container = std::map<int,Case27>;
 
 class Case27
 {

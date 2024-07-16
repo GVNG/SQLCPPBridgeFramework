@@ -13,7 +13,7 @@
 
 class Case43;
 
-typedef std::vector<Case43> Case43Container;
+using Case43Container = std::vector<Case43>;
 
 class Case43
 {

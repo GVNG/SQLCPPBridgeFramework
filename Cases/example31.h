@@ -35,8 +35,8 @@
 #include "sqlcppbridge.h"
 
 class Case31;
-typedef std::shared_ptr<Case31> Case31Ptr;
-typedef std::vector<Case31Ptr> Case31Container;
+using Case31Ptr = std::shared_ptr<Case31>;
+using Case31Container = std::vector<Case31Ptr>;
 
 class Case31
 {
