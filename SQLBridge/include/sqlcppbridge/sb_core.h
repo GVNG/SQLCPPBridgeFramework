@@ -94,7 +94,7 @@ namespace sql_bridge
     template<typename T> class protected_section
     {
     public:
-        using type = std::decay_t< std::remove_pointer_t<T> >;
+        using type = std::decay_t<T>;
     private:
         template<bool,typename TInt> struct check_for_container {using value_type = TInt;};
         template<typename TInt> struct check_for_container<true,TInt> {using value_type = typename TInt::value_type;};
@@ -131,11 +131,11 @@ namespace sql_bridge
         protected_section(protected_section&&) = delete;
         
         explicit inline protected_section(type&& src)
-            : pointer_(std::make_unique<type>(std::move(src)))
+            : pointer_(std::make_unique<type>(std::forward(src)))
             {}
-        explicit inline protected_section(type const& src)
-            : pointer_(std::make_unique<type>(src))
-            {}
+//        explicit inline protected_section(type const& src)
+//            : pointer_(std::make_unique<type>(src))
+//            {}
         inline protected_section(std::initializer_list<init_type> src)
             : pointer_(std::make_unique<type>(src))
             {}
@@ -145,6 +145,33 @@ namespace sql_bridge
         pointer_type pointer_;
     };
 
+    template<typename T> class _t_event
+    {
+        using type = T;
+        using locker = std::unique_lock<type>;
+        using lock_guard = std::lock_guard<type>;
+        using guarded_function = std::function<void()>;
+        using guarded_if_function = std::function<bool()>;
+    public:
+        _t_event() {};
+        _t_event(_t_event const&) = delete;
+        _t_event(_t_event&& v) = delete;
+
+        inline void fire() {lock_guard lk(mtx_);var_.notify_one();}
+        inline void fire_all() {lock_guard lk(mtx_);var_.notify_all();}
+        template<typename _tfn> inline std::enable_if_t<is_duration<_tfn>::value,bool> wait_for(_tfn const& dl) {locker lk(mtx_);return var_.wait_for(lk, dl)==std::cv_status::no_timeout;}
+        template<typename _tfn> inline std::enable_if_t<is_duration<_tfn>::value,bool> wait_for_if(_tfn const& dl,guarded_if_function fn) {locker lk(mtx_);if (fn()) return var_.wait_for(lk, dl)==std::cv_status::no_timeout; else {lk.unlock();return true;}}
+        inline void wait(guarded_function fn=nullptr) {locker lk(mtx_);if (fn) fn(); var_.wait(lk);}
+        inline void wait_if(guarded_if_function fn) {locker lk(mtx_);if (fn()) var_.wait(lk); else lk.unlock();}
+        inline void under_guard(guarded_function fn) {lock_guard lk(mtx_);fn();}
+        inline void under_guard_and_fire(guarded_function fn) {lock_guard lk(mtx_);fn();var_.notify_one();}
+        inline void under_guard_and_fire_all(guarded_function fn) {lock_guard lk(mtx_);fn();var_.notify_all();}
+    private:
+        type mtx_;
+        std::condition_variable var_;
+    };
+    
+    using mt_event = _t_event<std::mutex>;
 };
 
 #endif /* sb_core_h */
