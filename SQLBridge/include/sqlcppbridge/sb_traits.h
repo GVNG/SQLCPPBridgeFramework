@@ -200,7 +200,7 @@ namespace sql_bridge
         using no = struct { char array[2]; };
 
         template<typename C> static yes ft(typename C::value_type*);
-        template<typename C> static yes st(typename C::type_optional_flag*);
+        template<typename C> static yes st(typename C::optional_flag_type*);
         template<typename C> static no  ft(...);
         template<typename C> static no  st(...);
     public:

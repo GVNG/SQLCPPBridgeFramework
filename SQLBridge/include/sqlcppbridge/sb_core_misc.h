@@ -188,8 +188,8 @@ namespace sql_bridge
     template<typename T> class optional_value
     {
     public:
-        using value_type = T;
-        using type_optional_flag = bool;
+        using value_type = std::decay_t<T>;
+        using optional_flag_type = bool;
         
         optional_value()
             : value_(default_init<value_type>())
@@ -226,13 +226,13 @@ namespace sql_bridge
         inline void operator = (value_type const& src) {value_ = src; optional_ = false;}
         inline void operator = (optional_value&& src) {optional_ = src.optional_; value_ = std::move(src.value_);}
         inline void operator = (value_type&& src) {optional_ = false; value_ = std::move(src);}
-        inline type_optional_flag empty() const {return optional_;}
+        inline bool empty() const {return optional_;}
     private:
         value_type value_;
-        type_optional_flag optional_;
+        optional_flag_type optional_;
         
-        template<typename _tf> static typename std::enable_if<!std::is_pod<_tf>::value && std::is_default_constructible<_tf>::value,_tf>::type default_init() {return _tf();}
-        template<typename _tf> static typename std::enable_if<std::is_pod<_tf>::value,_tf>::type default_init()
+        template<typename _tf> static std::enable_if_t<!std::is_pod<_tf>::value && std::is_default_constructible<_tf>::value,_tf> default_init() {return _tf();}
+        template<typename _tf> static std::enable_if_t<std::is_pod<_tf>::value,_tf> default_init()
         {
             _tf ret;
             std::memset(&ret, 0, sizeof(ret));
