@@ -35,7 +35,7 @@
 #include "sqlcppbridge.h"
 #include <cmath>
 
-typedef std::vector<std::string> _TCase3Strings;
+using _TCase3Strings = std::vector<std::string>;
 
 class Case3
 {

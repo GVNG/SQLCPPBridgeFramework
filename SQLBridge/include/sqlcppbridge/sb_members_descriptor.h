@@ -222,7 +222,7 @@ namespace sql_bridge
             {
                 if (dst.use_pages())
                 {
-                    typedef typename TFn::const_iterator iterator;
+                    using iterator = typename TFn::const_iterator;
                     iterator ve = el.begin();
                     for(size_t i=0; i!=dst.page().length() && ve!=el.end(); ++i,ve++)
                         ncnt->bind_comp(&(*(*ve)), extkey);
