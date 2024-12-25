@@ -127,34 +127,6 @@ namespace sql_bridge
         std::string alt_name_;
     };
     
-    template<typename T> class interlocked
-    {
-        using lock_guard = std::lock_guard<std::mutex>;
-    public:
-        using type = std::decay_t<T>;
-        interlocked(type const& v)
-            : val_(v)
-            {}
-        inline operator type() const
-        {
-            lock_guard lk(mtx_);
-            return val_;
-        }
-        inline type operator = (type const& v){lock_guard lk(mtx_);val_ = v;return val_;}
-        inline type operator ++ () {lock_guard lk(mtx_);return ++val_;}
-        inline type operator ++ (int) {lock_guard lk(mtx_);return val_++;}
-        inline type operator -- () {lock_guard lk(mtx_);return --val_;}
-        inline type operator -- (int) {lock_guard lk(mtx_);return val_--;}
-
-    private:
-        interlocked() = delete;
-        interlocked(interlocked&&) = delete;
-        interlocked(interlocked const&) = delete;
-        
-        type val_;
-        mutable std::mutex mtx_;
-    };
-    
     // sqlbridge uses this implementation instead of standard
     // the reasons are:
     //      - 'in place' allocation for data

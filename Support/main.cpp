@@ -30,6 +30,7 @@
 
 #include <iostream>
 #include <sys/stat.h>
+#include <atomic>
 #include "sqlcppbridge.h"
 #include "time_tracker.h"
 
@@ -79,7 +80,7 @@
 
 using t_db_storage = sql_bridge::local_storage<sql_bridge::sqlite_adapter>;
 using t_threads_container = std::array<std::thread, 10>;
-using t_counter = sql_bridge::interlocked<size_t>;
+using t_counter = std::atomic<size_t>;
 
 static bool shutdown(false);
 static std::mutex console_mutex;

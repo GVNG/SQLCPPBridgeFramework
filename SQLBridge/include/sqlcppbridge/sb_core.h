@@ -168,7 +168,29 @@ namespace sql_bridge
         std::condition_variable var_;
     };
     
+    template<typename T, typename TCounter> class _t_countdown
+    {
+        using type = T;
+        using t_counter = TCounter;
+        using locker = std::unique_lock<type>;
+        using lock_guard = std::lock_guard<type>;
+    public:
+        _t_countdown(t_counter tc)
+            : counter_(tc)
+            {}
+        _t_countdown(_t_countdown const&) = delete;
+        _t_countdown(_t_countdown&& v) = delete;
+
+        inline void wait() {locker lk(mtx_);if (counter_) var_.wait(lk);}
+        inline void fire() {lock_guard lk(mtx_);if (!counter_) var_.notify_one(); else counter_--;}
+    private:
+        t_counter counter_;
+        type mtx_;
+        std::condition_variable var_;
+    };
+    
     using mt_event = _t_event<std::mutex>;
+    using mt_countdown = _t_countdown<std::mutex,size_t>;
 };
 
 #endif /* sb_core_h */
