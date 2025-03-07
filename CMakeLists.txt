@@ -3,6 +3,7 @@ cmake_minimum_required ( VERSION 3.15...3.16.2 )
 set( project_version 1.1.19 )
 set( project_description "SQL to C++ bridge written in modern C++" )
 set( project_homepage "https://github.com/GVNG/SQLCPPBridgeFramework" )
+set( SQLITE_SOURCE_URL "https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip" )
 
 cmake_policy(SET CMP0135 NEW)
 
@@ -12,19 +13,16 @@ project ( SQLCppBridge
   HOMEPAGE_URL "${project_homepage}"
   LANGUAGES    C CXX )
 
-#set(SQLITE_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/sqlite)
 set(SQLITE_SCRIPT_FILE ${CMAKE_CURRENT_LIST_DIR}/Support/sqlite/CMakeLists.txt)
-set(SQLITE_SOURCE_URL "https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip")
 string(REGEX MATCH "-([0-9]+).zip" _ ${SQLITE_SOURCE_URL})
 set(FETCH_TASK_NAME "sqlite${CMAKE_MATCH_1}")
 string(REGEX MATCH "sqlite([0-9])([0-9][0-9])([0-9][0-9])" _ ${FETCH_TASK_NAME})
 set(SQLITE_VERSION "${CMAKE_MATCH_1}.${CMAKE_MATCH_2}.${CMAKE_MATCH_3}")
 
-
 # possible options
 option ( BUILD_SHARED    "Build shared library instead of static" OFF )
 option ( BUILD_FRAMEWORK "Build framework" OFF )
-option ( FETCH_SQLITE  "Fetch sqlite" ON )
+option ( FETCH_SQLITE    "Fetch sqlite" ON )
 
 # if the user specified a platform to build for (i.e. OS)
 # we assume the user wants a framework
@@ -85,7 +83,7 @@ set_target_properties( ${PROJECT_NAME} PROPERTIES
   FRAMEWORK ${BUILD_FRAMEWORK}
   FRAMEWORK_VERSION C
   VERSION           ${project_version}
-  CXX_STANDARD      14
+  CXX_STANDARD      17
   PUBLIC_HEADER     "${HEADERS}" )
 
 if ( FETCH_SQLITE )
