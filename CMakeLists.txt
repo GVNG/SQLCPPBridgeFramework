@@ -47,6 +47,7 @@ else()
 endif()
 
 
+MESSAGE ( STATUS )
 MESSAGE ( STATUS "${PROJECT_NAME} Options:" )
 MESSAGE ( STATUS "-----------------------------" )
 MESSAGE ( STATUS "Build shared library:     " ${BUILD_SHARED} )
