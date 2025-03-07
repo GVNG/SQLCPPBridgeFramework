@@ -1,6 +1,6 @@
 cmake_minimum_required ( VERSION 3.15...3.16.2 )
 
-set( project_version 1.1.15 )
+set( project_version 1.1.19 )
 set( project_description "SQL to C++ bridge written in modern C++" )
 set( project_homepage "https://github.com/GVNG/SQLCPPBridgeFramework" )
 
@@ -51,12 +51,12 @@ MESSAGE ( STATUS "----" )
 if ( FETCH_SQLITE )
     include(FetchContent)
     FetchContent_Declare(
-        sqlite3430100
-        URL https://sqlite.org/2023/sqlite-amalgamation-3430100.zip
+        sqlite3490100
+        URL https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
         CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${SQLITE_INSTALL_LOCATION} -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
         PATCH_COMMAND ${CMAKE_COMMAND} -E copy "${SQLITE_SCRIPT_FILE}" "."
     )
-    FetchContent_MakeAvailable(sqlite3430100)
+    FetchContent_MakeAvailable(sqlite3490100)
     include_directories(${SQLite3_SOURCE_DIR}})
     add_dependencies(${PROJECT_NAME} lib::SQLite3)
 else()
