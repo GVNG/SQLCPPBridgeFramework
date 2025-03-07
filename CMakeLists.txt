@@ -14,6 +14,12 @@ project ( SQLCppBridge
 
 #set(SQLITE_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/sqlite)
 set(SQLITE_SCRIPT_FILE ${CMAKE_CURRENT_LIST_DIR}/Support/sqlite/CMakeLists.txt)
+set(SQLITE_SOURCE_URL "https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip")
+string(REGEX MATCH "-([0-9]+).zip" _ ${SQLITE_SOURCE_URL})
+set(FETCH_TASK_NAME "sqlite${CMAKE_MATCH_1}")
+string(REGEX MATCH "sqlite([0-9])([0-9][0-9])([0-9][0-9])" _ ${FETCH_TASK_NAME})
+set(SQLITE_VERSION "${CMAKE_MATCH_1}.${CMAKE_MATCH_2}.${CMAKE_MATCH_3}")
+
 
 # possible options
 option ( BUILD_SHARED    "Build shared library instead of static" OFF )
@@ -42,21 +48,21 @@ endif()
 
 
 MESSAGE ( STATUS "${PROJECT_NAME} Options:" )
-MESSAGE ( STATUS "----" )
-MESSAGE ( STATUS "Build shared library:   " ${BUILD_SHARED} )
-MESSAGE ( STATUS "Build framework:        " ${BUILD_FRAMEWORK} )
-MESSAGE ( STATUS "Fetch SQLite3:          " ${FETCH_SQLITE} )
-MESSAGE ( STATUS "----" )
+MESSAGE ( STATUS "-----------------------------" )
+MESSAGE ( STATUS "Build shared library:     " ${BUILD_SHARED} )
+MESSAGE ( STATUS "Build framework:          " ${BUILD_FRAMEWORK} )
+MESSAGE ( STATUS "Fetch SQLite (v${SQLITE_VERSION}):  " ${FETCH_SQLITE} )
+MESSAGE ( STATUS "-----------------------------" )
 
 if ( FETCH_SQLITE )
     include(FetchContent)
     FetchContent_Declare(
-        sqlite3490100
-        URL https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+        ${FETCH_TASK_NAME}
+        URL ${SQLITE_SOURCE_URL}
         CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${SQLITE_INSTALL_LOCATION} -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
         PATCH_COMMAND ${CMAKE_COMMAND} -E copy "${SQLITE_SCRIPT_FILE}" "."
     )
-    FetchContent_MakeAvailable(sqlite3490100)
+    FetchContent_MakeAvailable(${FETCH_TASK_NAME})
     include_directories(${SQLite3_SOURCE_DIR}})
     add_dependencies(${PROJECT_NAME} lib::SQLite3)
 else()
