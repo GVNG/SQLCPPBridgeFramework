@@ -57,7 +57,7 @@ INCDIR := include
 SRCDIR := src
 INCDIR_SB := ../SQLBridge/include/sqlcppbridge
 SRCDIR_SB := ../SQLBridge/src
-INCDIR_GTEST := Lib/$(OSNAME)/googletest/include
+INCDIR_GTEST := google/googletest/include
 INCDIR_CASES := ../Cases
 SRCDIR_CASES := ../Cases
 
@@ -81,13 +81,13 @@ OBJECTS += $(patsubst %.o,build/%.o,$(notdir $(patsubst $(SRCDIR_SB)/%.$(SRCEXT)
 # Platform Specific Compiler Flags
 CFLAGS := -c
 LIB := -lsqlite3 -lgtest
-LDFLAGS := -LLib/$(OSNAME)/googletest/lib
+LDFLAGS := -Lbuild/lib
 ifeq ($(UNAME_S), Darwin)
 	INC := -I $(INCDIR) -I $(INCDIR_SB) -I $(INCDIR_GTEST) -I $(INCDIR_CASES)
-	CFLAGS += -std=gnu++14 -stdlib=libc++ -O2 -fPIC -mmacosx-version-min=10.7 -isysroot $(DEVPATH)
+	CFLAGS += -std=c++17 -stdlib=libc++ -O2 -fPIC -mmacosx-version-min=15 -isysroot $(DEVPATH)
 	LDFLAGS += -stdlib=libc++
 else
-	CFLAGS += -std=gnu++14 -O2 -fpermissive
+	CFLAGS += -std=gnu++17 -O2 -fpermissive
 	INC := -I $(INCDIR) -I $(INCDIR_SB) -I $(INCDIR_CASES) -I $(INCDIR_GTEST)
 	LIB += -lpthread -lm
 endif
