@@ -17,4 +17,4 @@ SQLCPPBridgeMSVS/x64/
 SQLCPPBridgeMSVS/UnitTests/x64/
 SQLCPPBridgeMSVS/packages/
 build.cmake/
-UnitTests/Lib
+build_lib

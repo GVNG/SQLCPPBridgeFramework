@@ -33,6 +33,9 @@
 #define sb_adapter_sqlite_h
 
 #include <sqlite3.h>
+#ifdef SQL_ENCRYPTION
+    #include <sqlite3mc.h>
+#endif
 #include "sb_traits.h"
 #include "sb_core.h"
 #include "sb_links.h"
@@ -351,6 +354,9 @@ namespace sql_bridge
 #pragma mark - methods
         
         static std::string main_db_name(std::string const&);
+#ifdef SQL_ENCRYPTION
+        static bytes_block db_key();
+#endif
         
         sql_inserter_kv create_table(sql_file const& db,std::string const& type);
         sql_inserter_kv create_table_for_array(sql_file const& db,std::string const&, std::string const& typeval);

@@ -131,6 +131,16 @@ void read_data(t_db_storage* pst)
     }
 }
 
+#ifdef SQL_ENCRYPTION
+sql_bridge::bytes_block sql_bridge::sqlite_adapter::db_key()
+{
+    sql_bridge::bytes_block ret;
+    std::string passphrase("testDBkey");
+    ret.append(passphrase.c_str(), passphrase.size());
+    return ret;
+}
+#endif
+
 int main(int argc, char** argv)
 {
     time_tracker tracker;
@@ -211,6 +221,7 @@ int main(int argc, char** argv)
             
             std::cout << "is ok. ";
         }
+
         {
             time_tracker trk;
             sql_bridge::context cont(storage["case1"]);
