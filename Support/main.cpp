@@ -131,7 +131,7 @@ void read_data(t_db_storage* pst)
     }
 }
 
-#ifdef SQL_ENCRYPTION
+#ifdef SQLITE_ENCRYPTION
 sql_bridge::bytes_block sql_bridge::sqlite_adapter::db_key()
 {
     sql_bridge::bytes_block ret;
