@@ -3,7 +3,6 @@ cmake_minimum_required ( VERSION 3.15...3.16.2 )
 set( project_version 1.1.19 )
 set( project_description "SQL to C++ bridge written in modern C++" )
 set( project_homepage "https://github.com/GVNG/SQLCPPBridgeFramework" )
-set( SQLITE_SOURCE_URL "https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip" )
 
 cmake_policy(SET CMP0135 NEW)
 
@@ -12,12 +11,6 @@ project ( SQLCppBridge
   DESCRIPTION  "${project_description}"
   HOMEPAGE_URL "${project_homepage}"
   LANGUAGES    C CXX )
-
-set(SQLITE_SCRIPT_FILE ${CMAKE_CURRENT_LIST_DIR}/Support/sqlite/CMakeLists.txt)
-string(REGEX MATCH "-([0-9]+).zip" _ ${SQLITE_SOURCE_URL})
-set(FETCH_TASK_NAME "sqlite${CMAKE_MATCH_1}")
-string(REGEX MATCH "sqlite([0-9])([0-9][0-9])([0-9][0-9])" _ ${FETCH_TASK_NAME})
-set(SQLITE_VERSION "${CMAKE_MATCH_1}.${CMAKE_MATCH_2}.${CMAKE_MATCH_3}")
 
 # possible options
 option ( BUILD_SHARED    "Build shared library instead of static" OFF )
@@ -37,33 +30,33 @@ endif()
 file ( GLOB_RECURSE ALL_SRC "SQLBridge/src/*.cpp" )
 file ( GLOB_RECURSE HEADERS "SQLBridge/include/sqlcppbridge/*.h" )
 
+set (SQLITE3MC_BUILD_SHELL OFF)
 if ( BUILD_SHARED )
   add_library ( ${PROJECT_NAME} SHARED "${ALL_SRC}" "${HEADERS}" )
   set ( FETCH_SQLITE ON ) # sqlite linkage is required for shared library
+  set (SQLITE3MC_STATIC OFF)
 else()
-  add_library ( ${PROJECT_NAME} STATIC "${ALL_SRC}" "${HEADERS}" )  
+  add_library ( ${PROJECT_NAME} STATIC "${ALL_SRC}" "${HEADERS}" )
+  set (SQLITE3MC_STATIC ON)
 endif()
 
 
 MESSAGE ( STATUS )
 MESSAGE ( STATUS "${PROJECT_NAME} Options:" )
-MESSAGE ( STATUS "-----------------------------" )
-MESSAGE ( STATUS "Build shared library:     " ${BUILD_SHARED} )
-MESSAGE ( STATUS "Build framework:          " ${BUILD_FRAMEWORK} )
-MESSAGE ( STATUS "Fetch SQLite (v${SQLITE_VERSION}):  " ${FETCH_SQLITE} )
-MESSAGE ( STATUS "-----------------------------" )
+MESSAGE ( STATUS "---------------------------------" )
+MESSAGE ( STATUS "Build shared library:         " ${BUILD_SHARED} )
+MESSAGE ( STATUS "Build framework:              " ${BUILD_FRAMEWORK} )
+MESSAGE ( STATUS "Fetch SQLite3MultipleCiphers: " ${FETCH_SQLITE} )
+MESSAGE ( STATUS "---------------------------------" )
 
 if ( FETCH_SQLITE )
     include(FetchContent)
     FetchContent_Declare(
-        ${FETCH_TASK_NAME}
-        URL ${SQLITE_SOURCE_URL}
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${SQLITE_INSTALL_LOCATION} -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
-        PATCH_COMMAND ${CMAKE_COMMAND} -E copy "${SQLITE_SCRIPT_FILE}" "."
+        SQLite3MultipleCiphers
+        GIT_REPOSITORY https://github.com/utelle/SQLite3MultipleCiphers.git
+        GIT_TAG v2.1.0
     )
-    FetchContent_MakeAvailable(${FETCH_TASK_NAME})
-    include_directories(${SQLite3_SOURCE_DIR}})
-    add_dependencies(${PROJECT_NAME} lib::SQLite3)
+    FetchContent_MakeAvailable(SQLite3MultipleCiphers)
 else()
     find_package(SQLite3 REQUIRED)
 endif()
@@ -72,7 +65,7 @@ include_directories(SQLBridge/include/sqlcppbridge)
 add_library ( lib::SQLCppBridge ALIAS ${PROJECT_NAME} )
 
 target_compile_features ( ${PROJECT_NAME}
-    PRIVATE  cxx_std_14 )
+    PRIVATE  cxx_std_17 )
 
 target_include_directories ( ${PROJECT_NAME}
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/SQLBridge/include
@@ -86,14 +79,16 @@ set_target_properties( ${PROJECT_NAME} PROPERTIES
   CXX_STANDARD      17
   PUBLIC_HEADER     "${HEADERS}" )
 
-if ( FETCH_SQLITE )
+list (APPEND PUBLIC_HEADER "sqlite3.h sqlite3ext.h")
 
+if ( FETCH_SQLITE )
+  
   if ( BUILD_SHARED )
-    target_link_libraries (${PROJECT_NAME}
-        SQLite3) # link right into the shared library
+    add_dependencies(${PROJECT_NAME} sqlite3mc)
+    target_link_libraries (${PROJECT_NAME} sqlite3mc) # link right into the shared library
   else()
-    target_link_libraries (${PROJECT_NAME}
-        PUBLIC SQLite3) # just set as requirement for clients
+    add_dependencies(${PROJECT_NAME} sqlite3mc_static)
+    target_link_libraries (${PROJECT_NAME} PUBLIC sqlite3mc_static) # just set as requirement for clients
   endif()
 endif()
 
