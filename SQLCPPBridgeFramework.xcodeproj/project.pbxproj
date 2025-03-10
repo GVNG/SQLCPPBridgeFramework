@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -350,6 +350,10 @@
 		93F4427C20EF919800CC0B83 /* example20.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example20.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		93E3099E2D7EEBD00025C08F /* Encryption */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Encryption; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		937F847F21DA2B4800DD82F8 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -463,6 +467,7 @@
 				93E60D7620557FC7009151ED /* SQLBridge */,
 				93E60D7720557FE1009151ED /* Cases */,
 				93E60D7820557FFB009151ED /* Support */,
+				93E3099E2D7EEBD00025C08F /* Encryption */,
 				937F847B21DA2AA100DD82F8 /* UnitTests */,
 				93E60D6D20557F7A009151ED /* Products */,
 				93E60DBF20558D16009151ED /* Frameworks */,
@@ -688,6 +693,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				93E3099E2D7EEBD00025C08F /* Encryption */,
 			);
 			name = SQLCPPBridgeFramework;
 			productName = SQLCPPBridgeFramework;
