@@ -73,7 +73,10 @@
 
 
 #ifdef SQLITE_ENCRYPTION
-extern sql_bridge::bytes_block sql_bridge_db_key();
+namespace sql_bridge
+{
+    extern sql_bridge::bytes_block sql_bridge_db_key();
+};
 #endif
 
 #endif /* sb_adapter_h */
