@@ -72,4 +72,8 @@
     DECLARE_SQL_INHERITANCE_ACCESS_EXT(sql_bridge::sqlite_adapter,CLASSNAME,CLASSNAME_PARENT)
 
 
+#ifdef SQLITE_ENCRYPTION
+extern sql_bridge::bytes_block sql_bridge_db_key();
+#endif
+
 #endif /* sb_adapter_h */

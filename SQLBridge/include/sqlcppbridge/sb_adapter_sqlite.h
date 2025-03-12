@@ -354,9 +354,6 @@ namespace sql_bridge
 #pragma mark - methods
         
         static std::string main_db_name(std::string const&);
-#ifdef SQLITE_ENCRYPTION
-        static bytes_block db_key();
-#endif
         
         sql_inserter_kv create_table(sql_file const& db,std::string const& type);
         sql_inserter_kv create_table_for_array(sql_file const& db,std::string const&, std::string const& typeval);

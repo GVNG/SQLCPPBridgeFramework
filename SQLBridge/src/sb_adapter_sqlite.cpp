@@ -57,7 +57,7 @@ namespace sql_bridge
         if (sqlite3_open_v2(dbfname.c_str(), &base_, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_SHAREDCACHE, NULL)!=SQLITE_OK)
             throw file_sql_error(g_err_cantopen,dbfname);
 #ifdef SQLITE_ENCRYPTION
-        auto key = sqlite_adapter::db_key();
+        auto key = sql_bridge_db_key();
         if (!key.empty())
         {
             sqlite3mc_config(base_, "default:cipher", sqlite3mc_cipher_index("sqlcipher"));
