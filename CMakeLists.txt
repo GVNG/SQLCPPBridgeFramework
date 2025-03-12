@@ -79,7 +79,7 @@ set_target_properties( ${PROJECT_NAME} PROPERTIES
   CXX_STANDARD      17
   PUBLIC_HEADER     "${HEADERS}" )
 
-list (APPEND PUBLIC_HEADER "sqlite3.h sqlite3ext.h")
+list (APPEND PUBLIC_HEADER "sqlite3.h sqlite3ext.h sqlite3mc_version.h sqlite3mc_vfs.h sqlite3mc.h")
 
 if ( FETCH_SQLITE )
   
