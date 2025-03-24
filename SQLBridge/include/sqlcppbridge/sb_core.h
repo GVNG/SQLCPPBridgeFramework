@@ -57,7 +57,12 @@ namespace sql_bridge
         template<typename TFn> inline _t_to_string& operator << (TFn const& src) {_write(src);return *this;}
         inline operator type() const {return str();}
         inline type str() const {return buf_.str().substr(0,(size_t)buf_.tellp());}
-        inline void remove_from_tail(long offs) {buf_.seekp(-offs, std::ios_base::cur);buf_.put(0);buf_.seekp(-1, std::ios_base::cur);}
+        inline void remove_from_tail(long offs)
+        {
+            buf_.seekp(-offs, std::ios_base::cur);
+            buf_.put(0);
+            buf_.seekp(-1, std::ios_base::cur);
+        }
         inline operator type_stream&() {return buf_;}
     private:
         mutable type_stream buf_;

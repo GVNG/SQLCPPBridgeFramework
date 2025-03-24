@@ -54,10 +54,10 @@ namespace sql_bridge
         using yes = char;
         using no = struct { char array[2]; };
         
-        template<typename C> static yes ft(typename C::key_type*);
-        template<typename C> static no  ft(...);
-        template<typename C> static yes st(typename C::mapped_type*);
-        template<typename C> static no  st(...);
+        template<typename C> static constexpr yes ft(typename C::key_type*);
+        template<typename C> static constexpr no  ft(...);
+        template<typename C> static constexpr yes st(typename C::mapped_type*);
+        template<typename C> static constexpr no  st(...);
     public:
         static constexpr const bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
                                             sizeof(st<T>(0)) == sizeof(yes);
@@ -70,10 +70,10 @@ namespace sql_bridge
         using yes = char;
         using no = struct { char array[2]; };
 
-        template<typename C> static yes ft(typename C::first_type*);
-        template<typename C> static yes st(typename C::second_type*);
-        template<typename C> static no  ft(...);
-        template<typename C> static no  st(...);
+        template<typename C> static constexpr yes ft(typename C::first_type*);
+        template<typename C> static constexpr yes st(typename C::second_type*);
+        template<typename C> static constexpr no  ft(...);
+        template<typename C> static constexpr no  st(...);
     public:
         static constexpr const bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
                                             sizeof(st<T>(0)) == sizeof(yes);
@@ -86,8 +86,8 @@ namespace sql_bridge
         using yes = char;
         using no = struct { char array[2]; };
 
-        template<typename C> static yes test(typename C::const_iterator*);
-        template<typename C> static no  test(...);
+        template<typename C> static constexpr yes test(typename C::const_iterator*);
+        template<typename C> static constexpr no  test(...);
     public:
         static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
         using type = T;
@@ -99,8 +99,8 @@ namespace sql_bridge
         using yes = char;
         using no = struct { char array[2]; };
         
-        template<typename C> static yes test(typename C::element_type*);
-        template<typename C> static no  test(...);
+        template<typename C> static constexpr yes test(typename C::element_type*);
+        template<typename C> static constexpr no  test(...);
     public:
         static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
         using type = T;
@@ -114,16 +114,16 @@ namespace sql_bridge
         using no = struct { char array[2]; };
         using mem_fn = typename T::const_iterator (T::*)() const;
 
-        template<typename C> static std::enable_if_t<
+        template<typename C> static constexpr std::enable_if_t<
             std::is_same<decltype(static_cast<mem_fn>(&C::begin)),mem_fn>::value,
             yes> test_b(void const*);
 
-        template<typename C> static std::enable_if_t<
+        template<typename C> static constexpr std::enable_if_t<
             std::is_same<decltype(static_cast<mem_fn>(&C::end)),mem_fn>::value,
             yes> test_e(void const*);
         
-        template<typename C> static no test_b(...);
-        template<typename C> static no test_e(...);
+        template<typename C> static constexpr no test_b(...);
+        template<typename C> static constexpr no test_e(...);
         
     public:
         static constexpr bool const value = sizeof(test_b<T>(0)) == sizeof(yes) &&
@@ -138,10 +138,10 @@ namespace sql_bridge
         using no = struct { char array[2]; };
         using mem_fn = void (T::*)(typename T::const_reference);
         
-        template<typename C> static std::enable_if_t<
+        template<typename C> static constexpr std::enable_if_t<
             std::is_same<decltype(static_cast<mem_fn>(&C::push_back)),mem_fn>::value,
             yes> test(void const*);
-        template<typename C> static no test(...);
+        template<typename C> static constexpr no test(...);
     public:
         static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
         using type = T;
@@ -154,10 +154,10 @@ namespace sql_bridge
         using no = struct { char array[2]; };
         using mem_fn = typename T::mapped_type& (T::*)(typename T::key_type const&);
         
-        template<typename C> static std::enable_if_t<
+        template<typename C> static constexpr std::enable_if_t<
             std::is_same<decltype(static_cast<mem_fn>(&C::at)),mem_fn>::value,
             yes> test(void const*);
-        template<typename C> static no test(...);
+        template<typename C> static constexpr no test(...);
     public:
         static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
         using type = T;
@@ -169,10 +169,10 @@ namespace sql_bridge
         using yes = char;
         using no = struct { char array[2]; };
 
-        template<typename C> static yes ft(typename C::clock*);
-        template<typename C> static yes st(typename C::duration*);
-        template<typename C> static no  ft(...);
-        template<typename C> static no  st(...);
+        template<typename C> static constexpr yes ft(typename C::clock*);
+        template<typename C> static constexpr yes st(typename C::duration*);
+        template<typename C> static constexpr no  ft(...);
+        template<typename C> static constexpr no  st(...);
     public:
         static constexpr bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
                                       sizeof(st<T>(0)) == sizeof(yes);
@@ -185,10 +185,10 @@ namespace sql_bridge
         using yes = char;
         using no = struct { char array[2]; };
 
-        template<typename C> static yes ft(typename C::rep*);
-        template<typename C> static yes st(typename C::period*);
-        template<typename C> static no  ft(...);
-        template<typename C> static no  st(...);
+        template<typename C> static constexpr yes ft(typename C::rep*);
+        template<typename C> static constexpr yes st(typename C::period*);
+        template<typename C> static constexpr no  ft(...);
+        template<typename C> static constexpr no  st(...);
     public:
         static constexpr bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
                                       sizeof(st<T>(0)) == sizeof(yes);
@@ -201,10 +201,10 @@ namespace sql_bridge
         using yes = char;
         using no = struct { char array[2]; };
 
-        template<typename C> static yes ft(typename C::value_type*);
-        template<typename C> static yes st(typename C::optional_flag_type*);
-        template<typename C> static no  ft(...);
-        template<typename C> static no  st(...);
+        template<typename C> static constexpr yes ft(typename C::value_type*);
+        template<typename C> static constexpr yes st(typename C::optional_flag_type*);
+        template<typename C> static constexpr no  ft(...);
+        template<typename C> static constexpr no  st(...);
     public:
         static constexpr bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
                                       sizeof(st<T>(0)) == sizeof(yes);

@@ -26,9 +26,14 @@ public:
         {};
     inline bool operator == (Case43 const& rv) const 
     {
-        return ts_==rv.ts_ &&
-        delta_==rv.delta_ &&
-        st_ts_==rv.st_ts_;
+        auto dist = std::chrono::duration_cast<std::chrono::microseconds>(st_ts_-rv.st_ts_);
+        return  ts_==rv.ts_ &&
+                delta_==rv.delta_ &&
+                !dist.count();
+    }
+    inline bool operator < (Case43 const& rv) const
+    {
+        return delta_<rv.delta_;
     }
 private:
     size_t db_id_;

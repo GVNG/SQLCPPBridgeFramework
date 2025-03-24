@@ -61,7 +61,7 @@ namespace sql_bridge
             switch(type_)
             {
                 case e_key_type::integer: return iValue_<rv.iValue_;
-                case e_key_type::real: return rValue_<rv.rValue_;
+                case e_key_type::real: return dValue_<rv.dValue_;
                 case e_key_type::string: return tValue_<rv.tValue_;
                 case e_key_type::blob: return btValue_<rv.btValue_;
                 default: break;
@@ -72,24 +72,24 @@ namespace sql_bridge
         inline sql_value()
             : type_(e_key_type::empty)
             , iValue_(0)
-            , rValue_(0)
+            , dValue_(0)
             {}
         inline sql_value(std::string const& tx)
             : type_(e_key_type::string)
             , iValue_(0)
-            , rValue_(0)
+            , dValue_(0)
             , tValue_(tx)
             {};
         inline sql_value(std::string const& tx, _t_real_adapter<false>)
             : type_(e_key_type::string)
             , iValue_(0)
-            , rValue_(0)
+            , dValue_(0)
             , tValue_(tx)
             {};
         inline sql_value(bytes_block blk)
             : type_(e_key_type::blob)
             , iValue_(0)
-            , rValue_(0)
+            , dValue_(0)
             , btValue_(blk)
             {};
         template<typename T> inline sql_value(T const& v) : sql_value(v,_t_optional_adapter<is_kind_of_optional<T>::value>()) {}
@@ -101,33 +101,33 @@ namespace sql_bridge
         template<typename T> inline sql_value(T const& v, _t_real_adapter<true>)
             : type_(e_key_type::real)
             , iValue_(0)
-            , rValue_(static_cast<double>(v))
+            , dValue_(static_cast<double>(v))
             {};
         template<typename T> inline sql_value(T const& iv, _t_integral_adapter<true>)
             : type_(e_key_type::integer)
             , iValue_(static_cast<int64_t>(iv))
-            , rValue_(0)
+            , dValue_(0)
             {};
         template<typename T> inline sql_value(T const& rv, _t_chrono_adapter<true>)
             : type_(e_key_type::real)
             , iValue_(0)
-            , rValue_(static_cast<double>(rv.time_since_epoch().count()) / T::clock::period::den * T::clock::period::num)
+            , dValue_(static_cast<double>(rv.time_since_epoch().count()) / T::clock::period::den * T::clock::period::num)
             {};
         template<typename T> inline sql_value(T const& rv, _t_duration_adapter<true>)
             : type_(e_key_type::real)
             , iValue_(0)
-            , rValue_(static_cast<double>(rv.count()) / T::period::den * T::period::num)
+            , dValue_(static_cast<double>(rv.count()) / T::period::den * T::period::num)
             {};
         template<typename T> inline sql_value(T const& rv, _t_duration_adapter<false>)
             : type_(e_key_type::empty)
             , iValue_(0)
-            , rValue_(0)
+            , dValue_(0)
             {};
         template<typename T> inline std::enable_if_t<is_convertible_to_float<T>::value,T> value() const
         {
             if (type_!=e_key_type::real)
                 throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
-            return static_cast<T>(rValue_);
+            return static_cast<T>(dValue_);
         }
         template<typename T> inline std::enable_if_t<is_convertible_to_int<T>::value,T> value() const
         {
@@ -145,14 +145,14 @@ namespace sql_bridge
         {
             if (type_!=e_key_type::real)
                 throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
-            typename T::clock::duration ret(static_cast<typename T::clock::rep>(rValue_ / T::clock::period::num * T::clock::period::den));
+            typename T::clock::duration ret(static_cast<typename T::clock::rep>(dValue_ / T::clock::period::num * T::clock::period::den));
             return static_cast<T>(ret);
         }
         template<typename T> inline std::enable_if_t<is_duration<T>::value,T> value() const
         {
             if (type_!=e_key_type::real)
                 throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
-            T ret(static_cast<typename T::rep>(rValue_ / T::period::num * T::period::den));
+            T ret(static_cast<typename T::rep>(dValue_ / T::period::num * T::period::den));
             return ret;
         }
         template<typename T> inline std::enable_if_t<is_convertible_to_blob<T>::value,T const&> value() const
@@ -166,7 +166,7 @@ namespace sql_bridge
         // data
         e_key_type type_;
         int64_t iValue_;
-        double rValue_;
+        double dValue_;
         std::string tValue_;
         bytes_block btValue_;
     };
