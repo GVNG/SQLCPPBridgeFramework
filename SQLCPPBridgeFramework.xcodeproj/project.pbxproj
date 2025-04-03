@@ -152,6 +152,8 @@
 		939B6A2D2435D7F70013068E /* t_case31.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939B6A2C2435D7F70013068E /* t_case31.cpp */; };
 		939B6A33243642F40013068E /* t_case32.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939B6A32243642F40013068E /* t_case32.cpp */; };
 		939B6B03243C6B0C0013068E /* t_case33.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 939B6B02243C6B0C0013068E /* t_case33.cpp */; };
+		939E9FDE2D9EE15C00B60523 /* libsqlite3mc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 939E9FDA2D9EE02E00B60523 /* libsqlite3mc.a */; };
+		939E9FE42D9EE1DB00B60523 /* libsqlite3mc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 939E9FE12D9EE1CE00B60523 /* libsqlite3mc.a */; };
 		93A54A2F22DF444F00AB4C09 /* t_case26.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93A54A2E22DF444F00AB4C09 /* t_case26.cpp */; };
 		93AB7F6022CB93AB00D5658C /* t_misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AB7F5F22CB93AB00D5658C /* t_misc.cpp */; };
 		93AC267E23C5E79200752FA5 /* t_case29.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93AC267D23C5E79200752FA5 /* t_case29.cpp */; };
@@ -160,21 +162,19 @@
 		93B0720320591999008D2FB6 /* sb_data_section_descriptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B0720220591999008D2FB6 /* sb_data_section_descriptor.cpp */; };
 		93BEDCF020A34894004166EB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E60D7B20558090009151ED /* main.cpp */; };
 		93E30C4D2D7F1A960025C08F /* libgtest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93E30C4C2D7F1A410025C08F /* libgtest.a */; };
-		93E30C4F2D7F1ACD0025C08F /* libsqlite3mc_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93E30C4E2D7F1ABB0025C08F /* libsqlite3mc_static.a */; };
 		93E30C532D7F1B4A0025C08F /* SecurityFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93E30C522D7F1B4A0025C08F /* SecurityFoundation.framework */; };
-		93E30C542D7F1B7B0025C08F /* libsqlite3mc_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93E30C4E2D7F1ABB0025C08F /* libsqlite3mc_static.a */; };
 		93E30C552D7F1BCD0025C08F /* SecurityFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93E30C522D7F1B4A0025C08F /* SecurityFoundation.framework */; };
 		93E60DBB205589C4009151ED /* sb_tasks_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93E60DB9205589C4009151ED /* sb_tasks_queue.cpp */; };
 		93EA944B22DDB48D0034663D /* t_case25.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EA944A22DDB48D0034663D /* t_case25.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		93E30C472D7F03BF0025C08F /* PBXContainerItemProxy */ = {
+		939E9FDB2D9EE08400B60523 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 93E60D6420557F7A009151ED /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 93E30C432D7F03B00025C08F;
-			remoteInfo = SQLite3MC;
+			remoteInfo = Libraries;
 		};
 		93E30C4A2D7F15730025C08F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -309,6 +309,11 @@
 		939B9271251CC2E700026E5D /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = text.script.worksheet; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
 		939E0AE420F7650200106D46 /* example21.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example21.h; sourceTree = "<group>"; };
 		939E0AE520F7651900106D46 /* example21.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example21.cpp; sourceTree = "<group>"; };
+		939E9FDA2D9EE02E00B60523 /* libsqlite3mc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsqlite3mc.a; path = build_lib/s3mc/lib/libsqlite3mc.a; sourceTree = "<group>"; };
+		939E9FDD2D9EE0E700B60523 /* libsqlite3mc.la */ = {isa = PBXFileReference; lastKnownFileType = text; name = libsqlite3mc.la; path = build_lib/s3mc/lib/libsqlite3mc.la; sourceTree = "<group>"; };
+		939E9FDF2D9EE1CE00B60523 /* sqlite3mc.pc */ = {isa = PBXFileReference; lastKnownFileType = text; path = sqlite3mc.pc; sourceTree = "<group>"; };
+		939E9FE12D9EE1CE00B60523 /* libsqlite3mc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsqlite3mc.a; sourceTree = "<group>"; };
+		939E9FE22D9EE1CE00B60523 /* libsqlite3mc.la */ = {isa = PBXFileReference; lastKnownFileType = text; path = libsqlite3mc.la; sourceTree = "<group>"; };
 		93A1349020D149E90041EE2E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; usesTabs = 1; };
 		93A1349220D249BD0041EE2E /* make_framework */ = {isa = PBXFileReference; explicitFileType = text.script.sh; fileEncoding = 4; path = make_framework; sourceTree = SOURCE_ROOT; };
 		93A54A2E22DF444F00AB4C09 /* t_case26.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case26.cpp; sourceTree = "<group>"; };
@@ -395,8 +400,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				93E30C532D7F1B4A0025C08F /* SecurityFoundation.framework in Frameworks */,
+				939E9FE42D9EE1DB00B60523 /* libsqlite3mc.a in Frameworks */,
 				93E30C4D2D7F1A960025C08F /* libgtest.a in Frameworks */,
-				93E30C4F2D7F1ACD0025C08F /* libsqlite3mc_static.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -404,8 +409,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				93E30C542D7F1B7B0025C08F /* libsqlite3mc_static.a in Frameworks */,
 				93E30C552D7F1BCD0025C08F /* SecurityFoundation.framework in Frameworks */,
+				939E9FDE2D9EE15C00B60523 /* libsqlite3mc.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -496,6 +501,25 @@
 				939B9271251CC2E700026E5D /* CMakeLists.txt */,
 			);
 			name = CMake;
+			sourceTree = "<group>";
+		};
+		939E9FE02D9EE1CE00B60523 /* pkgconfig */ = {
+			isa = PBXGroup;
+			children = (
+				939E9FDF2D9EE1CE00B60523 /* sqlite3mc.pc */,
+			);
+			path = pkgconfig;
+			sourceTree = "<group>";
+		};
+		939E9FE32D9EE1CE00B60523 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				939E9FE02D9EE1CE00B60523 /* pkgconfig */,
+				939E9FE12D9EE1CE00B60523 /* libsqlite3mc.a */,
+				939E9FE22D9EE1CE00B60523 /* libsqlite3mc.la */,
+			);
+			name = lib;
+			path = build_lib/s3mc/lib;
 			sourceTree = "<group>";
 		};
 		93E60D6320557F7A009151ED = {
@@ -660,6 +684,9 @@
 		93E60DBF20558D16009151ED /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				939E9FE32D9EE1CE00B60523 /* lib */,
+				939E9FDD2D9EE0E700B60523 /* libsqlite3mc.la */,
+				939E9FDA2D9EE02E00B60523 /* libsqlite3mc.a */,
 				93E30C522D7F1B4A0025C08F /* SecurityFoundation.framework */,
 				93E30C502D7F1B340025C08F /* Security.framework */,
 				93E30C4E2D7F1ABB0025C08F /* libsqlite3mc_static.a */,
@@ -734,7 +761,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				93E30C482D7F03BF0025C08F /* PBXTargetDependency */,
+				939E9FDC2D9EE08400B60523 /* PBXTargetDependency */,
 			);
 			name = SQLCPPBridgeFramework;
 			productName = SQLCPPBridgeFramework;
@@ -801,7 +828,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p build_lib/{google,s3mc}\ncd build_lib/google\ncmake ../../UnitTests/google && make\nrm -rf include\ncp -r ../../UnitTests/google/googletest/include include\ncd ../s3mc\ncmake ../../Encryption -DSQLITE3MC_STATIC=ON && make\nmkdir include\ncp ../../Encryption/src/{sqlite3.h,sqlite3ext.h,sqlite3mc.h,sqlite3mc_version.h,sqlite3mc_vfs.h} include\n";
+			shellScript = "PATH=$PATH:/opt/homebrew/bin/\nmkdir -p build_lib/{google,s3mc}\ncd build_lib/google\ncmake ../../UnitTests/google && make\nrm -rf include\ncp -r ../../UnitTests/google/googletest/include include\ncd ../../Encryption\nautoreconf\ncd ../build_lib/s3mc\n../../Encryption/configure --disable-shared --prefix=$PWD && make install\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -962,10 +989,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		93E30C482D7F03BF0025C08F /* PBXTargetDependency */ = {
+		939E9FDC2D9EE08400B60523 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 93E30C432D7F03B00025C08F /* Libraries */;
-			targetProxy = 93E30C472D7F03BF0025C08F /* PBXContainerItemProxy */;
+			targetProxy = 939E9FDB2D9EE08400B60523 /* PBXContainerItemProxy */;
 		};
 		93E30C4B2D7F15730025C08F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -990,7 +1017,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/build_lib/google/lib",
-					"$(PROJECT_DIR)/build_lib/s3mc",
+					"$(PROJECT_DIR)/build_lib/s3mc/lib",
 				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1014,7 +1041,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/build_lib/google/lib",
-					"$(PROJECT_DIR)/build_lib/s3mc",
+					"$(PROJECT_DIR)/build_lib/s3mc/lib",
 				);
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1160,7 +1187,7 @@
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/build_lib/s3mc/include";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/build_lib/s3mc",
+					"$(PROJECT_DIR)/build_lib/s3mc/lib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1177,7 +1204,7 @@
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/build_lib/s3mc/include";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/build_lib/s3mc",
+					"$(PROJECT_DIR)/build_lib/s3mc/lib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
