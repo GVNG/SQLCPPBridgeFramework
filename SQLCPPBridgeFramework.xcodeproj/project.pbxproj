@@ -748,7 +748,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1620;
+				LastUpgradeCheck = 1630;
 				ORGANIZATIONNAME = DataArt;
 				TargetAttributes = {
 					937F848121DA2B4800DD82F8 = {
@@ -801,7 +801,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "PATH=$PATH:/opt/homebrew/bin/\nmkdir -p build_lib/{google,s3mc}\ncd build_lib/google\ncmake ../../UnitTests/google && make\nrm -rf include\ncp -r ../../UnitTests/google/googletest/include include\ncd ../s3mc\ncmake ../../Encryption -DSQLITE3MC_STATIC=ON && make\nmkdir include\ncp ../../Encryption/src/{sqlite3.h,sqlite3ext.h,sqlite3mc.h,sqlite3mc_version.h,sqlite3mc_vfs.h} include\n";
+			shellScript = "mkdir -p build_lib/{google,s3mc}\ncd build_lib/google\ncmake ../../UnitTests/google && make\nrm -rf include\ncp -r ../../UnitTests/google/googletest/include include\ncd ../s3mc\ncmake ../../Encryption -DSQLITE3MC_STATIC=ON && make\nmkdir include\ncp ../../Encryption/src/{sqlite3.h,sqlite3ext.h,sqlite3mc.h,sqlite3mc_version.h,sqlite3mc_vfs.h} include\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

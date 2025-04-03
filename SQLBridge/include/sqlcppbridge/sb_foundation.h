@@ -45,7 +45,7 @@ namespace sql_bridge
     class data_update_context;
     using data_section_descriptors_ptr = std::shared_ptr<data_section_descriptor>;
     using class_descriptors_ptr = std::shared_ptr<class_descriptor>;
-    using class_descriptors_map = std::map<size_t,class_descriptors_ptr>;
+    using class_descriptors_map = std::unordered_map<size_t,class_descriptors_ptr>;
     using class_descriptors_pair = class_descriptors_map::value_type;
     using class_descriptors_container = std::vector<class_descriptors_ptr>;
     using data_update_context_ptr = std::unique_ptr<data_update_context>;
