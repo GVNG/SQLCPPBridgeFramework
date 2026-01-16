@@ -137,4 +137,5 @@ TEST(Core,Chrono)
     ASSERT_EQ(sql_bridge::is_duration<std::string>::value, false);
     ASSERT_EQ(sql_bridge::is_duration<std::chrono::seconds>::value, true);
     ASSERT_EQ(sql_bridge::is_duration<std::chrono::system_clock::time_point>::value, false);
+    ASSERT_EQ(sql_bridge::is_duration<std::chrono::microseconds>::value, true);
 }

@@ -167,7 +167,7 @@ namespace sql_bridge
     template<typename T> struct is_kind_of_time_point : std::false_type {};
     template<typename T> struct is_kind_of_time_point< std::chrono::time_point<T> > : std::true_type {};
     template<typename T> struct is_kind_of_duration : std::false_type {};
-    template<typename T> struct is_kind_of_duration< std::chrono::duration<T> > : std::true_type {};
+    template<typename T,typename T2> struct is_kind_of_duration< std::chrono::duration<T, T2> > : std::true_type {};
     template<typename T> struct is_optional_bare : std::false_type {};
     template<typename T> struct is_optional_bare< optional_value<T> > : std::true_type {};
 
