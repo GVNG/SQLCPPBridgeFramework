@@ -207,6 +207,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		9300956D2F1A784700AB08A2 /* sb_optional.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_optional.h; sourceTree = "<group>"; };
 		931A169329003FF70057FA4F /* sb_adapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_adapter.h; sourceTree = "<group>"; };
 		931D3BE0216E218100BCD515 /* sb_stm_builder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_stm_builder.h; sourceTree = "<group>"; };
 		931D3CCD2170E38900BCD515 /* example23.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example23.h; sourceTree = "<group>"; };
@@ -725,6 +726,7 @@
 				93BEDCD720A2CCAE004166EB /* sb_trivial_members_descriptor.h */,
 				93BEDCB92090DCF4004166EB /* sb_value.h */,
 				93E60DB12055816E009151ED /* sqlcppbridge.h */,
+				9300956D2F1A784700AB08A2 /* sb_optional.h */,
 			);
 			path = sqlcppbridge;
 			sourceTree = "<group>";
@@ -775,7 +777,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1630;
+				LastUpgradeCheck = 2620;
 				ORGANIZATIONNAME = DataArt;
 				TargetAttributes = {
 					937F848121DA2B4800DD82F8 = {
@@ -792,7 +794,7 @@
 				};
 			};
 			buildConfigurationList = 93E60D6720557F7A009151ED /* Build configuration list for PBXProject "SQLCPPBridgeFramework" */;
-			compatibilityVersion = "Xcode 8.0";
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -1119,6 +1121,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 			};
 			name = Debug;
 		};
@@ -1169,6 +1172,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 			};
 			name = Release;
 		};

@@ -45,6 +45,7 @@
 #include <string>
 
 #include "sb_bytes_block.h"
+#include "sb_optional.h"
 
 namespace sql_bridge
 {
@@ -162,70 +163,23 @@ namespace sql_bridge
         static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
         using type = T;
     };
-    
-    template<typename T> struct is_kind_of_time_point
-    {
-    private:
-        using yes = char;
-        using no = struct { char array[2]; };
 
-        template<typename C> static constexpr yes ft(typename C::clock*);
-        template<typename C> static constexpr yes st(typename C::duration*);
-        template<typename C> static constexpr no  ft(...);
-        template<typename C> static constexpr no  st(...);
-    public:
-        static constexpr bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
-                                      sizeof(st<T>(0)) == sizeof(yes);
-        using type = T;
-    };
-
-    template <class T> struct is_kind_of_duration
-    {
-    private:
-        using yes = char;
-        using no = struct { char array[2]; };
-
-        template<typename C> static constexpr yes ft(typename C::rep*);
-        template<typename C> static constexpr yes st(typename C::period*);
-        template<typename C> static constexpr no  ft(...);
-        template<typename C> static constexpr no  st(...);
-    public:
-        static constexpr bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
-                                      sizeof(st<T>(0)) == sizeof(yes);
-        using type = T;
-    };
-
-    template<typename T> struct is_optional_bare
-    {
-    private:
-        using yes = char;
-        using no = struct { char array[2]; };
-
-        template<typename C> static constexpr yes ft(typename C::value_type*);
-        template<typename C> static constexpr yes st(typename C::optional_flag_type*);
-        template<typename C> static constexpr no  ft(...);
-        template<typename C> static constexpr no  st(...);
-    public:
-        static constexpr bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
-                                      sizeof(st<T>(0)) == sizeof(yes);
-        using type = T;
-    };
+    template<typename T> struct is_kind_of_time_point : std::false_type {};
+    template<typename T> struct is_kind_of_time_point< std::chrono::time_point<T> > : std::true_type {};
+    template<typename T> struct is_kind_of_duration : std::false_type {};
+    template<typename T> struct is_kind_of_duration< std::chrono::duration<T> > : std::true_type {};
+    template<typename T> struct is_optional_bare : std::false_type {};
+    template<typename T> struct is_optional_bare< optional_value<T> > : std::true_type {};
 
     template<typename T> struct is_ordered_set
         : std::integral_constant<bool,  std::is_base_of<std::set<typename T::value_type>, T>::value ||
-                                        std::is_base_of<std::multiset<typename T::value_type>, T>::value>
-    {
-    };
+                                        std::is_base_of<std::multiset<typename T::value_type>, T>::value> {};
 
     template<typename T> struct is_any_container
-        : std::integral_constant<bool, has_begin_end<has_const_iterator<T>::value,T>::value>
-    {
-    };
+        : std::integral_constant<bool, has_begin_end<has_const_iterator<T>::value,T>::value> {};
     
     template<typename T> struct is_pair
-        : std::integral_constant<bool, is_kind_of_pair<T>::value>
-    {
-    };
+        : std::integral_constant<bool, is_kind_of_pair<T>::value> {};
 
     template<bool,typename T> struct check_for_multimap : std::integral_constant<bool, false>{};
     template<typename T> struct check_for_multimap<true,T> : std::integral_constant<bool, !has_at<T>::value>{};
