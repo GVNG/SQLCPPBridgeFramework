@@ -65,20 +65,21 @@ namespace sql_bridge
             if (ret!=SQLITE_OK)
                 throw file_sql_error(g_err_cantopen,dbfname);
         }
-#endif
+#endif // SQLITE_ENCRYPTION
     }
     
     sqlite_adapter::sql_file::~sql_file()
     {
         reset_cache();
-        if (base_) sqlite3_close_v2(base_);
+        if (base_)
+            sqlite3_close_v2(base_);
         base_ = nullptr;
     }
     
     sqlite3_stmt* sqlite_adapter::sql_file::operator[](std::string const& txstm) const
     {
         if (!base_ || txstm.empty()) return nullptr;
-        _t_statements_map::const_iterator pos = statements_cache_.find(txstm);
+        auto pos = statements_cache_.find(txstm);
         if (pos!=statements_cache_.end())
         {
             sqlite3_reset(pos->second);
@@ -93,9 +94,9 @@ namespace sql_bridge
     
     void sqlite_adapter::sql_file::reset_cache() const
     {
-        for(auto& vk : statements_cache_)
+        _t_statements_map tmp(std::move(statements_cache_));
+        for(auto const& vk : tmp)
             sqlite3_finalize(vk.second);
-        statements_cache_.clear();
         created_tables_.clear();
     }
     
