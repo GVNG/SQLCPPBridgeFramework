@@ -16,6 +16,7 @@ project ( SQLCppBridge
 option ( BUILD_SHARED    "Build shared library instead of static" OFF )
 option ( BUILD_FRAMEWORK "Build framework" OFF )
 option ( FETCH_SQLITE    "Fetch sqlite" ON )
+option ( SQLCPPBRIDGE_INSTALL "Enable install rules" ON)
 
 # if the user specified a platform to build for (i.e. OS)
 # we assume the user wants a framework
@@ -47,6 +48,7 @@ MESSAGE ( STATUS "---------------------------------" )
 MESSAGE ( STATUS "Build shared library:         " ${BUILD_SHARED} )
 MESSAGE ( STATUS "Build framework:              " ${BUILD_FRAMEWORK} )
 MESSAGE ( STATUS "Fetch SQLite3MultipleCiphers: " ${FETCH_SQLITE} )
+MESSAGE ( STATUS "Add install rules:            " ${SQLCPPBRIDGE_INSTALL} )
 MESSAGE ( STATUS "---------------------------------" )
 
 if ( FETCH_SQLITE )
@@ -93,6 +95,10 @@ if ( FETCH_SQLITE )
 endif()
 
 # installation
-install ( TARGETS ${PROJECT_NAME}
-    LIBRARY DESTINATION lib
-    PUBLIC_HEADER DESTINATION include/sqlcppbridge)
+if (SQLCPPBRIDGE_INSTALL)
+
+    install ( TARGETS ${PROJECT_NAME}
+        LIBRARY DESTINATION lib
+        PUBLIC_HEADER DESTINATION include/sqlcppbridge)
+        
+endif()
