@@ -1,6 +1,6 @@
-cmake_minimum_required ( VERSION 3.15...3.16.2 )
+cmake_minimum_required(VERSION 3.16)
 
-set( project_version 1.1.19 )
+set( project_version 1.1.25 )
 set( project_description "SQL to C++ bridge written in modern C++" )
 set( project_homepage "https://github.com/GVNG/SQLCPPBridgeFramework" )
 
