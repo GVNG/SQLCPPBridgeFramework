@@ -225,6 +225,7 @@
 		934741152C305092008ED49C /* example43.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example43.h; sourceTree = "<group>"; };
 		9347416B2C307EE2008ED49C /* t_case43.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_case43.cpp; sourceTree = "<group>"; };
 		934A430E220DDE2900FEC1C9 /* libgtest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgtest.a; path = UnitTests/Lib/MacOS/googletest/lib/libgtest.a; sourceTree = "<group>"; };
+		935114C62FADD518007016BE /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = SOURCE_ROOT; };
 		935B07D92559411600CE0605 /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = text.script.worksheet; path = CMakeLists.txt; sourceTree = "<group>"; };
 		936C65C120774AFF0033F0FB /* sb_links.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sb_links.h; sourceTree = "<group>"; };
 		937AD9EF2456FFEA00FCC0DF /* example34.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = example34.h; sourceTree = "<group>"; };
@@ -659,6 +660,7 @@
 				93A1349020D149E90041EE2E /* Makefile */,
 				93E60D7B20558090009151ED /* main.cpp */,
 				93AB7F6122CC809100D5658C /* time_tracker.h */,
+				935114C62FADD518007016BE /* Package.swift */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -777,7 +779,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2620;
+				LastUpgradeCheck = 2640;
 				ORGANIZATIONNAME = DataArt;
 				TargetAttributes = {
 					937F848121DA2B4800DD82F8 = {
