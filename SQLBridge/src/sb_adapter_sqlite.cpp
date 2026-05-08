@@ -32,9 +32,9 @@
     #include <iostream>
 #endif
 
-#include "sb_adapter.h"
-#include "sb_exceptions.h"
-#include "sb_data_section.h"
+#include <sqlcppbridge/sb_adapter.h>
+#include <sqlcppbridge/sb_exceptions.h>
+#include <sqlcppbridge/sb_data_section.h>
 
 namespace sql_bridge
 {

@@ -31,8 +31,8 @@
 #ifdef DEBUG_CORE
     #include <iostream>
 #endif
-#include "sb_data_section_descriptor.h"
-#include "sb_exceptions.h"
+#include <sqlcppbridge/sb_data_section_descriptor.h>
+#include <sqlcppbridge/sb_exceptions.h>
 
 namespace sql_bridge
 {
