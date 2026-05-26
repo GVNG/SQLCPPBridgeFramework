@@ -45,7 +45,7 @@ namespace sql_bridge
             : ret_code_(0)
             , empty_(true)
             {}
-        const char* what() const throw() {return what_.c_str();}
+        const char* what() const throw() override {return what_.c_str();}
         inline std::string const& error() const {return error_;}
         inline std::string const& reason() const {return reason_;}
         inline int sql_retcode() const {return ret_code_;}
@@ -68,10 +68,13 @@ namespace sql_bridge
     class file_sql_error : public base_sql_error
     {
     public:
-        file_sql_error(std::string const& err, std::string const& rs)
-            : base_sql_error(err,rs,0)
+        file_sql_error(std::string const& err,
+                       std::string const& rs,
+                       std::string const& errtx,
+                       int rc)
+            : base_sql_error(err,rs,rc)
         {
-            what_ = to_string() << "[FILE]: " << err << " \"" << rs << "\"";
+            what_ = to_string() << "[FILE]: " << err << " \"" << rs << "\" -> (" << rc << ") " << errtx;
         };
     };
     

@@ -54,16 +54,23 @@ namespace sql_bridge
         , file_name_(dbfname)
         , err_code_(0)
     {
-        if (sqlite3_open_v2(dbfname.c_str(), &base_, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_SHAREDCACHE, NULL)!=SQLITE_OK)
-            throw file_sql_error(g_err_cantopen,dbfname);
+        auto retcd = sqlite3_open_v2(dbfname.c_str(), &base_, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_SHAREDCACHE, NULL);
+        if (retcd!=SQLITE_OK)
+        {
+            std::string errtx(sqlite3_errstr(retcd));
+            throw file_sql_error(g_err_cantopen,dbfname,errtx,retcd);
+        }
 #ifdef SQLITE_ENCRYPTION
         auto key = sql_bridge_db_key();
         if (!key.empty())
         {
             sqlite3mc_config(base_, "default:cipher", sqlite3mc_cipher_index("sqlcipher"));
-            auto ret = sqlite3_key(base_,key.data(),static_cast<int>(key.size()));
-            if (ret!=SQLITE_OK)
-                throw file_sql_error(g_err_cantopen,dbfname);
+            auto retcd = sqlite3_key(base_,key.data(),static_cast<int>(key.size()));
+            if (retcd!=SQLITE_OK)
+            {
+                std::string errtx(sqlite3_errstr(retcd));
+                throw file_sql_error(g_err_cantopen,dbfname,errtx,retcd);
+            }
         }
 #endif // SQLITE_ENCRYPTION
     }
