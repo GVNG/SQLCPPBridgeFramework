@@ -5,8 +5,8 @@ import PackageDescription
 let package = Package(
     name: "SQLCppBridge",
     platforms: [
-        .iOS(.v13),
-        .macOS(.v11),
+        .iOS(.v17),
+        .macOS(.v15),
         .watchOS(.v6)
     ],
     products: [

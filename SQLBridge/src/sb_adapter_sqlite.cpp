@@ -54,7 +54,7 @@ namespace sql_bridge
         , file_name_(dbfname)
         , err_code_(0)
     {
-        auto retcd = sqlite3_open_v2(dbfname.c_str(), &base_, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_SHAREDCACHE, NULL);
+        auto retcd = sqlite3_open_v2(dbfname.c_str(), &base_, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_PRIVATECACHE | SQLITE_OPEN_NOMUTEX, NULL);
         if (retcd!=SQLITE_OK)
         {
             std::string errtx(sqlite3_errstr(retcd));
