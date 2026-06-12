@@ -101,3 +101,51 @@ Install:
 -------------
 For Linux environment use "sudo make install" to put assembled with 'make' utility
 static library & headers to system folders
+
+Conan:
+-------------
+SQLCppBridge is available as a Conan 2 package. The dependency on SQLite is handled
+automatically per platform: plain `sqlite3` from ConanCenter on macOS/iOS/Linux,
+and `sqlite3multipleciphers` (fetched at build time) on Android.
+
+**One-time setup**
+
+Run the setup script once after cloning. It detects your Android NDK and installs
+a ready-to-use profile into `~/.conan2/profiles/`:
+
+    python scripts/setup_conan.py
+
+**Building the package**
+
+    # macOS
+    conan create . --build=missing
+
+    # iOS (physical device)
+    conan create . -pr:h=profiles/ios -pr:b=default --build=missing
+
+    # Android arm64 (requires Android NDK, run setup_conan.py first)
+    conan create . -pr:h=android-arm64 -pr:b=default --build=missing
+
+**Consuming the package**
+
+Add to your `conanfile.txt`:
+
+    [requires]
+    sqlcppbridge/1.1.25
+
+    [generators]
+    CMakeToolchain
+    CMakeDeps
+
+Then in your `CMakeLists.txt`:
+
+    find_package(SQLCppBridge REQUIRED)
+    target_link_libraries(myTarget PRIVATE SQLCppBridge::SQLCppBridge)
+
+A minimal working example is in `example/conan-consumer/`:
+
+    cd example/conan-consumer
+    conan install . --output-folder=build --build=missing
+    cmake --preset conan-debug
+    cmake --build build
+    ./build/consumer

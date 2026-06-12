@@ -98,7 +98,9 @@ endif()
 if (SQLCPPBRIDGE_INSTALL)
 
     install ( TARGETS ${PROJECT_NAME}
+        FRAMEWORK DESTINATION framework
         LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
         PUBLIC_HEADER DESTINATION include/sqlcppbridge)
         
 endif()

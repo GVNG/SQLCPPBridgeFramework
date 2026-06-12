@@ -1,0 +1,6 @@
+[requires]
+sqlcppbridge/1.1.25
+
+[generators]
+CMakeToolchain
+CMakeDeps
