@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -395,6 +395,12 @@
 		93F4427C20EF919800CC0B83 /* example20.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = example20.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		93428A442FE0454C00D9B3CE /* profiles */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = profiles; sourceTree = SOURCE_ROOT; };
+		93428A462FE0454C00D9B3CE /* scripts */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = scripts; sourceTree = SOURCE_ROOT; };
+		93428A4C2FE046BE00D9B3CE /* example */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = example; sourceTree = SOURCE_ROOT; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		937F847F21DA2B4800DD82F8 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -649,6 +655,9 @@
 		93E60D7820557FFB009151ED /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				93428A4C2FE046BE00D9B3CE /* example */,
+				93428A442FE0454C00D9B3CE /* profiles */,
+				93428A462FE0454C00D9B3CE /* scripts */,
 				935B07D82559411600CE0605 /* sqlite */,
 				939B926F251CC2D300026E5D /* CMake */,
 				937F847A21DA2A6300DD82F8 /* CODE_OF_CONDUCT.md */,

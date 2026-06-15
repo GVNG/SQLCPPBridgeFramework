@@ -139,7 +139,7 @@ sql_bridge::bytes_block sql_bridge::sql_bridge_db_key()
     ret.append(passphrase.c_str(), passphrase.size());
     return ret;
 }
-#endif
+#endif // SQLITE_ENCRYPTION
 
 int main(int argc, char** argv)
 {
