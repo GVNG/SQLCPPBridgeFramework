@@ -186,7 +186,9 @@ namespace sql_bridge
 
 #pragma mark - sqlite_adapter::sql_inserter_kv
     
-    sqlite_adapter::sql_inserter_kv::sql_inserter_kv(sql_file const& db, std::string const& table, bool kv)
+    sqlite_adapter::sql_inserter_kv::sql_inserter_kv(sql_file const& db,
+                                                     std::string const& table,
+                                                     bool kv)
         : state_(nullptr)
         , need_step_(false)
         , fld_num_(kv?2:1)
@@ -216,7 +218,8 @@ namespace sql_bridge
 
 #pragma mark - sqlite_adapter::sql_remove_kv
     
-    sqlite_adapter::sql_remove_kv::sql_remove_kv(sql_file const& db, std::string const& table)
+    sqlite_adapter::sql_remove_kv::sql_remove_kv(sql_file const& db,
+                                                 std::string const& table)
         : state_(nullptr)
         , need_step_(false)
     {
@@ -342,12 +345,17 @@ namespace sql_bridge
         return sql_remove_kv(db,to_string() << type << "_VAL");
     }
     
-    sqlite_adapter::sql_remove_kv sqlite_adapter::create_statement_for_remove_in_map(sql_file const& db,std::string const& table, std::string const& typekey, std::string const& typeval)
+    sqlite_adapter::sql_remove_kv sqlite_adapter::create_statement_for_remove_in_map(sql_file const& db,
+                                                                                     std::string const& table,
+                                                                                     std::string const& typekey,
+                                                                                     std::string const& typeval)
     {
         return sql_remove_kv(db,to_string() << table << "_" << typekey << "_to_" << typeval << "_table");
     }
 
-    sqlite_adapter::sql_inserter_kv sqlite_adapter::create_table_for_array(sql_file const& db,std::string const& table, std::string const& type)
+    sqlite_adapter::sql_inserter_kv sqlite_adapter::create_table_for_array(sql_file const& db,
+                                                                           std::string const& table,
+                                                                           std::string const& type)
     {
         db.reset_cache();
         db.execute(to_string() << "DROP TABLE IF EXISTS " << table);
@@ -355,7 +363,10 @@ namespace sql_bridge
         return sql_inserter_kv(db,table,false);
     }
     
-    sqlite_adapter::sql_inserter_kv sqlite_adapter::create_table_for_map(sql_file const& db,std::string const& table, std::string const& typekey, std::string const& typeval)
+    sqlite_adapter::sql_inserter_kv sqlite_adapter::create_table_for_map(sql_file const& db,
+                                                                         std::string const& table,
+                                                                         std::string const& typekey,
+                                                                         std::string const& typeval)
     {
         db.reset_cache();
         db.execute(to_string() << "DROP TABLE IF EXISTS " << table);
@@ -363,7 +374,8 @@ namespace sql_bridge
         return sql_inserter_kv(db,table,true);
     }
 
-    size_t sqlite_adapter::create_table_for_versions(sql_file const& db, std::string const& name)
+    size_t sqlite_adapter::create_table_for_versions(sql_file const& db,
+                                                     std::string const& name)
     {
         if (db.should_create_table(g_versions_table_name))
         {
@@ -388,7 +400,8 @@ namespace sql_bridge
         return to_string() << path << "/" << g_root_database << g_file_suffix;
     }
     
-    void sqlite_adapter::create_statements(class_link& dp, std::string const& relfrom)
+    void sqlite_adapter::create_statements(class_link& dp,
+                                           std::string const& relfrom)
     {
         // create
         to_string crts;
@@ -560,7 +573,10 @@ namespace sql_bridge
             create_statements(trg, to_string() << dp.table_name() << "_" << dp.index_ref().name());
     }
     
-    std::string sqlite_adapter::create_section(sql_file const& db, std::string const& name, std::string const& path, fn_change_file_name fnch)
+    std::string sqlite_adapter::create_section(sql_file const& db,
+                                               std::string const& name,
+                                               std::string const& path,
+                                               fn_change_file_name fnch)
     {
         size_t ver = create_table_for_versions(db,name);
         data_section_descriptors_ptr desc = data_section_descriptors::instance()[name];
