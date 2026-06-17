@@ -4,8 +4,6 @@
 #include <vector>
 #include <cassert>
 
-// --- Data model ---
-
 class Contact
 {
     DECLARE_SQL_ACCESS(Contact);
@@ -35,8 +33,6 @@ DEFINE_SQL_DATABASE(contacts_db, 1, Contact)::upgrade_structure(size_t from, siz
 {
     if (from) drop_all();
 }
-
-// --- main ---
 
 int main()
 {
