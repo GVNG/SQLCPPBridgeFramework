@@ -63,8 +63,8 @@ namespace sql_bridge
         value_type value_;
         optional_flag_type optional_;
         
-        template<typename _tf> static std::enable_if_t<!std::is_pod<_tf>::value && std::is_default_constructible<_tf>::value,_tf> default_init() {return _tf();}
-        template<typename _tf> static std::enable_if_t<std::is_pod<_tf>::value,_tf> default_init()
+        template<typename _tf> static std::enable_if_t<!std::is_trivial<_tf>::value && std::is_default_constructible<_tf>::value,_tf> default_init() {return _tf();}
+        template<typename _tf> static std::enable_if_t<std::is_trivial<_tf>::value,_tf> default_init()
         {
             _tf ret;
             std::memset(&ret, 0, sizeof(ret));
