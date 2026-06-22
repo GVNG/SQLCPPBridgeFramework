@@ -181,7 +181,6 @@ namespace sql_bridge
         }
 #pragma mark - save
         
-//        template<typename T> inline void save(std::string const& key, T const& val) const {proc_queue_->add(std::make_shared< save_task<T> >(val,key,proc_queue_));}
         template<typename T> inline void save(std::string const& key, T const* val) const {proc_queue_->add(std::make_shared< save_task<T> >(*val,key,proc_queue_));}
         template<typename T> inline void save(std::string const& key, T&& val) const {proc_queue_->add(std::make_shared< save_task<T> >(std::forward<T>(val),key,proc_queue_));}
 
