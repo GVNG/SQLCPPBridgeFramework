@@ -341,13 +341,11 @@ namespace sql_bridge
 
         template<typename T> inline context& save(T const& src) {_save<T>(range(),src);return *this;}
         template<typename T> inline context& save(T const* src) {_save_sync<T>(range(),*src);return *this;}
-        template<typename T> inline context& save(T* src) {_save_sync<T>(range(),*src);return *this;}
         template<typename T> inline context& save(T& src) {_save<T>(range(),src);return *this;}
         template<typename T> inline context& save(T&& src) {_save_m<T>(range(),std::move(src));return *this;}
 
         template<typename T> inline context& save(size_t pgsz, T const& src) {_save_sync<T>(range(0,pgsz),src);return *this;}
         template<typename T> inline context& save(size_t pgsz, T const* src) {_save_sync<T>(range(0,pgsz),*src);return *this;}
-        template<typename T> inline context& save(size_t pgsz, T* src) {_save_sync<T>(range(0,pgsz),*src);return *this;}
         template<typename T> inline context& save(size_t pgsz, T& src) {_save_sync<T>(range(0,pgsz),src);return *this;}
         template<typename T> inline context& save(size_t pgsz, T&& src) {_save_m<T>(range(0,pgsz),std::move(src));return *this;}
 
@@ -363,25 +361,20 @@ namespace sql_bridge
 
         template<typename T> inline context& remove(T const& src) {_remove<T>(src);return *this;}
         template<typename T> inline context& remove(T const* src) {_remove_sync<T>(*src);return *this;}
-        template<typename T> inline context& remove(T* src) {_remove_sync<T>(*src);return *this;}
         template<typename T> inline context& remove(T& src) {_remove<T>(src);return *this;}
-        template<typename T> inline context& remove(T&& src) {_remove_m<T>(std::move(src));return *this;}
+        template<typename T> inline context& remove(T&& src) {_remove_m<T>(std::forward<T>(src));return *this;}
 
         template<typename T> inline std::enable_if_t<is_map<T>::value,context&> remove(typename T::key_type const& val) {_remove_by_key<T>(val);return *this;}
         template<typename T> inline std::enable_if_t<is_map<T>::value,context&> remove(typename T::key_type const* val) {_remove_by_key<T>(*val);return *this;}
-        template<typename T> inline std::enable_if_t<is_map<T>::value,context&> remove(typename T::key_type& val) {_remove_by_key<T>(val);return *this;}
-        template<typename T> inline std::enable_if_t<is_map<T>::value,context&> remove(typename T::key_type* val) {_remove_by_key<T>(*val);return *this;}
         template<typename T> inline context& remove_if(std::string const& flt = "") {_remove_if<typename types_selector<T>::type>(build_suffix(flt));return *this;}
 
         template<typename T> inline context& replace(T const& src) {_replace<T>(src);return *this;}
         template<typename T> inline context& replace(T const* src) {_replace_sync<T>(*src);return *this;}
-        template<typename T> inline context& replace(T* src) {_replace_sync<T>(*src);return *this;}
         template<typename T> inline context& replace(T& src) {_replace<T>(src);return *this;}
-        template<typename T> inline context& replace(T&& src) {_replace_m<T>(std::move(src));return *this;}
+        template<typename T> inline context& replace(T&& src) {_replace_m<T>(std::forward<T>(src));return *this;}
         
         template<typename T> inline ref_context at(T const& src) {return _at<T>(src);};
         template<typename T> inline ref_context at(T const* src) {return _at<T>(*src);};
-        template<typename T> inline ref_context at(T& src) {return _at<T>(src);};
         template<typename T> inline ref_context at(T* src) {return _at<T>(*src);};
 
         inline context& limit(size_t count, size_t offset = 0) {context_engine::limit(count,offset);return *this;}

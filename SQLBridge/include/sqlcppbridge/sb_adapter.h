@@ -77,6 +77,6 @@ namespace sql_bridge
 {
     extern sql_bridge::bytes_block sql_bridge_db_key();
 };
-#endif
+#endif // SQLITE_ENCRYPTION
 
 #endif /* sb_adapter_h */
