@@ -165,12 +165,8 @@ namespace sql_bridge
         template<typename T> inline ref_context& save() {_replace<T>(nullptr);return *this;}
         template<typename T> inline ref_context& save(T const& src) {_save<T>(range(),&src);return *this;}
         template<typename T> inline ref_context& save(T const* src) {_save<T>(range(),src);return *this;}
-        template<typename T> inline ref_context& save(T* src) {_save<T>(range(),src);return *this;}
-        template<typename T> inline ref_context& save(T& src) {_save<T>(range(),&src);return *this;}
         template<typename T> inline ref_context& save(size_t pgsz, T const& src) {_save<T>(range(0,pgsz),&src);return *this;}
         template<typename T> inline ref_context& save(size_t pgsz, T const* src) {_save<T>(range(0,pgsz),src);return *this;}
-        template<typename T> inline ref_context& save(size_t pgsz, T& src) {_save<T>(range(0,pgsz),&src);return *this;}
-        template<typename T> inline ref_context& save(size_t pgsz, T* src) {_save<T>(range(0,pgsz),src);return *this;}
 
         template<typename T> inline ref_context& load() {_load<T>(nullptr,"",nullptr);return *this;}
         template<typename T> inline ref_context& load(T& dst, std::string const& flt = "", size_t* num = nullptr) {_load<T>(&dst,build_suffix(flt,true),num);return *this;}
@@ -181,10 +177,6 @@ namespace sql_bridge
         template<typename T> inline ref_context& replace() {_replace<T>(nullptr);return *this;}
         template<typename T> inline ref_context& replace(T const& src) {_replace<T>(&src);return *this;}
         template<typename T> inline ref_context& replace(T const* src) {_replace<T>(src);return *this;}
-        template<typename T> inline ref_context& replace(T* src) {_replace<T>(src);return *this;}
-        template<typename T> inline ref_context& replace(T& src) {_replace<T>(&src);return *this;}
-
-
         
         
         inline ref_context& limit(size_t count, size_t offset = 0) {context_engine::limit(count,offset);return *this;}

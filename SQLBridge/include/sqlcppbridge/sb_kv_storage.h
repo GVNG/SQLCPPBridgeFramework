@@ -52,7 +52,9 @@ namespace sql_bridge
         template<typename T> inline void load(std::string const& key, T& trg) const {_load(key,trg);}
         inline void load(std::string const& key, std::string& trg) const {_load(key, trg);}
         
-        inline data_sections_ptr create_section(std::string const& name,std::string const& path, fn_change_file_name fnch)
+        inline data_sections_ptr create_section(std::string const& name,
+                                                std::string const& path,
+                                                fn_change_file_name fnch)
         {
             std::string fname(TStrategy::create_section(*this,name,path,fnch));
             return std::make_shared< _t_data_section<TStrategy> >(fname,name);

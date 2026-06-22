@@ -49,6 +49,7 @@
 #include <functional>
 #include <iomanip>
 #include <cstring>
+#include <utility>
 
 namespace sql_bridge
 {

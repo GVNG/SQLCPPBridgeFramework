@@ -78,16 +78,10 @@ namespace sql_bridge
         {
             using _t_base = std::decay_t<T>;
         public:
-            save_task(T const& src, std::string const& key, db_proc_queue_ptr const& trg)
-                : db_task(data_sections_ptr())
-                , kvdb_(trg)
-                , data_(src)
-                , key_(key)
-                {};
             save_task(T&& src, std::string const& key, db_proc_queue_ptr const& trg)
                 : db_task(data_sections_ptr())
                 , kvdb_(trg)
-                , data_(std::move(src))
+                , data_(std::forward<T>(src))
                 , key_(key)
                 {};
             void run_task() override
@@ -189,9 +183,7 @@ namespace sql_bridge
         
         template<typename T> inline void save(std::string const& key, T const& val) const {proc_queue_->add(std::make_shared< save_task<T> >(val,key,proc_queue_));}
         template<typename T> inline void save(std::string const& key, T const* val) const {proc_queue_->add(std::make_shared< save_task<T> >(*val,key,proc_queue_));}
-        template<typename T> inline void save(std::string const& key, T& val) const {proc_queue_->add(std::make_shared< save_task<T> >(val,key,proc_queue_));}
-        template<typename T> inline void save(std::string const& key, T* val) const {proc_queue_->add(std::make_shared< save_task<T> >(*val,key,proc_queue_));}
-        template<typename T> inline void save(std::string const& key, T&& val) const {proc_queue_->add(std::make_shared< save_task<T> >(std::move(val),key,proc_queue_));}
+        template<typename T> inline void save(std::string const& key, T&& val) const {proc_queue_->add(std::make_shared< save_task<T> >(std::forward<T>(val),key,proc_queue_));}
 
 #pragma mark - load
         
