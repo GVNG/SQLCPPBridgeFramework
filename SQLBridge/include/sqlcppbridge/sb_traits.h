@@ -241,11 +241,11 @@ namespace sql_bridge
     
     template<typename T> struct is_raw_init_allow
         : std::integral_constant<bool,  !std::is_default_constructible<T>::value &&
-                                        std::is_trivial<T>::value> {};
+                                        is_pod_like<T>::value> {};
     
     template<typename T> struct can_create_by_default
         : std::integral_constant<bool,  std::is_default_constructible<T>::value ||
-                                        std::is_trivial<T>::value> {};
+                                        is_pod_like<T>::value> {};
     
     template<bool,typename T> struct map_type_check : std::integral_constant<bool, false>{using type = T;};
     template<typename T> struct map_type_check<true,T> : std::integral_constant<bool, !is_sql_acceptable<typename T::mapped_type>::value && !is_container<typename T::mapped_type>::value> {using type = typename T::mapped_type;};
