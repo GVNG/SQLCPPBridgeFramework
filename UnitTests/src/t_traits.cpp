@@ -48,6 +48,9 @@ TEST(Core, Traits)
     ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_set>::value, false);
     ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_array>::value, false);
     ASSERT_EQ(sql_bridge::is_back_pushable_container<_t_bool_vector>::value, true);
+    
+    ASSERT_EQ(sql_bridge::is_pod_like<int>::value,true);
+    ASSERT_EQ(sql_bridge::is_pod_like<_t_array>::value,true);
 }
 
 TEST(Core,Traits2)
@@ -138,4 +141,5 @@ TEST(Core,Chrono)
     ASSERT_EQ(sql_bridge::is_duration<std::chrono::seconds>::value, true);
     ASSERT_EQ(sql_bridge::is_duration<std::chrono::system_clock::time_point>::value, false);
     ASSERT_EQ(sql_bridge::is_duration<std::chrono::microseconds>::value, true);
+    ASSERT_EQ(sql_bridge::is_pod_like<std::chrono::system_clock::time_point>::value, false);
 }

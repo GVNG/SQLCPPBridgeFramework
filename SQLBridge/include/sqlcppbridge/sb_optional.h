@@ -15,7 +15,10 @@ namespace sql_bridge
     // POD-like trait for modern C++ (C++20 and later).
     // Replaces deprecated std::is_pod by combining standard-layout and trivially-copyable checks.
     // This is a heuristic and not an exact standard equivalent.
-    template<typename T> struct is_pod_like : std::integral_constant<bool, std::is_trivially_copyable<T>::value && std::is_standard_layout<T>::value> {};
+    template<typename T> struct is_pod_like
+        : std::integral_constant<bool,  std::is_trivially_copyable<T>::value &&
+                                        std::is_trivially_default_constructible<T>::value &&
+                                        std::is_standard_layout<T>::value> {};
     // sqlbridge uses this implementation instead of standard
     // the reasons are:
     //      - 'in place' allocation for data
