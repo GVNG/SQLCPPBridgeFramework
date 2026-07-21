@@ -19,6 +19,7 @@ namespace sql_bridge
         : std::integral_constant<bool,  std::is_trivially_copyable<T>::value &&
                                         std::is_trivially_default_constructible<T>::value &&
                                         std::is_standard_layout<T>::value> {};
+    
     // sqlbridge uses this implementation instead of standard
     // the reasons are:
     //      - 'in place' allocation for data

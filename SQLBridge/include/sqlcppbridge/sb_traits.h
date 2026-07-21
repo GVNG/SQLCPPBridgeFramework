@@ -49,102 +49,42 @@
 
 namespace sql_bridge
 {
-    template<typename T> struct is_key_mapped
+    template<typename T, typename = void> struct is_key_mapped : std::false_type {};
+    template<typename T> struct is_key_mapped<T, std::void_t<typename T::key_type,typename T::mapped_type> > : std::true_type
     {
-    private:
-        using yes = char;
-        using no = struct { char array[2]; };
-        
-        template<typename C> static constexpr yes ft(typename C::key_type*);
-        template<typename C> static constexpr no  ft(...);
-        template<typename C> static constexpr yes st(typename C::mapped_type*);
-        template<typename C> static constexpr no  st(...);
-    public:
-        static constexpr const bool value = sizeof(ft<T>(0)) == sizeof(yes) &&
-                                            sizeof(st<T>(0)) == sizeof(yes);
         using type = T;
     };
     
-    template<typename T> struct has_const_iterator
+    template<typename T, typename = void> struct has_const_iterator : std::false_type {};
+    template<typename T> struct has_const_iterator<T, std::void_t<typename T::const_iterator*> > : std::true_type
     {
-    private:
-        using yes = char;
-        using no = struct { char array[2]; };
-
-        template<typename C> static constexpr yes test(typename C::const_iterator*);
-        template<typename C> static constexpr no  test(...);
-    public:
-        static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
         using type = T;
     };
 
-    template<typename T> struct has_element_type
+    template<typename T, typename = void> struct has_element_type : std::false_type {};
+    template<typename T> struct has_element_type<T, std::void_t<typename T::element_type*> > : std::true_type
     {
-    private:
-        using yes = char;
-        using no = struct { char array[2]; };
-        
-        template<typename C> static constexpr yes test(typename C::element_type*);
-        template<typename C> static constexpr no  test(...);
-    public:
-        static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
         using type = T;
     };
 
-    template<bool,typename T> struct has_begin_end : std::integral_constant<bool, false>{};
-    template <typename T> struct has_begin_end<true,T>
+    template<typename T, typename = void> struct has_begin_end : std::false_type {};
+    template<typename T> struct has_begin_end<T,std::void_t<decltype(std::declval<const T&>().begin()),
+                                                            decltype(std::declval<const T&>().end())> > : std::true_type
     {
-    private:
-        using yes = char;
-        using no = struct { char array[2]; };
-        using mem_fn = typename T::const_iterator (T::*)() const;
-
-        template<typename C> static constexpr std::enable_if_t<
-            std::is_same<decltype(static_cast<mem_fn>(&C::begin)),mem_fn>::value,
-            yes> test_b(void const*);
-
-        template<typename C> static constexpr std::enable_if_t<
-            std::is_same<decltype(static_cast<mem_fn>(&C::end)),mem_fn>::value,
-            yes> test_e(void const*);
-        
-        template<typename C> static constexpr no test_b(...);
-        template<typename C> static constexpr no test_e(...);
-        
-    public:
-        static constexpr bool const value = sizeof(test_b<T>(0)) == sizeof(yes) &&
-                                            sizeof(test_e<T>(0)) == sizeof(yes);
         using type = T;
     };
     
-    template<typename T> struct has_push_back
+    template<typename T, typename = void> struct has_push_back : std::false_type{};
+    template<typename T> struct has_push_back<T,std::void_t<typename T::const_reference,
+                                                            decltype(std::declval<T&>().push_back(std::declval<typename T::const_reference>()))> > : std::true_type
     {
-    private:
-        using yes = char;
-        using no = struct { char array[2]; };
-        using mem_fn = void (T::*)(typename T::const_reference);
-        
-        template<typename C> static constexpr std::enable_if_t<
-            std::is_same<decltype(static_cast<mem_fn>(&C::push_back)),mem_fn>::value,
-            yes> test(void const*);
-        template<typename C> static constexpr no test(...);
-    public:
-        static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
         using type = T;
     };
-
-    template<typename T> struct has_at
+    
+    template<typename T, typename = void> struct has_at : std::false_type{};
+    template<typename T> struct has_at<T,std::void_t<typename T::key_type,
+                                                     decltype(std::declval<T&>().at(std::declval<const typename T::key_type&>()))> > : std::true_type
     {
-    private:
-        using yes = char;
-        using no = struct { char array[2]; };
-        using mem_fn = typename T::mapped_type& (T::*)(typename T::key_type const&);
-        
-        template<typename C> static constexpr std::enable_if_t<
-            std::is_same<decltype(static_cast<mem_fn>(&C::at)),mem_fn>::value,
-            yes> test(void const*);
-        template<typename C> static constexpr no test(...);
-    public:
-        static constexpr bool const value = sizeof(test<T>(0)) == sizeof(yes);
         using type = T;
     };
 
@@ -163,7 +103,7 @@ namespace sql_bridge
         : std::integral_constant<bool,  std::is_base_of<std::set<typename T::value_type>, T>::value ||
                                         std::is_base_of<std::multiset<typename T::value_type>, T>::value> {};
 
-    template<typename T> struct is_any_container : std::integral_constant<bool, has_begin_end<has_const_iterator<T>::value,T>::value> {};
+    template<typename T> struct is_any_container : std::integral_constant<bool, has_begin_end<T>::value && has_const_iterator<T>::value> {};
     
     template<bool,typename T> struct check_for_multimap : std::integral_constant<bool, false>{};
     template<typename T> struct check_for_multimap<true,T> : std::integral_constant<bool, !has_at<T>::value>{};
