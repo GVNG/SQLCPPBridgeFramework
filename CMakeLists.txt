@@ -71,7 +71,7 @@ target_compile_features ( ${PROJECT_NAME}
 
 target_include_directories ( ${PROJECT_NAME}
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/SQLBridge/include
-    PUBLIC ${SQLite3_SOURCE_DIR}
+    PUBLIC ${SQLite3_INCLUDE_DIR}
 )
 
 set_target_properties( ${PROJECT_NAME} PROPERTIES
