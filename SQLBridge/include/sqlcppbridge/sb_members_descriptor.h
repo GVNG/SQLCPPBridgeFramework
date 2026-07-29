@@ -504,219 +504,218 @@ namespace sql_bridge
 #pragma mark - read
         
         template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value> _read(T& dst, data_update_context& cont) {}
+        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value> _read(T& dst, data_update_context& cont)
+        {
+            if constexpr (is_sql_acceptable<TFn>::value)
+            {
+                sql_value vr(dst.*member_);
+                cont.read(vr);
+                dst.*member_ = vr.value<TMb>();
+            }
+            else
+            if constexpr (is_kind_of_optional<TFn>::value)
+            {
+                sql_value vr((dst.*member_).value());
+                cont.read(vr);
+                if (vr.empty())
+                    dst.*member_ = TMb();
+                else
+                    dst.*member_ = vr.value<typename TMb::value_type>();
+            }
+            else
+                static_assert(false, "There is unspecified routine for trivial values");
+        }
         template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const&) {}
-        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value> _read(T& dst, data_update_context& cont) {_read_trivial<TFn>(dst,cont);}
-        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _read_trivial(T& dst, data_update_context& cont)
+        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
         {
-            sql_value vr(dst.*member_);
-            cont.read(vr);
-            dst.*member_ = vr.value<TMb>();
-        }
-        template<typename TFn> inline std::enable_if_t<is_kind_of_optional<TFn>::value> _read_trivial(T& dst, data_update_context& cont)
-        {
-            sql_value vr((dst.*member_).value());
-            cont.read(vr);
-            if (vr.empty())
-                dst.*member_ = TMb();
-            else
-                dst.*member_ = vr.value<typename TMb::value_type>();
-        }
-
-        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value &&
-                                                       !is_container<TFn>::value && !is_map<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
-        {
-            size_t elemt = typeid(TFn).hash_code();
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
-            ncnt->read_comp(&(dst.*member_), extkey);
-        }
-
-        template<typename TFn> inline std::enable_if_t<is_container_of_containers<TFn>::value &&
-                                                       !is_trivial_container<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
-        {
-            size_t elemt = typeid(TFn).hash_code();
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
-            ncnt->read_comp(&(dst.*member_), extkey);
-        }
-
-        template<typename TFn> inline std::enable_if_t<is_trivial_container<TFn>::value || is_trivial_map<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
-        {
-            size_t elemt = typeid(TFn).hash_code();
-            _clear(dst.*member_);
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
-            ncnt->read_comp(&(dst.*member_), extkey);
-        }
-
-        template<typename TFn> inline std::enable_if_t<is_map<TFn>::value &&
-                                                       !is_trivial_map<TFn>::value &&
-                                                       !is_container_of_containers<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const& extkey) {_read_comp_map<TFn>(dst,cont,extkey);}
-
-        template<typename TFn> inline std::enable_if_t<is_pointer<typename TFn::mapped_type>::value> _read_comp_map(T& dst, data_update_context& cont, sql_value const& extkey)
-        {
-            using k_type = typename TFn::key_type;
-            using m_type = typename TFn::mapped_type;
-            using obj_type = std::conditional_t<std::is_pointer<m_type>::value, std::unique_ptr<typename is_pointer<m_type>::type>, m_type>;
-
-            size_t elemt = types_selector<TFn>::destination_id();
-            (dst.*member_).clear();
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
-            sql_value key((k_type()));
-            if (description_->used_pointers() && description_->has_unique_key())
+            if constexpr (is_trivial_container<TFn>::value ||
+                          is_trivial_map<TFn>::value)
             {
-                sql_values_map ids_container;
-                sql_value sbkey = description_->sql_value_for_unique_key();
-                to_string fld;
-                while(ncnt->is_ok())
-                {
-                    ncnt->read(key);
-                    ncnt->read(sbkey);
-                    ncnt->next(nullptr);
-                    ids_container.insert({sbkey,key});
-                    fld << "?,";
-                }
-                if (ids_container.empty()) return;
-                fld.remove_from_tail(1);
-                std::string filter = to_string()
-                    << TStrategy::sql_where()
-                    << TStrategy::sql_where_in(description_->field_name_for_unique_key(),fld);
-                data_update_context_ptr elmcnt(cont.context_from_root(elemt,filter,range()));
-                for(auto const& kv : ids_container)
-                    elmcnt->add(kv.first);
-                while(elmcnt->is_ok())
-                {
-                    obj_type var(allocate_object<m_type>());
-                    elmcnt->read_comp(&(*var), sql_value());
-                    sql_value kv = elmcnt->id_for_members(&(*var));
-                    add_to_map(dst.*member_, ids_container.find(kv)->second.value<k_type>(), std::move(var));
-                    cont.read_counter_inc();
-                }
-            }
-            else
-            {
-                while(ncnt->is_ok())
-                {
-                    obj_type var(allocate_object<m_type>());
-                    ncnt->read(key);
-                    ncnt->read_comp(&(*var), extkey);
-                    add_to_map(dst.*member_, key.value<k_type>(), std::move(var));
-                    cont.read_counter_inc();
-                }
-            }
-        }
-
-        template<typename TFn> inline std::enable_if_t<!is_pointer<typename TFn::mapped_type>::value> _read_comp_map(T& dst, data_update_context& cont, sql_value const& extkey)
-        {
-            using k_type = typename TFn::key_type;
-            using m_type = typename TFn::mapped_type;
-            size_t elemt = types_selector<TFn>::destination_id();
-            if (cont.use_pages() && !(dst.*member_).empty()) return;
-            (dst.*member_).clear();
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
-            sql_value key((k_type()));
-            while(ncnt->is_ok())
-            {
-                m_type var;
-                ncnt->read(key);
-                ncnt->read_comp(&var, extkey);
-                add_to_map(dst.*member_, key.value<k_type>(), std::move(var));
-                cont.read_counter_inc();
-            }
-        }
-
-        template<typename TFn> inline std::enable_if_t<is_container<TFn>::value &&
-                                                       !is_trivial_container<TFn>::value &&
-                                                       !is_container_of_containers<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const& extkey) {_read_comp_cont<TFn>(dst,cont,extkey);}
-
-        template<typename TFn> inline std::enable_if_t<is_kind_of_array<TFn>::value &&
-                                                       !is_pointer<typename TFn::value_type>::value> _read_comp_cont(T& dst, data_update_context& cont, sql_value const& extkey)
-        {
-            using type = typename TFn::value_type;
-            using iterator = typename TFn::iterator;
-            size_t elemt = types_selector<TFn>::destination_id();
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
-            iterator pos = (dst.*member_).begin();
-            while(ncnt->is_ok())
-            {
-                if (pos==(dst.*member_).end())
-                    throw sql_bridge_error(to_string() << "The table: \"" << ncnt->table_name() << "\" contains more elements than provided container",
-                                           g_expand_static_recommendation);
-                ncnt->read_comp(*pos, extkey);
-                pos++;
-            }
-            if (pos!=(dst.*member_).end())
-                throw sql_bridge_error(to_string() << "The table: \"" << ncnt->table_name() << "\" contains less elements than provided static container.",
-                                       g_replace_static_recommendation);
-        }
-
-        template<typename TFn> inline std::enable_if_t<!is_kind_of_array<TFn>::value &&
-                                                       is_pointer<typename TFn::value_type>::value> _read_comp_cont(T& dst, data_update_context& cont, sql_value const& extkey)
-        {
-            using type = typename TFn::value_type;
-            using obj_type = std::conditional_t<std::is_pointer<type>::value, std::unique_ptr<typename is_pointer<type>::type>, type>;
-            size_t elemt = types_selector<TFn>::destination_id();
-            _clear(dst.*member_);
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
-            if (description_->used_pointers() && description_->has_unique_key())
-            {
-                sql_values_container ids_container;
-                sql_value key = description_->sql_value_for_unique_key();
-                to_string fld;
-                while(ncnt->is_ok())
-                {
-                    ncnt->read(key);
-                    ncnt->next(nullptr);
-                    ids_container.push_back(key);
-                    fld << "?,";
-                }
-                if (ids_container.empty()) return;
-                fld.remove_from_tail(1);
-                std::string filter = to_string()
-                    << TStrategy::sql_where()
-                    << TStrategy::sql_where_in(description_->field_name_for_unique_key(),fld);
-                data_update_context_ptr elmcnt(cont.context_from_root(elemt,filter,range()));
-                for(auto const& kv : ids_container)
-                    elmcnt->add(kv);
-                while(elmcnt->is_ok())
-                {
-                    obj_type var(allocate_object<type>());
-                    elmcnt->read_comp(&(*var), sql_value());
-                    add_to_container(dst.*member_, std::move(var));
-                    cont.read_counter_inc();
-                }
-            }
-            else
-            {
-                while(ncnt->is_ok())
-                {
-                    obj_type var(allocate_object<type>());
-                    ncnt->read_comp(&(*var), extkey);
-                    add_to_container(dst.*member_, std::move(var));
-                }
-            }
-        }
-
-        template<typename TFn> inline std::enable_if_t<!is_kind_of_array<TFn>::value &&
-                                                       !is_pointer<typename TFn::value_type>::value> _read_comp_cont(T& dst, data_update_context& cont, sql_value const& extkey)
-        {
-            using type = typename TFn::value_type;
-            size_t elemt = types_selector<TFn>::destination_id();
-            range pg;
-            if (cont.use_pages() && cont.page().is_active())
-            {
-                pg = range((dst.*member_).size(),cont.page().length());
-                cont.page().disable();
-            }
-            else
-            {
-                if (cont.use_pages() && !(dst.*member_).empty()) return;
+                size_t elemt = typeid(TFn).hash_code();
                 _clear(dst.*member_);
+                data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
+                ncnt->read_comp(&(dst.*member_), extkey);
             }
-            data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),pg));
-            while(ncnt->is_ok())
+            else
+            if constexpr (is_container_of_containers<TFn>::value)
             {
-                type var;
-                ncnt->read_comp(&var, extkey);
-                add_to_container(dst.*member_, std::move(var));
-                cont.read_counter_inc();
+                size_t elemt = typeid(TFn).hash_code();
+                data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
+                ncnt->read_comp(&(dst.*member_), extkey);
+            }
+            else
+            if constexpr (is_map<TFn>::value)
+            {
+                if constexpr (is_pointer<typename TFn::mapped_type>::value)
+                {
+                    using k_type = typename TFn::key_type;
+                    using m_type = typename TFn::mapped_type;
+                    using obj_type = std::conditional_t<std::is_pointer<m_type>::value, std::unique_ptr<typename is_pointer<m_type>::type>, m_type>;
+                    
+                    size_t elemt = types_selector<TFn>::destination_id();
+                    (dst.*member_).clear();
+                    data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
+                    sql_value key((k_type()));
+                    if (description_->used_pointers() && description_->has_unique_key())
+                    {
+                        sql_values_map ids_container;
+                        sql_value sbkey = description_->sql_value_for_unique_key();
+                        to_string fld;
+                        while(ncnt->is_ok())
+                        {
+                            ncnt->read(key);
+                            ncnt->read(sbkey);
+                            ncnt->next(nullptr);
+                            ids_container.insert({sbkey,key});
+                            fld << "?,";
+                        }
+                        if (ids_container.empty()) return;
+                        fld.remove_from_tail(1);
+                        std::string filter = to_string()
+                        << TStrategy::sql_where()
+                        << TStrategy::sql_where_in(description_->field_name_for_unique_key(),fld);
+                        data_update_context_ptr elmcnt(cont.context_from_root(elemt,filter,range()));
+                        for(auto const& kv : ids_container)
+                            elmcnt->add(kv.first);
+                        while(elmcnt->is_ok())
+                        {
+                            obj_type var(allocate_object<m_type>());
+                            elmcnt->read_comp(&(*var), sql_value());
+                            sql_value kv = elmcnt->id_for_members(&(*var));
+                            add_to_map(dst.*member_, ids_container.find(kv)->second.value<k_type>(), std::move(var));
+                            cont.read_counter_inc();
+                        }
+                    }
+                    else
+                    {
+                        while(ncnt->is_ok())
+                        {
+                            obj_type var(allocate_object<m_type>());
+                            ncnt->read(key);
+                            ncnt->read_comp(&(*var), extkey);
+                            add_to_map(dst.*member_, key.value<k_type>(), std::move(var));
+                            cont.read_counter_inc();
+                        }
+                    }
+                }
+                else
+                {
+                    using k_type = typename TFn::key_type;
+                    using m_type = typename TFn::mapped_type;
+                    size_t elemt = types_selector<TFn>::destination_id();
+                    if (cont.use_pages() && !(dst.*member_).empty()) return;
+                    (dst.*member_).clear();
+                    data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
+                    sql_value key((k_type()));
+                    while(ncnt->is_ok())
+                    {
+                        m_type var;
+                        ncnt->read(key);
+                        ncnt->read_comp(&var, extkey);
+                        add_to_map(dst.*member_, key.value<k_type>(), std::move(var));
+                        cont.read_counter_inc();
+                    }
+                }
+            }
+            else
+            if constexpr (is_container<TFn>::value)
+            {
+                if constexpr (is_kind_of_array<TFn>::value)
+                {
+                    static_assert(!is_pointer<typename TFn::value_type>::value, "It's impossible to use pointers inside std::array-like containers");
+                    using type = typename TFn::value_type;
+                    using iterator = typename TFn::iterator;
+                    size_t elemt = types_selector<TFn>::destination_id();
+                    data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
+                    iterator pos = (dst.*member_).begin();
+                    while(ncnt->is_ok())
+                    {
+                        if (pos==(dst.*member_).end())
+                            throw sql_bridge_error(to_string() << "The table: \"" << ncnt->table_name() << "\" contains more elements than provided container",
+                                                   g_expand_static_recommendation);
+                        ncnt->read_comp(*pos, extkey);
+                        pos++;
+                    }
+                    if (pos!=(dst.*member_).end())
+                        throw sql_bridge_error(to_string() << "The table: \"" << ncnt->table_name() << "\" contains less elements than provided static container.",
+                                               g_replace_static_recommendation);
+                }
+                else
+                if constexpr (is_pointer<typename TFn::value_type>::value)
+                {
+                    using type = typename TFn::value_type;
+                    using obj_type = std::conditional_t<std::is_pointer<type>::value, std::unique_ptr<typename is_pointer<type>::type>, type>;
+                    size_t elemt = types_selector<TFn>::destination_id();
+                    _clear(dst.*member_);
+                    data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
+                    if (description_->used_pointers() && description_->has_unique_key())
+                    {
+                        sql_values_container ids_container;
+                        sql_value key = description_->sql_value_for_unique_key();
+                        to_string fld;
+                        while(ncnt->is_ok())
+                        {
+                            ncnt->read(key);
+                            ncnt->next(nullptr);
+                            ids_container.push_back(key);
+                            fld << "?,";
+                        }
+                        if (ids_container.empty()) return;
+                        fld.remove_from_tail(1);
+                        std::string filter = to_string()
+                        << TStrategy::sql_where()
+                        << TStrategy::sql_where_in(description_->field_name_for_unique_key(),fld);
+                        data_update_context_ptr elmcnt(cont.context_from_root(elemt,filter,range()));
+                        for(auto const& kv : ids_container)
+                            elmcnt->add(kv);
+                        while(elmcnt->is_ok())
+                        {
+                            obj_type var(allocate_object<type>());
+                            elmcnt->read_comp(&(*var), sql_value());
+                            add_to_container(dst.*member_, std::move(var));
+                            cont.read_counter_inc();
+                        }
+                    }
+                    else
+                    {
+                        while(ncnt->is_ok())
+                        {
+                            obj_type var(allocate_object<type>());
+                            ncnt->read_comp(&(*var), extkey);
+                            add_to_container(dst.*member_, std::move(var));
+                        }
+                    }
+                }
+                else
+                {
+                    using type = typename TFn::value_type;
+                    size_t elemt = types_selector<TFn>::destination_id();
+                    range pg;
+                    if (cont.use_pages() && cont.page().is_active())
+                    {
+                        pg = range((dst.*member_).size(),cont.page().length());
+                        cont.page().disable();
+                    }
+                    else
+                    {
+                        if (cont.use_pages() && !(dst.*member_).empty()) return;
+                        _clear(dst.*member_);
+                    }
+                    data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),pg));
+                    while(ncnt->is_ok())
+                    {
+                        type var;
+                        ncnt->read_comp(&var, extkey);
+                        add_to_container(dst.*member_, std::move(var));
+                        cont.read_counter_inc();
+                    }
+                }
+            }
+            else
+            {
+                size_t elemt = typeid(TFn).hash_code();
+                data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
+                ncnt->read_comp(&(dst.*member_), extkey);
             }
         }
 
