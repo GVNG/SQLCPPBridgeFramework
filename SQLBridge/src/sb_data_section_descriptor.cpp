@@ -288,7 +288,7 @@ namespace sql_bridge
             dump_statements(src[i],to_string() << "  " << (src[i].target().empty()?" ":"|"));
             std::cerr << std::endl;
         }
-#endif
+#endif // DEBUG_CORE
     }
     
     void data_section_descriptor::dump_statements(class_link const& src, std::string const& pref) const
@@ -326,6 +326,6 @@ namespace sql_bridge
                         << " \"" << src.target()[i].table_name() << "\"" << std::endl;
             dump_statements(src.target()[i], to_string() << pref << "  " << (src.target()[i].target().empty()?" ":"|"));
         }
-#endif
+#endif // DEBUG_CORE
     }
 };

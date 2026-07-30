@@ -67,6 +67,7 @@ namespace sql_bridge
         inline void operator = (optional_value&& src) {optional_ = src.optional_; value_ = std::move(src.value_);}
         inline void operator = (value_type&& src) {optional_ = false; value_ = std::move(src);}
         inline bool empty() const {return optional_;}
+        inline bool has_value() const {return !empty();}
     private:
         value_type value_;
         optional_flag_type optional_;

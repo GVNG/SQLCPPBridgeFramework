@@ -96,6 +96,7 @@ namespace sql_bridge
     template<typename T,typename T2> struct is_kind_of_duration< std::chrono::duration<T, T2> > : std::true_type {};
     template<typename T> struct is_optional_bare : std::false_type {};
     template<typename T> struct is_optional_bare< optional_value<T> > : std::true_type {};
+    template<typename T> struct is_optional_bare< std::optional<T> > : std::true_type {};
     template<typename T> struct is_vector_bool : std::false_type {};
     template<> struct is_vector_bool< std::vector<bool> > : std::true_type {};
 
@@ -191,13 +192,17 @@ namespace sql_bridge
     template<typename T> struct map_type_check<true,T> : std::integral_constant<bool, !is_sql_acceptable<typename T::mapped_type>::value && !is_container<typename T::mapped_type>::value> {using type = typename T::mapped_type;};
     template<bool,typename T> struct container_type_check : std::integral_constant<bool, false>{using type = T;};
     template<typename T> struct container_type_check<true,T> : std::integral_constant<bool, !is_sql_acceptable<typename T::value_type>::value && !is_container<typename T::value_type>::value> {using type = typename T::value_type;};
-    
+    template<bool,typename T> struct optional_type_check : std::integral_constant<bool, false>{using type = T;};
+    template<typename T> struct optional_type_check<true,T> : std::integral_constant<bool, true> {using type = typename T::value_type;};
+
     template<typename T> struct types_selector
     {
-        using T1 = typename std::conditional<map_type_check<is_any_map<T>::value,T>::value, typename map_type_check<is_any_map<T>::value,T>::type, T>::type;
-        using T2 = typename std::conditional<container_type_check<is_container<T>::value,T>::value, typename container_type_check<is_container<T>::value, T>::type, T1>::type;
-        static_assert(!std::is_same<T2, void>::value,"No acceptable type selected");
-        using type = typename is_pointer<T2>::type ;
+        using T1 = typename optional_type_check<is_kind_of_optional<T>::value,T>::type;
+        using T2 = typename std::conditional<map_type_check<is_any_map<T1>::value,T1>::value, typename map_type_check<is_any_map<T1>::value,T1>::type, T1>::type;
+        using T3 = typename std::conditional<container_type_check<is_container<T2>::value,T2>::value, typename container_type_check<is_container<T2>::value, T2>::type, T2>::type;
+        static_assert(!std::is_same<T3, void>::value,"No acceptable type selected");
+        
+        using type = typename is_pointer<T3>::type;
         static constexpr size_t destination_id() {return typeid(type).hash_code();}
     };
     

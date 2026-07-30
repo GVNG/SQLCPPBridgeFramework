@@ -101,12 +101,14 @@ TEST(Core,TraitsOptional)
     using _t_vector = std::vector<float>;
     using _t_optional_int = sql_bridge::optional_value<int>;
     using _t_optional_vector = sql_bridge::optional_value<_t_vector>;
-    
+    using _t_optional_int_std = std::optional<int>;
+
     ASSERT_EQ(sql_bridge::is_optional_or_trivial<_t_optional_int>::value, true);
     ASSERT_EQ(sql_bridge::is_optional_or_trivial<_t_vector>::value, false);
     ASSERT_EQ(sql_bridge::is_optional_or_trivial<_t_pair>::value, false);
     ASSERT_EQ(sql_bridge::is_optional_or_trivial<_t_optional_vector>::value, false);
     ASSERT_EQ(sql_bridge::is_kind_of_optional<_t_optional_vector>::value, true);
+    ASSERT_EQ(sql_bridge::is_kind_of_optional<_t_optional_int_std>::value, true);
 }
 
 TEST(Core,TraitsPointers)
@@ -142,4 +144,23 @@ TEST(Core,Chrono)
     ASSERT_EQ(sql_bridge::is_duration<std::chrono::system_clock::time_point>::value, false);
     ASSERT_EQ(sql_bridge::is_duration<std::chrono::microseconds>::value, true);
     ASSERT_EQ(sql_bridge::is_pod_like<std::chrono::system_clock::time_point>::value, false);
+}
+
+TEST(Core,TypesSelector)
+{
+    using _t_base = int;
+    using _t_int_ptr = std::shared_ptr<_t_base>;
+    using _t_int_optional = std::optional<_t_base>;
+
+    using _t_vector_int = std::vector<_t_base>;
+    using _t_vector_int_ptr = std::shared_ptr<_t_vector_int>;
+    using _t_vector_int_optional = std::optional<_t_vector_int>;
+
+    ASSERT_EQ(sql_bridge::types_selector<_t_base>::destination_id(),typeid(int).hash_code());
+    ASSERT_EQ(sql_bridge::types_selector<_t_int_ptr>::destination_id(),typeid(int).hash_code());
+    ASSERT_EQ(sql_bridge::types_selector<_t_int_optional>::destination_id(),typeid(int).hash_code());
+
+    ASSERT_EQ(sql_bridge::types_selector<_t_vector_int>::destination_id(),typeid(_t_vector_int).hash_code());
+    ASSERT_EQ(sql_bridge::types_selector<_t_vector_int_ptr>::destination_id(),typeid(_t_vector_int).hash_code());
+    ASSERT_EQ(sql_bridge::types_selector<_t_vector_int_optional>::destination_id(),typeid(_t_vector_int).hash_code());
 }
