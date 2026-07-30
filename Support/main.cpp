@@ -150,7 +150,7 @@ int main(int argc, char** argv)
         mkdir("./DB", 0777);
         t_db_storage storage("./DB");
      
-#if 0
+#if 1
 
         {
             std::cout << "Case KVDB ";

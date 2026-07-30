@@ -96,10 +96,7 @@ namespace sql_bridge
         template<typename T> inline sql_value(T const& v, _t_optional_adapter<true>) : sql_value()
         {
             if (v.has_value())
-            {
-                sql_value tval(v.value(),_t_real_adapter<std::is_floating_point<typename T::value_type>::value>());
-                *this = tval;
-            }
+                *this = sql_value(v.value(),_t_real_adapter<std::is_floating_point<typename T::value_type>::value>());
         };
         template<typename T> inline sql_value(T const& v, _t_optional_adapter<false>) : sql_value(v,_t_real_adapter<std::is_floating_point<T>::value>()) {};
         template<typename T> inline sql_value(T const& v, _t_real_adapter<false>) : sql_value(v,_t_integral_adapter<is_convertible_to_int<T>::value>()) {}
