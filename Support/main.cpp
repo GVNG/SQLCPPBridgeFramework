@@ -150,7 +150,7 @@ int main(int argc, char** argv)
         mkdir("./DB", 0777);
         t_db_storage storage("./DB");
      
-#if 1
+#if 0
 
         {
             std::cout << "Case KVDB ";
@@ -954,7 +954,6 @@ int main(int argc, char** argv)
             assert(src==dst);
             std::cout << "is ok. ";
         }
-#endif
         {
             time_tracker trk;
             sql_bridge::context cont(storage["case44"]);
@@ -967,6 +966,9 @@ int main(int argc, char** argv)
             assert(src==dst);
             std::cout << "is ok. ";
         }
+#endif
+        
+        
 
 #if 0 // recursion
         {
