@@ -197,11 +197,11 @@ namespace sql_bridge
 
     template<typename T> struct types_selector
     {
-        using T1 = typename optional_type_check<is_kind_of_optional<T>::value,T>::type;
+        using T0 = typename is_pointer<T>::type;
+        using T1 = typename optional_type_check<is_kind_of_optional<T0>::value,T0>::type;
         using T2 = typename std::conditional<map_type_check<is_any_map<T1>::value,T1>::value, typename map_type_check<is_any_map<T1>::value,T1>::type, T1>::type;
         using T3 = typename std::conditional<container_type_check<is_container<T2>::value,T2>::value, typename container_type_check<is_container<T2>::value, T2>::type, T2>::type;
         static_assert(!std::is_same<T3, void>::value,"No acceptable type selected");
-        
         using type = typename is_pointer<T3>::type;
         static constexpr size_t destination_id() {return typeid(type).hash_code();}
     };

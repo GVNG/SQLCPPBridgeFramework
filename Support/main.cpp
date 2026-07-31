@@ -78,6 +78,7 @@
 #include "example42.h"
 #include "example43.h"
 #include "example44.h"
+#include "example45.h"
 
 using t_db_storage = sql_bridge::local_storage<sql_bridge::sqlite_adapter>;
 using t_threads_container = std::array<std::thread, 10>;
@@ -150,7 +151,7 @@ int main(int argc, char** argv)
         mkdir("./DB", 0777);
         t_db_storage storage("./DB");
      
-#if 0
+#if 1
 
         {
             std::cout << "Case KVDB ";
@@ -966,9 +967,19 @@ int main(int argc, char** argv)
             assert(src==dst);
             std::cout << "is ok. ";
         }
+        {
+            time_tracker trk;
+            sql_bridge::context cont(storage["case45"]);
+            Case45Container src,dst;
+            std::cout << "Case 45 ";
+            for(int i=0; i<10; ++i)
+                src.push_back(Case45(i));
+            cont.save(src);
+            cont.load(dst);
+            assert(src==dst);
+            std::cout << "is ok. ";
+        }
 #endif
-        
-        
 
 #if 0 // recursion
         {

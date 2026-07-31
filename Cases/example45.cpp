@@ -1,9 +1,9 @@
 //
-//  t_case41.cpp
-//  Tests
+//  example45.cpp
+//  SQLCPPBridgeFramework
 //
-//  Created by Roman Makhnenko on 15/05/2020.
-//  Copyright © 2020 DataArt.
+//  Created by Roman Makhnenko on 12/03/16.
+//  Copyright © 2016, DataArt.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -28,18 +28,29 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "t_db_fixture.h"
-#include "example41.h"
+#include "example45.h"
 
-TEST_F(DBFixture, Case41)
+DEFINE_SQL_TRIVIAL_TABLE(rel_container, Case45RelContainer);
+
+DEFINE_SQL_TABLE(rel,Case45Related)
 {
-    sql_bridge::context cont(storage()["case41"]);
-    Case41Container dst,src(10,Case41(200)),dst2;
-    cont.replace(src);
-    cont.load(dst);
-    ASSERT_EQ(src,dst);
-    cont.save(Case41());
-    cont.load(dst2);
-    ASSERT_EQ(dst2.back().data_.empty(), true);
-}
+    bind("dat",                 &Case45Related::dat_),
+    bind("val",                 &Case45Related::value_),
+};
 
+DEFINE_SQL_TABLE(root,Case45)
+{
+    bind("id",                  &Case45::eid_,          sql_bridge::e_db_index_type::Unique),
+    bind("rel",                 &Case45::related_),
+};
+
+DEFINE_SQL_DATABASE(case45,1,Case45)::upgrade_structure(size_t from, size_t to)
+{
+    // ------------------------------------------------------------------------------------
+    // you can place here the upgrade script from the 'from' to the 'to' version
+    // something like below, or whatever SQL statements you want
+    //
+    //if (from<=2 && to>2)
+    //    execute("CREATE INDEX IF NOT EXISTS BLAH_BLAH_INDEX ON MY_TABLE (BLAH_BLAH_ID)");
+    // ------------------------------------------------------------------------------------
+}

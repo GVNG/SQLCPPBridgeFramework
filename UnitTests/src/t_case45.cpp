@@ -1,9 +1,9 @@
 //
-//  t_case41.cpp
+//  t_case45.cpp
 //  Tests
 //
-//  Created by Roman Makhnenko on 15/05/2020.
-//  Copyright © 2020 DataArt.
+//  Created by Roman Makhnenko on 30/07/2026.
+//  Copyright © 2026 DataArt.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -29,17 +29,15 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "t_db_fixture.h"
-#include "example41.h"
+#include "example45.h"
 
-TEST_F(DBFixture, Case41)
+TEST_F(DBFixture, Case45)
 {
-    sql_bridge::context cont(storage()["case41"]);
-    Case41Container dst,src(10,Case41(200)),dst2;
-    cont.replace(src);
+    sql_bridge::context cont(storage()["case45"]);
+    Case45Container dst,src;
+    for(int i=0; i<100; ++i)
+        src.push_back(Case45(i));
+    cont.save(src);
     cont.load(dst);
     ASSERT_EQ(src,dst);
-    cont.save(Case41());
-    cont.load(dst2);
-    ASSERT_EQ(dst2.back().data_.empty(), true);
 }
-

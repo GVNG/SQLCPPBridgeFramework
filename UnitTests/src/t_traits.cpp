@@ -151,16 +151,24 @@ TEST(Core,TypesSelector)
     using _t_base = int;
     using _t_int_ptr = std::shared_ptr<_t_base>;
     using _t_int_optional = std::optional<_t_base>;
-
+    
     using _t_vector_int = std::vector<_t_base>;
     using _t_vector_int_ptr = std::shared_ptr<_t_vector_int>;
     using _t_vector_int_optional = std::optional<_t_vector_int>;
-
+    
+    using _t_extra = std::pair<int,int>;
+    using _t_extra_container = std::vector<_t_extra>;
+    using _t_extra_container_ptr = std::shared_ptr<_t_extra_container>;
+    
     ASSERT_EQ(sql_bridge::types_selector<_t_base>::destination_id(),typeid(int).hash_code());
     ASSERT_EQ(sql_bridge::types_selector<_t_int_ptr>::destination_id(),typeid(int).hash_code());
     ASSERT_EQ(sql_bridge::types_selector<_t_int_optional>::destination_id(),typeid(int).hash_code());
-
+    
     ASSERT_EQ(sql_bridge::types_selector<_t_vector_int>::destination_id(),typeid(_t_vector_int).hash_code());
     ASSERT_EQ(sql_bridge::types_selector<_t_vector_int_ptr>::destination_id(),typeid(_t_vector_int).hash_code());
     ASSERT_EQ(sql_bridge::types_selector<_t_vector_int_optional>::destination_id(),typeid(_t_vector_int).hash_code());
+    
+    ASSERT_EQ(sql_bridge::types_selector<_t_extra>::destination_id(),typeid(_t_extra).hash_code());
+    ASSERT_EQ(sql_bridge::types_selector<_t_extra_container>::destination_id(),typeid(_t_extra).hash_code());
+    ASSERT_EQ(sql_bridge::types_selector<_t_extra_container_ptr>::destination_id(),typeid(_t_extra).hash_code());
 }

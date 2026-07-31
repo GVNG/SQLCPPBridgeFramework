@@ -1,9 +1,9 @@
 //
-//  t_case41.cpp
-//  Tests
+//  example45.h
+//  SQLCPPBridgeFramework
 //
-//  Created by Roman Makhnenko on 15/05/2020.
-//  Copyright © 2020 DataArt.
+//  Created by Roman Makhnenko on 12/03/16.
+//  Copyright © 2016, DataArt.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -28,18 +28,56 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "t_db_fixture.h"
-#include "example41.h"
+#pragma once
+#ifndef example45_h
+#define example45_h
 
-TEST_F(DBFixture, Case41)
+#include "sqlcppbridge.h"
+
+class Case45;
+class Case45Related;
+using Case45Container = std::vector<Case45>;
+using Case45RelContainer = std::vector<Case45Related>;
+using Case45RelPtr = std::shared_ptr<Case45RelContainer>;
+
+class Case45Related
 {
-    sql_bridge::context cont(storage()["case41"]);
-    Case41Container dst,src(10,Case41(200)),dst2;
-    cont.replace(src);
-    cont.load(dst);
-    ASSERT_EQ(src,dst);
-    cont.save(Case41());
-    cont.load(dst2);
-    ASSERT_EQ(dst2.back().data_.empty(), true);
-}
+    DECLARE_SQL_ACCESS(Case45Related);
+public:
+    Case45Related(std::size_t i = 0)
+        : dat_(i*10)
+        , value_(M_PI_2*i)
+        {};
+    inline bool operator == (Case45Related const& rv) const
+    {
+        return  dat_ == rv.dat_ &&
+                value_ == rv.value_;
+    }
+private:
+    std::size_t dat_;
+    double value_;
+};
 
+class Case45
+{
+    DECLARE_SQL_ACCESS(Case45);
+public:
+    Case45(std::size_t i = 0)
+        : eid_(i)
+        , related_(std::make_shared<Case45RelContainer>())
+    {
+        for(int k=0; k<10; ++k)
+            related_->push_back(Case45Related(i*20+k));
+    }
+    inline bool operator == (Case45 const& rv) const
+    {
+        return  eid_==rv.eid_ &&
+                *related_==*rv.related_;
+    }
+private:
+    std::size_t eid_;
+    Case45RelPtr related_;
+};
+
+
+#endif // !example45_h

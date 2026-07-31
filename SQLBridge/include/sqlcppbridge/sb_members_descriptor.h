@@ -51,11 +51,27 @@ namespace sql_bridge
         inline class_descriptors_pair prefix_description() const override {return _prefix<TMb>();}
         std::string const& table_name() const override {static std::string const def;return def;}
         std::string const& sql_type() const override {return _sql_type<TMb>();}
-        void bind(void const* src, data_update_context& cnt) override {_bind_elem<TMb>(*static_cast<T const*>(src),cnt);};
+        void bind(void const* src, data_update_context& cnt) override
+        {
+            if constexpr (is_optional_or_trivial<TMb>::value)
+            {
+                auto const& el = *static_cast<T const*>(src);
+                cnt.add(sql_value(el.*member_));
+            }
+        };
         void bind_comp(void const* src, data_update_context& cnt, sql_value const& extkey) override {_bind_comp_elem<TMb>(*static_cast<T const*>(src),cnt,extkey);};
         void bind_at(void const*,void const*,data_update_context&,sql_value const&) override {};
         void bind_inheritance(size_t,void const*,data_update_context&,sql_value const&) override {};
-        sql_value expand(void const* src) override {return _expand<TMb>(*static_cast<T const*>(src));}
+        sql_value expand(void const* src) override
+        {
+            if constexpr (is_optional_or_trivial<TMb>::value)
+            {
+                auto const& el = *static_cast<T const*>(src);
+                return sql_value(el.*member_);
+            }
+            else
+                return sql_value();
+        }
         sql_value try_cast() const override {return sql_value(TMb());}
         void read(void* dst, data_update_context& cnt) override {_read<TMb>(*static_cast<T*>(dst),cnt);}
         void read_comp(void* dst, data_update_context& cnt, sql_value const& extkey) override {_read_comp<TMb>(*static_cast<T*>(dst),cnt,extkey);}
@@ -72,7 +88,7 @@ namespace sql_bridge
 #pragma mark - constructor
         
         _t_member_descriptor(std::string const& fn, TMb T::* m, e_db_index_type it, class_descriptors_ptr desc)
-            : class_descriptor(typeid(typename types_selector<TMb>::type).hash_code(),is_pointer<TMb>::value,fn,it)
+            : class_descriptor(types_selector<TMb>::destination_id(),is_pointer<TMb>::value,fn,it)
             , member_(m)
             , description_(desc)
             {}
@@ -186,153 +202,149 @@ namespace sql_bridge
         
 #pragma mark - bind
         
-        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value> _bind_elem(T const& el, data_update_context& dst) {dst.add(sql_value(el.*member_));}
-        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value> _bind_elem(T const& el, data_update_context& dst) {}
-        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value> _bind_comp_elem(T const& el, data_update_context& dst, sql_value const&) {}
-        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value> _bind_comp_elem(T const& el, data_update_context& dst, sql_value const& extkey) {_bind_comp<TMb>(el.*member_,dst,extkey);}
-
-        template<typename TFn> inline std::enable_if_t<is_trivial_container<TFn>::value || is_trivial_map<TFn>::value> _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        template<typename TFn> inline void _bind_comp_elem(T const& el, data_update_context& dst, sql_value const& extkey)
         {
-            size_t elemt = typeid(TFn).hash_code();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
-            ncnt->bind_comp(&el, extkey);
+            if constexpr (!is_optional_or_trivial<TFn>::value)
+                _bind_comp<TMb>(el.*member_,dst,extkey);
         }
 
-        template<typename TFn> inline std::enable_if_t<is_container<TFn>::value && !is_trivial_container<TFn>::value> _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey) {_bind_comp_cont<TFn>(el,dst,extkey);}
-
-        template<typename TFn> inline std::enable_if_t<!is_container_of_containers<TFn>::value && is_pointer<typename TFn::value_type>::value> _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
+        template<typename TFn> inline void _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey)
         {
-            size_t elemt = types_selector<TFn>::destination_id();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
-
-            if (description_->used_pointers() && description_->has_unique_key())
+            if constexpr (is_trivial_container<TFn>::value || is_trivial_map<TFn>::value)
             {
-                for(auto const& ve : el)
-                {
-                    sql_value key = dst.id_for_members(&(*ve));
-                    ncnt->add(key);
-                    ncnt->add(extkey);
-                    ncnt->next(&key);
-                }
-                data_update_context_ptr excnt(dst.context_from_root(elemt,"",range()));
-                for(auto const& ve : el)
-                    excnt->bind_comp(&(*ve), sql_value());
+                size_t elemt = typeid(TFn).hash_code();
+                data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
+                ncnt->bind_comp(&el, extkey);
             }
             else
+            if constexpr (is_container_of_containers<TFn>::value)
             {
-                if (dst.use_pages())
+                size_t elemt = typeid(TFn).hash_code();
+                data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
+                ncnt->bind_comp(&el, extkey);
+            }
+            else
+            if constexpr (is_container<TFn>::value)
+            {
+                if constexpr (is_pointer<typename TFn::value_type>::value)
                 {
-                    using iterator = typename TFn::const_iterator;
-                    iterator ve = el.begin();
-                    for(size_t i=0; i!=dst.page().length() && ve!=el.end(); ++i,ve++)
-                        ncnt->bind_comp(&(*(*ve)), extkey);
-                    dst.page().disable();
+                    size_t elemt = types_selector<TFn>::destination_id();
+                    data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
+                    
+                    if (description_->used_pointers() && description_->has_unique_key())
+                    {
+                        for(auto const& ve : el)
+                        {
+                            sql_value key = dst.id_for_members(&(*ve));
+                            ncnt->add(key);
+                            ncnt->add(extkey);
+                            ncnt->next(&key);
+                        }
+                        data_update_context_ptr excnt(dst.context_from_root(elemt,"",range()));
+                        for(auto const& ve : el)
+                            excnt->bind_comp(&(*ve), sql_value());
+                    }
+                    else
+                    {
+                        if (dst.use_pages())
+                        {
+                            using iterator = typename TFn::const_iterator;
+                            iterator ve = el.begin();
+                            for(size_t i=0; i!=dst.page().length() && ve!=el.end(); ++i,ve++)
+                                ncnt->bind_comp(&(*(*ve)), extkey);
+                            dst.page().disable();
+                        }
+                        else
+                        {
+                            for(auto const& ve : el)
+                                ncnt->bind_comp(&(*ve), extkey);
+                        }
+                    }
                 }
                 else
                 {
-                    for(auto const& ve : el)
-                        ncnt->bind_comp(&(*ve), extkey);
+                    using type = typename TFn::value_type;
+                    using iterator = typename TFn::const_iterator;
+                    size_t elemt = typeid(type).hash_code();
+                    if (dst.use_pages())
+                    {
+                        if (dst.page().is_active())
+                        {
+                            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
+                            iterator ve = el.begin();
+                            for(size_t i=0; i!=dst.page().length() && ve!=el.end(); ++i,ve++)
+                                ncnt->bind_comp(&(*ve), extkey);
+                            dst.page().disable();
+                        }
+                    }
+                    else
+                    {
+                        data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
+                        for(auto const& ve : el)
+                            ncnt->bind_comp(&ve, extkey);
+                    }
                 }
             }
-        }
-        
-        template<typename TFn> inline std::enable_if_t<!is_container_of_containers<TFn>::value && !is_pointer<typename TFn::value_type>::value> _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
-        {
-            using type = typename TFn::value_type;
-            using iterator = typename TFn::const_iterator;
-            size_t elemt = typeid(type).hash_code();
-            if (dst.use_pages())
+            else
+            if constexpr (is_map<TFn>::value)
             {
-                if (dst.page().is_active())
+                if constexpr (is_pointer<typename TFn::mapped_type>::value)
                 {
+                    using k_type = typename TFn::key_type ;
+                    using m_type = typename is_pointer<typename TFn::mapped_type>::type;
+                    size_t elemt = typeid(m_type).hash_code();
                     data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
-                    iterator ve = el.begin();
-                    for(size_t i=0; i!=dst.page().length() && ve!=el.end(); ++i,ve++)
-                        ncnt->bind_comp(&(*ve), extkey);
-                    dst.page().disable();
+                    if (description_->used_pointers() && description_->has_unique_key())
+                    {
+                        data_update_context_ptr excnt(dst.context_from_root(elemt,"",range()));
+                        for(auto const& ve : el)
+                        {
+                            sql_value key = excnt->id_for_members(&(*ve.second));
+                            ncnt->add(ve.first);
+                            ncnt->add(key);
+                            ncnt->add(extkey);
+                            ncnt->next(nullptr);
+                        }
+                        for(auto const& ve : el)
+                            excnt->bind_comp(&(*ve.second), sql_value());
+                    }
+                    else
+                    {
+                        for(auto const& ve : el)
+                        {
+                            ncnt->add(ve.first);
+                            ncnt->bind_comp(&(*ve.second), extkey);
+                        }
+                    }
+                }
+                else
+                {
+                    using k_type = typename TFn::key_type;
+                    using m_type = typename is_pointer<typename TFn::mapped_type>::type;
+                    size_t elemt = typeid(m_type).hash_code();
+                    data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
+                    for(auto const& ve : el)
+                    {
+                        ncnt->add(ve.first);
+                        ncnt->bind_comp(&ve.second, extkey);
+                    }
                 }
             }
             else
+            if constexpr (is_pointer<TFn>::value)
             {
+                using type = typename is_pointer<TFn>::type;
+                if (el!=nullptr)
+                    _bind_comp<type>(*el, dst, extkey);
+            }
+            else
+            {
+                size_t elemt = typeid(TFn).hash_code();
                 data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
-                for(auto const& ve : el)
-                    ncnt->bind_comp(&ve, extkey);
+                ncnt->bind_comp(&el, extkey);
             }
         }
 
-        template<typename TFn> inline std::enable_if_t<is_container_of_containers<TFn>::value> _bind_comp_cont(TFn const& el, data_update_context& dst, sql_value const& extkey)
-        {
-            size_t elemt = typeid(TFn).hash_code();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
-            ncnt->bind_comp(&el, extkey);
-        }
-        
-        template<typename TFn> inline std::enable_if_t<is_map<TFn>::value && !is_trivial_map<TFn>::value> _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey) {_bind_comp_map<TFn>(el,dst,extkey);}
-
-        template<typename TFn> inline std::enable_if_t<is_container_of_containers<TFn>::value> _bind_comp_map(TFn const& el, data_update_context& dst, sql_value const& extkey)
-        {
-            size_t elemt = typeid(TFn).hash_code();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
-            ncnt->bind_comp(&el, extkey);
-        }
-
-        template<typename TFn> inline std::enable_if_t<!is_container_of_containers<TFn>::value &&
-                                                       !is_pointer<typename TFn::mapped_type>::value> _bind_comp_map(TFn const& el, data_update_context& dst, sql_value const& extkey)
-        {
-            using k_type = typename TFn::key_type;
-            using m_type = typename is_pointer<typename TFn::mapped_type>::type;
-            size_t elemt = typeid(m_type).hash_code();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
-            for(auto const& ve : el)
-            {
-                ncnt->add(ve.first);
-                ncnt->bind_comp(&ve.second, extkey);
-            }
-        }
-
-        template<typename TFn> inline std::enable_if_t<!is_container_of_containers<TFn>::value &&
-                                                       is_pointer<typename TFn::mapped_type>::value> _bind_comp_map(TFn const& el, data_update_context& dst, sql_value const& extkey)
-        {
-            using k_type = typename TFn::key_type ;
-            using m_type = typename is_pointer<typename TFn::mapped_type>::type;
-            size_t elemt = typeid(m_type).hash_code();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
-            if (description_->used_pointers() && description_->has_unique_key())
-            {
-                data_update_context_ptr excnt(dst.context_from_root(elemt,"",range()));
-                for(auto const& ve : el)
-                {
-                    sql_value key = excnt->id_for_members(&(*ve.second));
-                    ncnt->add(ve.first);
-                    ncnt->add(key);
-                    ncnt->add(extkey);
-                    ncnt->next(nullptr);
-                }
-                for(auto const& ve : el)
-                    excnt->bind_comp(&(*ve.second), sql_value());
-            }
-            else
-            {
-                for(auto const& ve : el)
-                {
-                    ncnt->add(ve.first);
-                    ncnt->bind_comp(&(*ve.second), extkey);
-                }
-            }
-        }
-
-        template<typename TFn> inline std::enable_if_t<!is_container<TFn>::value &&
-                                                       !is_map<TFn>::value> _bind_comp(TFn const& el, data_update_context& dst, sql_value const& extkey)
-        {
-            size_t elemt = typeid(TFn).hash_code();
-            data_update_context_ptr ncnt(dst.context_for_member(elemt,extkey,field_name(),range()));
-            ncnt->bind_comp(&el, extkey);
-        }
-
-#pragma mark - expand
-        
-        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value,sql_value> _expand(T const& el) {return sql_value(el.*member_);}
-        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value,sql_value> _expand(T const& el) {return sql_value();}
 
 #pragma mark - read at
 
@@ -503,45 +515,62 @@ namespace sql_bridge
 
 #pragma mark - read
         
-        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value> _read(T& dst, data_update_context& cont) {}
-        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value> _read(T& dst, data_update_context& cont)
+        template<typename TFn> inline void _read(T& dst, data_update_context& cont)
         {
-            if constexpr (is_sql_acceptable<TFn>::value)
+            if constexpr (is_optional_or_trivial<TFn>::value)
             {
-                sql_value vr(dst.*member_);
-                cont.read(vr);
-                dst.*member_ = vr.value<TMb>();
-            }
-            else
-            if constexpr (is_kind_of_optional<TFn>::value)
-            {
-                sql_value vr((dst.*member_).value());
-                cont.read(vr);
-                if (vr.empty())
-                    dst.*member_ = TMb();
+                if constexpr (is_sql_acceptable<TFn>::value)
+                {
+                    sql_value vr(dst.*member_);
+                    cont.read(vr);
+                    dst.*member_ = vr.value<TMb>();
+                }
                 else
-                    dst.*member_ = vr.value<typename TMb::value_type>();
+                if constexpr (is_kind_of_optional<TFn>::value)
+                {
+                    sql_value vr((dst.*member_).value());
+                    cont.read(vr);
+                    if (vr.empty())
+                        dst.*member_ = TMb();
+                    else
+                        dst.*member_ = vr.value<typename TMb::value_type>();
+                }
+                else
+                    static_assert(false, "There is unspecified routine for trivial values");
             }
-            else
-                static_assert(false, "There is unspecified routine for trivial values");
         }
+        
         template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const&) {}
         template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
+        {
+            if constexpr (is_pointer<TFn>::value)
+            {
+                using type = typename is_pointer<TFn>::type;
+                auto& el = dst.*member_;
+                static_assert(is_smart_pointer<has_element_type<TFn>::value,TFn>::value, "There are smart pointers only available here.");
+                el = allocate_object<TFn>();
+                _read_comp_impl(*el,cont,extkey);
+            }
+            else
+                _read_comp_impl(dst.*member_,cont,extkey);
+        }
+        
+        template<typename TFn> inline void _read_comp_impl(TFn& dst, data_update_context& cont, sql_value const& extkey)
         {
             if constexpr (is_trivial_container<TFn>::value ||
                           is_trivial_map<TFn>::value)
             {
                 size_t elemt = typeid(TFn).hash_code();
-                _clear(dst.*member_);
+                _clear(dst);
                 data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
-                ncnt->read_comp(&(dst.*member_), extkey);
+                ncnt->read_comp(&(dst), extkey);
             }
             else
             if constexpr (is_container_of_containers<TFn>::value)
             {
                 size_t elemt = typeid(TFn).hash_code();
                 data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
-                ncnt->read_comp(&(dst.*member_), extkey);
+                ncnt->read_comp(&(dst), extkey);
             }
             else
             if constexpr (is_map<TFn>::value)
@@ -553,7 +582,7 @@ namespace sql_bridge
                     using obj_type = std::conditional_t<std::is_pointer<m_type>::value, std::unique_ptr<typename is_pointer<m_type>::type>, m_type>;
                     
                     size_t elemt = types_selector<TFn>::destination_id();
-                    (dst.*member_).clear();
+                    dst.clear();
                     data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
                     sql_value key((k_type()));
                     if (description_->used_pointers() && description_->has_unique_key())
@@ -582,7 +611,7 @@ namespace sql_bridge
                             obj_type var(allocate_object<m_type>());
                             elmcnt->read_comp(&(*var), sql_value());
                             sql_value kv = elmcnt->id_for_members(&(*var));
-                            add_to_map(dst.*member_, ids_container.find(kv)->second.value<k_type>(), std::move(var));
+                            add_to_map(dst, ids_container.find(kv)->second.value<k_type>(), std::move(var));
                             cont.read_counter_inc();
                         }
                     }
@@ -593,7 +622,7 @@ namespace sql_bridge
                             obj_type var(allocate_object<m_type>());
                             ncnt->read(key);
                             ncnt->read_comp(&(*var), extkey);
-                            add_to_map(dst.*member_, key.value<k_type>(), std::move(var));
+                            add_to_map(dst, key.value<k_type>(), std::move(var));
                             cont.read_counter_inc();
                         }
                     }
@@ -603,8 +632,8 @@ namespace sql_bridge
                     using k_type = typename TFn::key_type;
                     using m_type = typename TFn::mapped_type;
                     size_t elemt = types_selector<TFn>::destination_id();
-                    if (cont.use_pages() && !(dst.*member_).empty()) return;
-                    (dst.*member_).clear();
+                    if (cont.use_pages() && !dst.empty()) return;
+                    dst.clear();
                     data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
                     sql_value key((k_type()));
                     while(ncnt->is_ok())
@@ -612,7 +641,7 @@ namespace sql_bridge
                         m_type var;
                         ncnt->read(key);
                         ncnt->read_comp(&var, extkey);
-                        add_to_map(dst.*member_, key.value<k_type>(), std::move(var));
+                        add_to_map(dst, key.value<k_type>(), std::move(var));
                         cont.read_counter_inc();
                     }
                 }
@@ -627,16 +656,16 @@ namespace sql_bridge
                     using iterator = typename TFn::iterator;
                     size_t elemt = types_selector<TFn>::destination_id();
                     data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
-                    iterator pos = (dst.*member_).begin();
+                    iterator pos = dst.begin();
                     while(ncnt->is_ok())
                     {
-                        if (pos==(dst.*member_).end())
+                        if (pos==dst.end())
                             throw sql_bridge_error(to_string() << "The table: \"" << ncnt->table_name() << "\" contains more elements than provided container",
                                                    g_expand_static_recommendation);
                         ncnt->read_comp(*pos, extkey);
                         pos++;
                     }
-                    if (pos!=(dst.*member_).end())
+                    if (pos!=dst.end())
                         throw sql_bridge_error(to_string() << "The table: \"" << ncnt->table_name() << "\" contains less elements than provided static container.",
                                                g_replace_static_recommendation);
                 }
@@ -646,7 +675,7 @@ namespace sql_bridge
                     using type = typename TFn::value_type;
                     using obj_type = std::conditional_t<std::is_pointer<type>::value, std::unique_ptr<typename is_pointer<type>::type>, type>;
                     size_t elemt = types_selector<TFn>::destination_id();
-                    _clear(dst.*member_);
+                    _clear(dst);
                     data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
                     if (description_->used_pointers() && description_->has_unique_key())
                     {
@@ -672,7 +701,7 @@ namespace sql_bridge
                         {
                             obj_type var(allocate_object<type>());
                             elmcnt->read_comp(&(*var), sql_value());
-                            add_to_container(dst.*member_, std::move(var));
+                            add_to_container(dst, std::move(var));
                             cont.read_counter_inc();
                         }
                     }
@@ -682,7 +711,7 @@ namespace sql_bridge
                         {
                             obj_type var(allocate_object<type>());
                             ncnt->read_comp(&(*var), extkey);
-                            add_to_container(dst.*member_, std::move(var));
+                            add_to_container(dst, std::move(var));
                         }
                     }
                 }
@@ -693,20 +722,20 @@ namespace sql_bridge
                     range pg;
                     if (cont.use_pages() && cont.page().is_active())
                     {
-                        pg = range((dst.*member_).size(),cont.page().length());
+                        pg = range(dst.size(),cont.page().length());
                         cont.page().disable();
                     }
                     else
                     {
-                        if (cont.use_pages() && !(dst.*member_).empty()) return;
-                        _clear(dst.*member_);
+                        if (cont.use_pages() && !dst.empty()) return;
+                        _clear(dst);
                     }
                     data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),pg));
                     while(ncnt->is_ok())
                     {
                         type var;
                         ncnt->read_comp(&var, extkey);
-                        add_to_container(dst.*member_, std::move(var));
+                        add_to_container(dst, std::move(var));
                         cont.read_counter_inc();
                     }
                 }
@@ -715,7 +744,7 @@ namespace sql_bridge
             {
                 size_t elemt = typeid(TFn).hash_code();
                 data_update_context_ptr ncnt(cont.context_for_member(elemt,extkey,field_name(),range()));
-                ncnt->read_comp(&(dst.*member_), extkey);
+                ncnt->read_comp(&dst, extkey);
             }
         }
 

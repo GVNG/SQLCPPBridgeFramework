@@ -29,8 +29,8 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
-#ifndef example44_hpp
-#define example44_hpp
+#ifndef example44_h
+#define example44_h
 
 #include "sqlcppbridge.h"
 
@@ -63,4 +63,4 @@ private:
     Case44OptionalStd value_;
 };
 
-#endif /* example44_hpp */
+#endif // !example44_h
