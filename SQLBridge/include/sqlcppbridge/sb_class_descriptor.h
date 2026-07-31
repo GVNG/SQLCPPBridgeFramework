@@ -74,6 +74,7 @@ namespace sql_bridge
         void remove_inheritance(size_t tid,void const* root,data_update_context& cont,sql_value const& extkey) override {_remove_inheritance<T>(*static_cast<T const*>(root),tid,cont,extkey);};
         bool is_this_mem_ptr(void const* base, void const* memptr) const override {return false;}
         bool is_target_map() const override {return is_map<T>::value;}
+        
         bool is_not_empty_container(void const* src) const override
         {
             if constexpr (is_container<T>::value ||

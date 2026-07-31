@@ -99,8 +99,7 @@ namespace sql_bridge
         
         template<typename TFn> inline bool _is_not_empty_container(T const& el) const
         {
-            if constexpr (is_container<TFn>::value ||
-                          is_map<TFn>::value)
+            if constexpr (is_container<TFn>::value || is_map<TFn>::value)
                 return !(el.*member_).empty();
             else
                 return false;

@@ -154,252 +154,256 @@ namespace sql_bridge
         
 #pragma mark - bind
 
-        template<typename TFn> inline std::enable_if_t<is_container<TFn>::value> _bind_comp(TFn const& src,data_update_context& cont,sql_value const& extkey) {_bind_comp_container<TFn>(src,cont,extkey);}
-
-        template<typename TFn> inline std::enable_if_t<!is_trivial_container<TFn>::value &&
-                                                       is_pointer<typename TFn::value_type>::value> _bind_comp_container(TFn const& src,data_update_context& cont,sql_value const& extkey)
+        template<typename TFn> inline void _bind_comp(TFn const& src,
+                                                      data_update_context& cont,
+                                                      sql_value const& extkey)
         {
-            size_t tid = typeid(typename is_pointer<typename TFn::value_type>::type).hash_code();
-            std::string const& refname(cont.forward_ref());
-            for(auto const& v : src)
+            if constexpr (is_container<TFn>::value)
             {
-                if (!extkey.empty())
-                    cont.add(extkey);
-                cont.next(&v);
-                sql_value extid = cont.id_for_members(&v);
-                if (extid.empty())
-                    throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the forward link", "You should configure any type of index at least at one field in the definition of table");
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
-                ncnt->bind_comp(&(*v), extid);
+                if constexpr (is_trivial_container<TFn>::value)
+                {
+                    if constexpr (is_vector_bool<TFn>::value)
+                    {
+                        for(auto v : src)
+                        {
+                            bool t = v;
+                            cont.add(sql_value(t));
+                            if (!extkey.empty())
+                                cont.add(extkey);
+                            cont.next(&t);
+                        }
+                    }
+                    else
+                    {
+                        for(auto const& v : src)
+                        {
+                            cont.add(sql_value(v));
+                            if (!extkey.empty())
+                                cont.add(extkey);
+                            cont.next(&v);
+                        }
+                    }
+                }
+                else
+                if constexpr (is_pointer<typename TFn::value_type>::value)
+                {
+                    size_t tid = typeid(typename is_pointer<typename TFn::value_type>::type).hash_code();
+                    std::string const& refname(cont.forward_ref());
+                    for(auto const& v : src)
+                    {
+                        if (!extkey.empty())
+                            cont.add(extkey);
+                        cont.next(&v);
+                        sql_value extid = cont.id_for_members(&v);
+                        if (extid.empty())
+                            throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the forward link", "You should configure any type of index at least at one field in the definition of table");
+                        data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
+                        ncnt->bind_comp(&(*v), extid);
+                    }
+                }
+                else
+                {
+                    size_t tid = typeid(typename TFn::value_type).hash_code();
+                    std::string const& refname(cont.forward_ref());
+                    for(auto const& v : src)
+                    {
+                        if (!extkey.empty())
+                            cont.add(extkey);
+                        cont.next(&v);
+                        sql_value extid = cont.id_for_members(&v);
+                        if (extid.empty())
+                            throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the forward link", "You should configure any type of index at least at one field in the definition of table");
+                        data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
+                        ncnt->bind_comp(&v, extid);
+                    }
+                }
             }
-        }
-        template<typename TFn> inline std::enable_if_t<!is_trivial_container<TFn>::value &&
-                                                       !is_pointer<typename TFn::value_type>::value> _bind_comp_container(TFn const& src,data_update_context& cont,sql_value const& extkey)
-        {
-            size_t tid = typeid(typename TFn::value_type).hash_code();
-            std::string const& refname(cont.forward_ref());
-            for(auto const& v : src)
+            else
+            if constexpr (is_any_map<TFn>::value)
             {
-                if (!extkey.empty())
-                    cont.add(extkey);
-                cont.next(&v);
-                sql_value extid = cont.id_for_members(&v);
-                if (extid.empty())
-                    throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the forward link", "You should configure any type of index at least at one field in the definition of table");
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
-                ncnt->bind_comp(&v, extid);
-            }
-        }
-        template<typename TFn> inline std::enable_if_t<is_trivial_container<TFn>::value &&
-                                                       is_vector_bool<TFn>::value> _bind_comp_container(TFn const& src,data_update_context& cont,sql_value const& extkey)
-        {
-            for(auto v : src)
-            {
-                bool t = v;
-                cont.add(sql_value(t));
-                if (!extkey.empty())
-                    cont.add(extkey);
-                cont.next(&t);
-            }
-        }
-        template<typename TFn> inline std::enable_if_t<is_trivial_container<TFn>::value && 
-                                                       !is_vector_bool<TFn>::value> _bind_comp_container(TFn const& src,data_update_context& cont,sql_value const& extkey)
-        {
-            for(auto const& v : src)
-            {
-                cont.add(sql_value(v));
-                if (!extkey.empty())
-                    cont.add(extkey);
-                cont.next(&v);
-            }
-        }
-
-        template<typename TFn> inline std::enable_if_t<is_any_map<TFn>::value> _bind_comp(TFn const& src,data_update_context& cont,sql_value const& extkey) {_bind_comp_map<TFn>(src,cont,extkey);}
-
-        template<typename TFn> inline std::enable_if_t<!is_trivial_map<TFn>::value &&
-                                                       is_pointer<typename TFn::mapped_type>::value> _bind_comp_map(TFn const& src,data_update_context& cont,sql_value const& extkey)
-        {
-            size_t tid = typeid(typename is_pointer<typename TFn::mapped_type>::type).hash_code();
-            std::string const& refname(cont.forward_ref());
-            for(auto const& v : src)
-            {
-                cont.add(sql_value(v.first));
-                if (!extkey.empty())
-                    cont.add(extkey);
-                cont.next(&v);
-                sql_value extid = cont.id_for_members(&v);
-                if (extid.empty())
-                    throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
-                ncnt->bind_comp(&(*v.second), extid);
-            }
-        }
-        
-        template<typename TFn> inline std::enable_if_t<!is_trivial_map<TFn>::value && 
-                                                       !is_pointer<typename TFn::mapped_type>::value> _bind_comp_map(TFn const& src,data_update_context& cont,sql_value const& extkey)
-        {
-            size_t tid = typeid(typename TFn::mapped_type).hash_code();
-            std::string const& refname(cont.forward_ref());
-            for(auto const& v : src)
-            {
-                cont.add(sql_value(v.first));
-                if (!extkey.empty())
-                    cont.add(extkey);
-                cont.next(&v);
-                sql_value extid = cont.id_for_members(&v);
-                if (extid.empty())
-                    throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
-                ncnt->bind_comp(&v.second, extid);
-            }
-        }
-        template<typename TFn> inline std::enable_if_t<is_trivial_map<TFn>::value> _bind_comp_map(TFn const& src,data_update_context& cont,sql_value const& extkey)
-        {
-            for(auto const& v : src)
-            {
-                cont.add(sql_value(v.first));
-                cont.add(sql_value(v.second));
-                if (!extkey.empty())
-                    cont.add(extkey);
-                cont.next(&v);
+                if constexpr (is_trivial_map<TFn>::value)
+                {
+                    for(auto const& v : src)
+                    {
+                        cont.add(sql_value(v.first));
+                        cont.add(sql_value(v.second));
+                        if (!extkey.empty())
+                            cont.add(extkey);
+                        cont.next(&v);
+                    }
+                }
+                else
+                if constexpr (is_pointer<typename TFn::mapped_type>::value)
+                {
+                    size_t tid = typeid(typename is_pointer<typename TFn::mapped_type>::type).hash_code();
+                    std::string const& refname(cont.forward_ref());
+                    for(auto const& v : src)
+                    {
+                        cont.add(sql_value(v.first));
+                        if (!extkey.empty())
+                            cont.add(extkey);
+                        cont.next(&v);
+                        sql_value extid = cont.id_for_members(&v);
+                        if (extid.empty())
+                            throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
+                        data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
+                        ncnt->bind_comp(&(*v.second), extid);
+                    }
+                }
+                else
+                {
+                    size_t tid = typeid(typename TFn::mapped_type).hash_code();
+                    std::string const& refname(cont.forward_ref());
+                    for(auto const& v : src)
+                    {
+                        cont.add(sql_value(v.first));
+                        if (!extkey.empty())
+                            cont.add(extkey);
+                        cont.next(&v);
+                        sql_value extid = cont.id_for_members(&v);
+                        if (extid.empty())
+                            throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
+                        data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
+                        ncnt->bind_comp(&v.second, extid);
+                    }
+                }
             }
         }
         
 #pragma mark - read
-        
-        template<typename TFn> inline std::enable_if_t<is_kind_of_array<TFn>::value> _read_comp(TFn& dst,data_update_context& cont,sql_value const& extkey)
+
+        template<typename TFn> inline void _read_comp(TFn& dst,data_update_context& cont,sql_value const& extkey)
         {
-            using type = typename TFn::value_type;
-            using iterator = typename TFn::iterator;
-            sql_value val((type()));
-            iterator pos = dst.begin();
-            while(cont.is_ok())
+            if constexpr (is_kind_of_array<TFn>::value)
             {
-                if (pos==dst.end())
-                    throw sql_bridge_error(to_string() << "The table: \"" << cont.table_name() << "\" contains more elements than provided container",
-                                           g_expand_static_recommendation);
-                cont.read(val);
-                cont.next(nullptr);
-                *pos = val.value<type>();
-                pos++;
+                using type = typename TFn::value_type;
+                using iterator = typename TFn::iterator;
+                sql_value val((type()));
+                iterator pos = dst.begin();
+                while(cont.is_ok())
+                {
+                    if (pos==dst.end())
+                        throw sql_bridge_error(to_string() << "The table: \"" << cont.table_name() << "\" contains more elements than provided container",
+                                               g_expand_static_recommendation);
+                    cont.read(val);
+                    cont.next(nullptr);
+                    *pos = val.value<type>();
+                    pos++;
+                }
+                if (pos!=dst.end())
+                    throw sql_bridge_error(to_string() << "The table: \"" << cont.table_name() << "\" contains less elements than provided static container.",
+                                           g_replace_static_recommendation);
             }
-            if (pos!=dst.end())
-                throw sql_bridge_error(to_string() << "The table: \"" << cont.table_name() << "\" contains less elements than provided static container.",
-                                       g_replace_static_recommendation);
+            else
+            if constexpr (is_trivial_container<TFn>::value)
+            {
+                using type = typename TFn::value_type;
+                sql_value val((type()));
+                while(cont.is_ok())
+                {
+                    cont.read(val);
+                    cont.next(nullptr);
+                    add_to_container(dst,val.value<type>());
+                }
+            }
+            else
+            if constexpr (is_trivial_map<TFn>::value)
+            {
+                using k_type = typename TFn::key_type;
+                using m_type = typename TFn::mapped_type;
+                sql_value key((k_type())),val((m_type()));
+                while(cont.is_ok())
+                {
+                    cont.read(key);
+                    cont.read(val);
+                    cont.next(nullptr);
+                    dst.insert(typename TFn::value_type(key.value<k_type>(),val.value<m_type>()));
+                }
+            }
+            else
+            if constexpr (is_container<TFn>::value)
+            {
+                if constexpr (is_pointer<typename TFn::value_type>::value)
+                {
+                    using type = typename is_pointer<typename TFn::value_type>::type;
+                    using obj_type = std::conditional_t<std::is_pointer<typename TFn::value_type>::value, std::unique_ptr<type>, typename TFn::value_type>;
+                    size_t tid = typeid(type).hash_code();
+                    std::string const& refname(cont.forward_ref());
+                    while(cont.is_ok())
+                    {
+                        cont.next(nullptr);
+                        sql_value extid = cont.id_for_members(&dst);
+                        data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
+                        obj_type v(allocate_object<typename TFn::value_type>());
+                        ncnt->read_comp(&(*v), extid);
+                        add_to_container(dst, std::move(v));
+                    }
+                }
+                else
+                {
+                    using type = typename TFn::value_type;
+                    size_t tid = typeid(type).hash_code();
+                    std::string const& refname(cont.forward_ref());
+                    while(cont.is_ok())
+                    {
+                        cont.next(nullptr);
+                        sql_value extid = cont.id_for_members(&dst);
+                        data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
+                        type v;
+                        ncnt->read_comp(&v, extid);
+                        add_to_container(dst, std::move(v));
+                    }
+                }
+            }
+            else
+            if constexpr (is_map<TFn>::value)
+            {
+                if constexpr (is_pointer<typename TFn::mapped_type>::value)
+                {
+                    using k_type = typename TFn::key_type;
+                    using m_type = typename is_pointer<typename TFn::mapped_type>::type;
+                    using obj_type = std::conditional_t<std::is_pointer<typename TFn::mapped_type>::value, std::unique_ptr<m_type>, typename TFn::mapped_type>;
+                    sql_value key((k_type()));
+                    size_t tid = typeid(m_type).hash_code();
+                    std::string const& refname(cont.forward_ref());
+                    while(cont.is_ok())
+                    {
+                        cont.read(key);
+                        cont.next(nullptr);
+                        sql_value extid = cont.id_for_members(&dst);
+                        if (extid.empty())
+                            throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
+                        obj_type v(allocate_object<typename TFn::mapped_type>());
+                        data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
+                        ncnt->read_comp(&(*v), extid);
+                        dst.insert(typename TFn::value_type(key.value<k_type>(),std::move(v)));
+                    }
+                }
+                else
+                {
+                    using k_type = typename TFn::key_type;
+                    using m_type = typename TFn::mapped_type;
+                    sql_value key((k_type()));
+                    size_t tid = typeid(m_type).hash_code();
+                    std::string const& refname(cont.forward_ref());
+                    while(cont.is_ok())
+                    {
+                        cont.read(key);
+                        cont.next(nullptr);
+                        sql_value extid = cont.id_for_read_members(&dst);
+                        m_type v;
+                        data_update_context_ptr ncnt(cont.context_for_member(tid, extid.empty()?key:extid, refname, range()));
+                        ncnt->read_comp(&v, extid.empty()?key:extid);
+                        dst.insert(typename TFn::value_type(key.value<k_type>(),std::move(v)));
+                    }
+                }
+            }
         }
 
+#pragma mark - add to container
+        
         template<typename TFn, typename TVal> inline std::enable_if_t<is_back_pushable_container<TFn>::value> add_to_container(TFn& dst, TVal&& v) const {dst.push_back(std::move(v));}
         template<typename TFn, typename TVal> inline std::enable_if_t<!is_back_pushable_container<TFn>::value> add_to_container(TFn& dst, TVal&& v) const {dst.insert(dst.end(),std::move(v));}
-
-        template<typename TFn> inline std::enable_if_t<is_container<TFn>::value && !is_kind_of_array<TFn>::value> _read_comp(TFn& dst,data_update_context& cont,sql_value const& extkey) {_read_comp_cont(dst,cont,extkey);}
-
-        template<typename TFn> inline std::enable_if_t<!is_trivial_container<TFn>::value && is_pointer<typename TFn::value_type>::value> _read_comp_cont(TFn& dst,data_update_context& cont,sql_value const& extkey)
-        {
-            using type = typename is_pointer<typename TFn::value_type>::type;
-            using obj_type = std::conditional_t<std::is_pointer<typename TFn::value_type>::value, std::unique_ptr<type>, typename TFn::value_type>;
-            size_t tid = typeid(type).hash_code();
-            std::string const& refname(cont.forward_ref());
-            while(cont.is_ok())
-            {
-                cont.next(nullptr);
-                sql_value extid = cont.id_for_members(&dst);
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
-                obj_type v(allocate_object<typename TFn::value_type>());
-                ncnt->read_comp(&(*v), extid);
-                add_to_container(dst, std::move(v));
-            }
-        }
-
-        template<typename TFn> inline std::enable_if_t<!is_trivial_container<TFn>::value &&
-                                                       !is_pointer<typename TFn::value_type>::value> _read_comp_cont(TFn& dst,data_update_context& cont,sql_value const& extkey)
-        {
-            using type = typename TFn::value_type;
-            size_t tid = typeid(type).hash_code();
-            std::string const& refname(cont.forward_ref());
-            while(cont.is_ok())
-            {
-                cont.next(nullptr);
-                sql_value extid = cont.id_for_members(&dst);
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
-                type v;
-                ncnt->read_comp(&v, extid);
-                add_to_container(dst, std::move(v));
-            }
-        }
-
-        template<typename TFn> inline std::enable_if_t<is_trivial_container<TFn>::value> _read_comp_cont(TFn& dst,data_update_context& cont,sql_value const& extkey)
-        {
-            using type = typename TFn::value_type;
-            sql_value val((type()));
-            while(cont.is_ok())
-            {
-                cont.read(val);
-                cont.next(nullptr);
-                add_to_container(dst,val.value<type>());
-            }
-        }
-
-        template<typename TFn> inline std::enable_if_t<is_map<TFn>::value> _read_comp(TFn& dst,data_update_context& cont,sql_value const& extkey) {_read_comp_map<TFn>(dst,cont,extkey);}
-
-        template<typename TFn> inline std::enable_if_t<!is_trivial_map<TFn>::value &&
-                                                       is_pointer<typename TFn::mapped_type>::value> _read_comp_map(TFn& dst,data_update_context& cont,sql_value const& extkey)
-        {
-            using k_type = typename TFn::key_type;
-            using m_type = typename is_pointer<typename TFn::mapped_type>::type;
-            using obj_type = std::conditional_t<std::is_pointer<typename TFn::mapped_type>::value, std::unique_ptr<m_type>, typename TFn::mapped_type>;
-            sql_value key((k_type()));
-            size_t tid = typeid(m_type).hash_code();
-            std::string const& refname(cont.forward_ref());
-            while(cont.is_ok())
-            {
-                cont.read(key);
-                cont.next(nullptr);
-                sql_value extid = cont.id_for_members(&dst);
-                if (extid.empty())
-                    throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
-                obj_type v(allocate_object<typename TFn::mapped_type>());
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
-                ncnt->read_comp(&(*v), extid);
-                dst.insert(typename TFn::value_type(key.value<k_type>(),std::move(v)));
-            }
-        }
-        
-        template<typename TFn> inline std::enable_if_t<!is_trivial_map<TFn>::value &&
-                                                       !is_pointer<typename TFn::mapped_type>::value> _read_comp_map(TFn& dst,data_update_context& cont,sql_value const& extkey)
-        {
-            using k_type = typename TFn::key_type;
-            using m_type = typename TFn::mapped_type;
-            sql_value key((k_type()));
-            size_t tid = typeid(m_type).hash_code();
-            std::string const& refname(cont.forward_ref());
-            while(cont.is_ok())
-            {
-                cont.read(key);
-                cont.next(nullptr);
-                sql_value extid = cont.id_for_read_members(&dst);
-//                if (extid.empty())
-//                    throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
-                m_type v;
-                data_update_context_ptr ncnt(cont.context_for_member(tid, extid.empty()?key:extid, refname, range()));
-                ncnt->read_comp(&v, extid.empty()?key:extid);
-                dst.insert(typename TFn::value_type(key.value<k_type>(),std::move(v)));
-            }
-        }
-
-        template<typename TFn> inline std::enable_if_t<is_trivial_map<TFn>::value> _read_comp_map(TFn& dst,data_update_context& cont,sql_value const& extkey)
-        {
-            using k_type = typename TFn::key_type;
-            using m_type = typename TFn::mapped_type;
-            sql_value key((k_type())),val((m_type()));
-            while(cont.is_ok())
-            {
-                cont.read(key);
-                cont.read(val);
-                cont.next(nullptr);
-                dst.insert(typename TFn::value_type(key.value<k_type>(),val.value<m_type>()));
-            }
-        }
-        
     };
 };
 
