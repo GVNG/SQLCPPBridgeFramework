@@ -97,48 +97,31 @@ namespace sql_bridge
         
 #pragma mark - check for empty containers
         
-        template<typename TFn> inline std::enable_if_t<is_container<TFn>::value ||
-                                                       is_map<TFn>::value,bool> _is_not_empty_container(T const& el) const
+        template<typename TFn> inline bool _is_not_empty_container(T const& el) const
         {
-            return !(el.*member_).empty();
-        }
-
-        template<typename TFn> inline std::enable_if_t<!is_container<TFn>::value &&
-                                                       !is_map<TFn>::value,bool> _is_not_empty_container(T const& el) const
-        {
-            return false;
+            if constexpr (is_container<TFn>::value ||
+                          is_map<TFn>::value)
+                return !(el.*member_).empty();
+            else
+                return false;
         }
 
 #pragma mark - prefix for member
         
-        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value ||
-                                                       is_container_of_containers<TFn>::value ||
-                                                       is_trivial_container<TFn>::value ||
-                                                       is_trivial_map<TFn>::value,class_descriptors_pair> _prefix() const
+        template<typename TFn> inline class_descriptors_pair _prefix() const
         {
-            return empty_descriptors_pair;
+            if constexpr (is_map<TFn>::value &&
+                          !is_trivial_map<TFn>::value &&
+                          !is_container_of_containers<TFn>::value)
+            {
+                using k_type = _t_trivial_member_descriptor<TStrategy, typename TMb::key_type>;
+                return class_descriptors_pair(typeid(typename TMb::key_type).hash_code(),
+                                              std::make_shared<k_type>(g_key_field_name,e_db_index_type::Basic));
+            }
+            else
+                return empty_descriptors_pair;
         }
-        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value &&
-                                                       !is_container<TFn>::value &&
-                                                       !is_map<TFn>::value,class_descriptors_pair> _prefix() const
-        {
-            return empty_descriptors_pair;
-        }
-        template<typename TFn> inline std::enable_if_t<!is_container_of_containers<TFn>::value &&
-                                                       is_container<TFn>::value &&
-                                                       !is_trivial_container<TFn>::value,class_descriptors_pair> _prefix() const
-        {
-            return empty_descriptors_pair;
-        }
-        template<typename TFn> inline std::enable_if_t<!is_container_of_containers<TFn>::value &&
-                                                       is_map<TFn>::value &&
-                                                       !is_trivial_map<TFn>::value,class_descriptors_pair> _prefix() const
-        {
-            using k_type = _t_trivial_member_descriptor<TStrategy, typename TMb::key_type>;
-            return class_descriptors_pair(typeid(typename TMb::key_type).hash_code(),
-                                          std::make_shared<k_type>(g_key_field_name,e_db_index_type::Basic));
-        }
-
+        
 #pragma mark - members by reference
         
         template<typename TFn> inline class_descriptors_container const& _members() const
