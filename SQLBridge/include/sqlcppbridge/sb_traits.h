@@ -43,6 +43,7 @@
 #include <typeinfo>
 #include <memory>
 #include <string>
+#include <optional>
 
 #include "sb_bytes_block.h"
 #include "sb_optional.h"
