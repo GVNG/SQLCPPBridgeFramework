@@ -141,42 +141,31 @@ namespace sql_bridge
 
 #pragma mark - members by reference
         
-        inline class_descriptors_container _join_desc() const
+        template<typename TFn> inline class_descriptors_container const& _members() const
         {
-            class_descriptors_container ret(description_->members());
-            ret.insert(ret.begin(), _prefix<TMb>().second);
-            return ret;
+            if constexpr (is_optional_or_trivial<TFn>::value ||
+                          is_container_of_containers<TFn>::value ||
+                          is_trivial_map<TFn>::value ||
+                          is_trivial_container<TFn>::value)
+            {
+                static const class_descriptors_container ret;
+                return ret;
+            }
+            else
+            if constexpr (is_container<TFn>::value)
+                return description_->members();
+            else
+            if constexpr (is_map<TFn>::value)
+            {
+                class_descriptors_container tmp(description_->members());
+                tmp.insert(tmp.begin(), _prefix<TMb>().second);
+                static const class_descriptors_container ret(tmp);
+                return ret;
+            }
+            else
+                return description_->members();
         }
-
-        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value ||
-                                                       is_container_of_containers<TFn>::value ||
-                                                       is_trivial_map<TFn>::value ||
-                                                       is_trivial_container<TFn>::value, class_descriptors_container const&> _members() const
-        {
-            static const class_descriptors_container ret;
-            return ret;
-        }
-        template<typename TFn> inline std::enable_if_t<is_container<TFn>::value &&
-                                                       !is_trivial_container<TFn>::value &&
-                                                       !is_container_of_containers<TFn>::value,class_descriptors_container const&> _members() const
-        {
-            return description_->members();
-        }
-        template<typename TFn> inline std::enable_if_t<is_map<TFn>::value &&
-                                                       !is_trivial_map<TFn>::value &&
-                                                       !is_container_of_containers<TFn>::value,class_descriptors_container const&> _members() const
-        {
-            static const class_descriptors_container ret(_join_desc());
-            return ret;
-        }
-        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value &&
-                                                       !is_container<TFn>::value &&
-                                                       !is_map<TFn>::value, class_descriptors_container const&> _members() const
-        {
-            return description_->members();
-        }
-
-
+        
 #pragma mark - sql types
         
         template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value,std::string const&> _sql_type() const
