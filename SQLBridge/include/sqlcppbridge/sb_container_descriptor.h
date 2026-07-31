@@ -83,75 +83,76 @@ namespace sql_bridge
         // methods
         
 #pragma mark - create members
-        
-        template<typename TFn> inline static std::enable_if_t<is_container<TFn>::value,class_descriptors_container> _create_members() {return _create_members_for_container<TFn>();}
-        template<typename TFn> inline static std::enable_if_t<is_any_map<TFn>::value,class_descriptors_container> _create_members() {return _create_members_for_map<TFn>();}
 
-        template<typename TFn> inline static std::enable_if_t<!is_trivial_container<TFn>::value &&
-                                                              is_pointer<typename TFn::value_type>::value,class_descriptors_container> _create_members_for_container()
+        template<typename TFn> inline static class_descriptors_container _create_members()
         {
-            using type = _t_link_member_descriptor<TStrategy, typename is_pointer<typename TFn::value_type>::type>;
-            class_descriptors_container ret = {std::make_shared<type>(),};
-            return ret;
-        }
-        
-        template<typename TFn> inline static std::enable_if_t<!is_trivial_container<TFn>::value && 
-                                                              !is_pointer<typename TFn::value_type>::value,class_descriptors_container> _create_members_for_container()
-        {
-            using type = _t_link_member_descriptor<TStrategy, typename TFn::value_type>;
-            class_descriptors_container ret = {std::make_shared<type>(),};
-            return ret;
-        }
-        
-        
-        template<typename TFn> inline static std::enable_if_t<is_trivial_container<TFn>::value,class_descriptors_container> _create_members_for_container()
-        {
-            using type = _t_trivial_member_descriptor<TStrategy, typename TFn::value_type>;
-            class_descriptors_container ret = {std::make_shared<type>(g_value_field_name),};
-            return ret;
+            if constexpr (is_container<TFn>::value)
+            {
+                if constexpr (is_trivial_container<TFn>::value)
+                {
+                    using type = _t_trivial_member_descriptor<TStrategy, typename TFn::value_type>;
+                    class_descriptors_container ret = {std::make_shared<type>(g_value_field_name),};
+                    return ret;
+                }
+                else
+                if constexpr (is_pointer<typename TFn::value_type>::value)
+                {
+                    using type = _t_link_member_descriptor<TStrategy, typename is_pointer<typename TFn::value_type>::type>;
+                    class_descriptors_container ret = {std::make_shared<type>(),};
+                    return ret;
+                }
+                else
+                {
+                    using type = _t_link_member_descriptor<TStrategy, typename TFn::value_type>;
+                    class_descriptors_container ret = {std::make_shared<type>(),};
+                    return ret;
+                }
+            }
+            else
+            if constexpr (is_any_map<TFn>::value)
+            {
+                if constexpr (is_trivial_map<TFn>::value)
+                {
+                    using k_type = _t_trivial_member_descriptor<TStrategy, typename TFn::key_type>;
+                    using m_type = _t_trivial_member_descriptor<TStrategy, typename TFn::mapped_type>;
+                    class_descriptors_container ret =
+                    {
+                        std::make_shared<k_type>(g_key_field_name,_index_type_for_map<TFn>()),
+                        std::make_shared<m_type>(g_value_field_name),
+                    };
+                    return ret;
+                }
+                else
+                if constexpr (is_pointer<typename TFn::mapped_type>::value)
+                {
+                    using k_type = _t_trivial_member_descriptor<TStrategy, typename TFn::key_type>;
+                    using m_type = _t_link_member_descriptor<TStrategy, typename is_pointer<typename TFn::mapped_type>::type>;
+                    class_descriptors_container ret =
+                    {
+                        std::make_shared<k_type>(g_key_field_name,_index_type_for_map<TFn>()),
+                        std::make_shared<m_type>(),
+                    };
+                    return ret;
+                }
+                else
+                {
+                    using k_type = _t_trivial_member_descriptor<TStrategy, typename TFn::key_type>;
+                    using m_type = _t_link_member_descriptor<TStrategy, typename TFn::mapped_type>;
+                    class_descriptors_container ret =
+                    {
+                        std::make_shared<k_type>(g_key_field_name,_index_type_for_map<TFn>()),
+                        std::make_shared<m_type>(),
+                    };
+                    return ret;
+                }
+            }
+            else
+                static_assert(false, "There is an unspecified routine for this container");
         }
 
         template<typename TFn> inline static std::enable_if_t<is_multimap<TFn>::value,e_db_index_type> _index_type_for_map() {return e_db_index_type::Basic;}
         template<typename TFn> inline static std::enable_if_t<!is_multimap<TFn>::value,e_db_index_type> _index_type_for_map() {return e_db_index_type::Unique;}
 
-        template<typename TFn> inline static std::enable_if_t<!is_trivial_map<TFn>::value &&
-                                                              is_pointer<typename TFn::mapped_type>::value,class_descriptors_container> _create_members_for_map()
-        {
-            using k_type = _t_trivial_member_descriptor<TStrategy, typename TFn::key_type>;
-            using m_type = _t_link_member_descriptor<TStrategy, typename is_pointer<typename TFn::mapped_type>::type>;
-            class_descriptors_container ret =
-            {
-                std::make_shared<k_type>(g_key_field_name,_index_type_for_map<TFn>()),
-                std::make_shared<m_type>(),
-            };
-            return ret;
-        }
-        
-        template<typename TFn> inline static std::enable_if_t<!is_trivial_map<TFn>::value &&
-                                                              !is_pointer<typename TFn::mapped_type>::value,class_descriptors_container> _create_members_for_map()
-        {
-            using k_type = _t_trivial_member_descriptor<TStrategy, typename TFn::key_type>;
-            using m_type = _t_link_member_descriptor<TStrategy, typename TFn::mapped_type>;
-            class_descriptors_container ret =
-            {
-                std::make_shared<k_type>(g_key_field_name,_index_type_for_map<TFn>()),
-                std::make_shared<m_type>(),
-            };
-            return ret;
-        }
-        
-        template<typename TFn> inline static std::enable_if_t<is_trivial_map<TFn>::value,class_descriptors_container> _create_members_for_map()
-        {
-            using k_type = _t_trivial_member_descriptor<TStrategy, typename TFn::key_type>;
-            using m_type = _t_trivial_member_descriptor<TStrategy, typename TFn::mapped_type>;
-            class_descriptors_container ret =
-            {
-                std::make_shared<k_type>(g_key_field_name,_index_type_for_map<TFn>()),
-                std::make_shared<m_type>(g_value_field_name),
-            };
-            return ret;
-        }
-        
 #pragma mark - bind
 
         template<typename TFn> inline void _bind_comp(TFn const& src,
@@ -272,7 +273,9 @@ namespace sql_bridge
         
 #pragma mark - read
 
-        template<typename TFn> inline void _read_comp(TFn& dst,data_update_context& cont,sql_value const& extkey)
+        template<typename TFn> inline void _read_comp(TFn& dst,
+                                                      data_update_context& cont,
+                                                      sql_value const& extkey)
         {
             if constexpr (is_kind_of_array<TFn>::value)
             {
