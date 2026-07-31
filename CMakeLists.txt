@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-set( project_version 1.1.25 )
+set( project_version 1.2 )
 set( project_description "SQL to C++ bridge written in modern C++" )
 set( project_homepage "https://github.com/GVNG/SQLCPPBridgeFramework" )
 
@@ -11,6 +11,9 @@ project ( SQLCppBridge
   DESCRIPTION  "${project_description}"
   HOMEPAGE_URL "${project_homepage}"
   LANGUAGES    C CXX )
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # possible options
 option ( BUILD_SHARED    "Build shared library instead of static" OFF )
