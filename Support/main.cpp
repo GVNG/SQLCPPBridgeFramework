@@ -79,6 +79,7 @@
 #include "example43.h"
 #include "example44.h"
 #include "example45.h"
+#include "example46.h"
 
 using t_db_storage = sql_bridge::local_storage<sql_bridge::sqlite_adapter>;
 using t_threads_container = std::array<std::thread, 10>;
@@ -152,7 +153,6 @@ int main(int argc, char** argv)
         t_db_storage storage("./DB");
      
 #if 1
-
         {
             std::cout << "Case KVDB ";
             time_tracker trk;
@@ -979,8 +979,29 @@ int main(int argc, char** argv)
             assert(src==dst);
             std::cout << "is ok. ";
         }
+        {
+            time_tracker trk;
+            sql_bridge::context cont(storage["case46"]);
+            Case46Container src,dst;
+            Case46Simple srcS,dstS;
+            std::cout << "Case 46 ";
+            for(int i=0; i<10; ++i)
+                src.insert({{sql_bridge::to_string() << "a" << i,sql_bridge::to_string() << "b" << i},Case46(i)});
+            for(int i=0; i<100; ++i)
+                srcS.insert({{sql_bridge::to_string() << "a" << i,sql_bridge::to_string() << "b" << i},sql_bridge::to_string() << "c" << i});
+            cont.replace(src);
+            cont.load(dst);
+            assert(src==dst);
+            cont.replace(srcS);
+            cont.load(dstS);
+            assert(srcS==dstS);
+            std::cout << "is ok. ";
+        }
 #endif
-
+        
+        
+        
+        
 #if 0 // recursion
         {
             time_tracker trk;

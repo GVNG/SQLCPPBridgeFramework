@@ -111,9 +111,39 @@ namespace sql_bridge
             else
             if constexpr (is_any_map<TFn>::value)
             {
+                using k_src_type = typename TFn::key_type;
+                using vk_type = _t_trivial_member_descriptor<TStrategy, int64_t>;
+                if constexpr (!is_sql_acceptable<k_src_type>::value)
+                {
+                    using k_type = _t_link_member_descriptor<TStrategy, k_src_type>;
+                    using m_src_type = typename TFn::mapped_type;
+                    if constexpr (is_sql_acceptable<m_src_type>::value)
+                    {
+                        using m_type = _t_trivial_member_descriptor<TStrategy, m_src_type>;
+                        class_descriptors_container ret =
+                        {
+                            std::make_shared<vk_type>(g_key_field_name,_index_type_for_map<TFn>()),
+                            std::make_shared<k_type>(),
+                            std::make_shared<m_type>(g_value_field_name),
+                        };
+                        return ret;
+                    }
+                    else
+                    {
+                        using m_type = _t_link_member_descriptor<TStrategy, m_src_type>;
+                        class_descriptors_container ret =
+                        {
+                            std::make_shared<vk_type>(g_key_field_name,_index_type_for_map<TFn>()),
+                            std::make_shared<k_type>(),
+                            std::make_shared<m_type>(),
+                        };
+                        return ret;
+                    }
+                }
+                else
                 if constexpr (is_trivial_map<TFn>::value)
                 {
-                    using k_type = _t_trivial_member_descriptor<TStrategy, typename TFn::key_type>;
+                    using k_type = _t_trivial_member_descriptor<TStrategy, k_src_type>;
                     using m_type = _t_trivial_member_descriptor<TStrategy, typename TFn::mapped_type>;
                     class_descriptors_container ret =
                     {
@@ -125,7 +155,7 @@ namespace sql_bridge
                 else
                 if constexpr (is_pointer<typename TFn::mapped_type>::value)
                 {
-                    using k_type = _t_trivial_member_descriptor<TStrategy, typename TFn::key_type>;
+                    using k_type = _t_trivial_member_descriptor<TStrategy, k_src_type>;
                     using m_type = _t_link_member_descriptor<TStrategy, typename is_pointer<typename TFn::mapped_type>::type>;
                     class_descriptors_container ret =
                     {
@@ -136,7 +166,7 @@ namespace sql_bridge
                 }
                 else
                 {
-                    using k_type = _t_trivial_member_descriptor<TStrategy, typename TFn::key_type>;
+                    using k_type = _t_trivial_member_descriptor<TStrategy, k_src_type>;
                     using m_type = _t_link_member_descriptor<TStrategy, typename TFn::mapped_type>;
                     class_descriptors_container ret =
                     {
@@ -150,8 +180,17 @@ namespace sql_bridge
                 static_assert(false, "There is an unspecified routine for this container");
         }
 
-        template<typename TFn> inline static std::enable_if_t<is_multimap<TFn>::value,e_db_index_type> _index_type_for_map() {return e_db_index_type::Basic;}
-        template<typename TFn> inline static std::enable_if_t<!is_multimap<TFn>::value,e_db_index_type> _index_type_for_map() {return e_db_index_type::Unique;}
+        template<typename TFn> inline static e_db_index_type _index_type_for_map()
+        {
+            using k_type = typename TFn::key_type;
+            if constexpr (is_multimap<TFn>::value)
+                return e_db_index_type::Basic;
+            else
+            if constexpr (is_sql_acceptable<k_type>::value)
+                return e_db_index_type::Unique;
+            else
+                return e_db_index_type::PrimaryKey;
+        }
 
 #pragma mark - bind
 
@@ -234,38 +273,77 @@ namespace sql_bridge
                     }
                 }
                 else
-                if constexpr (is_pointer<typename TFn::mapped_type>::value)
+                if constexpr (is_sql_acceptable<typename TFn::key_type>::value)
                 {
-                    size_t tid = typeid(typename is_pointer<typename TFn::mapped_type>::type).hash_code();
-                    std::string const& refname(cont.forward_ref());
-                    for(auto const& v : src)
+                    if constexpr (is_pointer<typename TFn::mapped_type>::value)
                     {
-                        cont.add(sql_value(v.first));
-                        if (!extkey.empty())
-                            cont.add(extkey);
-                        cont.next(&v);
-                        sql_value extid = cont.id_for_members(&v);
-                        if (extid.empty())
-                            throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
-                        data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
-                        ncnt->bind_comp(&(*v.second), extid);
+                        size_t tid = typeid(typename is_pointer<typename TFn::mapped_type>::type).hash_code();
+                        std::string const& refname(cont.forward_ref());
+                        for(auto const& v : src)
+                        {
+                            cont.add(sql_value(v.first));
+                            if (!extkey.empty())
+                                cont.add(extkey);
+                            cont.next(&v);
+                            sql_value extid = cont.id_for_members(&v);
+                            if (extid.empty())
+                                throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
+                            data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
+                            ncnt->bind_comp(&(*v.second), extid);
+                        }
+                    }
+                    else
+                    {
+                        size_t tid = typeid(typename TFn::mapped_type).hash_code();
+                        std::string const& refname(cont.forward_ref());
+                        for(auto const& v : src)
+                        {
+                            cont.add(sql_value(v.first));
+                            if (!extkey.empty())
+                                cont.add(extkey);
+                            cont.next(&v);
+                            sql_value extid = cont.id_for_members(&v);
+                            if (extid.empty())
+                                throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
+                            data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
+                            ncnt->bind_comp(&v.second, extid);
+                        }
                     }
                 }
                 else
                 {
-                    size_t tid = typeid(typename TFn::mapped_type).hash_code();
-                    std::string const& refname(cont.forward_ref());
-                    for(auto const& v : src)
+                    size_t fsid = typeid(typename TFn::key_type).hash_code();
+                    if constexpr (is_sql_acceptable<typename TFn::mapped_type>::value)
                     {
-                        cont.add(sql_value(v.first));
-                        if (!extkey.empty())
-                            cont.add(extkey);
-                        cont.next(&v);
-                        sql_value extid = cont.id_for_members(&v);
-                        if (extid.empty())
-                            throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
-                        data_update_context_ptr ncnt(cont.context_for_member(tid, extid, refname, range()));
-                        ncnt->bind_comp(&v.second, extid);
+                        for(auto const& v : src)
+                        {
+                            cont.add(sql_value(v.second));
+                            if (!extkey.empty())
+                                cont.add(extkey);
+                            cont.next(&v);
+                            sql_value extid = cont.id_for_members(&v);
+                            if (extid.empty())
+                                throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the forward link", "You should configure any type of index at least at one field in the definition of table");
+                            data_update_context_ptr fccnt(cont.context_for_member(fsid, extid, cont.forward_ref(), range()));
+                            fccnt->bind_comp(&v.first, extid);
+                        }
+                    }
+                    else
+                    {
+                        size_t scid = typeid(typename TFn::mapped_type).hash_code();
+                        for(auto const& v : src)
+                        {
+                            if (!extkey.empty())
+                                cont.add(extkey);
+                            cont.next(&v);
+                            sql_value extid = cont.id_for_members(&v);
+                            if (extid.empty())
+                                throw sql_bridge_error(to_string() << "Table: " << table_name() << ". The undefined field for the forward link", "You should configure any type of index at least at one field in the definition of table");
+                            data_update_context_ptr fccnt(cont.context_for_member(fsid, extid, cont.forward_ref(), range()));
+                            data_update_context_ptr sccnt(cont.context_for_member(scid, extid, cont.forward_ref_alt(), range()));
+                            fccnt->bind_comp(&v.first, extid);
+                            sccnt->bind_comp(&v.second, extid);
+                        }
                     }
                 }
             }
@@ -361,9 +439,47 @@ namespace sql_bridge
             else
             if constexpr (is_map<TFn>::value)
             {
+                using k_type = typename TFn::key_type;
+                if constexpr (!is_sql_acceptable<k_type>::value)
+                {
+                    using m_type = typename TFn::mapped_type;
+                    size_t ktid = typeid(k_type).hash_code();
+                    if constexpr (is_sql_acceptable<m_type>::value)
+                    {
+                        std::string const& refname(cont.forward_ref());
+                        sql_value key((int64_t(0))),dat((m_type()));
+                        while(cont.is_ok())
+                        {
+                            cont.read(key);
+                            cont.read(dat);
+                            cont.next(nullptr);
+                            data_update_context_ptr ncnt(cont.context_for_member(ktid, key, refname, range()));
+                            k_type mapkey;
+                            ncnt->read_comp(&mapkey, key);
+                            dst.insert({std::move(mapkey),dat.value<m_type>()});
+                        }
+                    }
+                    else
+                    {
+                        size_t vltid = typeid(m_type).hash_code();
+                        sql_value key((int64_t(0)));
+                        while(cont.is_ok())
+                        {
+                            cont.read(key);
+                            cont.next(nullptr);
+                            data_update_context_ptr fdcnt(cont.context_for_member(ktid, key, cont.forward_ref(), range()));
+                            data_update_context_ptr sdcnt(cont.context_for_member(vltid, key, cont.forward_ref_alt(), range()));
+                            k_type mapkey;
+                            m_type mapdat;
+                            fdcnt->read_comp(&mapkey, key);
+                            sdcnt->read_comp(&mapdat, key);
+                            dst.insert({std::move(mapkey),std::move(mapdat)});
+                        }
+                    }
+                }
+                else
                 if constexpr (is_pointer<typename TFn::mapped_type>::value)
                 {
-                    using k_type = typename TFn::key_type;
                     using m_type = typename is_pointer<typename TFn::mapped_type>::type;
                     using obj_type = std::conditional_t<std::is_pointer<typename TFn::mapped_type>::value, std::unique_ptr<m_type>, typename TFn::mapped_type>;
                     sql_value key((k_type()));
@@ -384,7 +500,6 @@ namespace sql_bridge
                 }
                 else
                 {
-                    using k_type = typename TFn::key_type;
                     using m_type = typename TFn::mapped_type;
                     sql_value key((k_type()));
                     size_t tid = typeid(m_type).hash_code();

@@ -502,175 +502,165 @@ namespace sql_bridge
         
 #pragma mark - load page
 
-        template<typename T> inline std::enable_if_t<!is_pointer<T>::value &&
-                                                     !is_container<T>::value &&
-                                                     !is_any_map<T>::value> _load_page(range pgsz, T& dst, std::string const& flt, size_t& num)
+        template<typename T> inline void _load_page(range pgsz, T& dst, std::string const& flt, size_t& num)
         {
-            size_t tid = typeid(T).hash_code();
-            data_update_context_ptr cont(create_reader(tid, flt, pgsz));
-            cont->read(&dst);
-            num = cont->read_counter();
+            if constexpr (is_pointer<T>::value)
+            {
+                size_t tid = types_selector<T>::destination_id();
+                data_update_context_ptr cont(create_reader(tid, flt, pgsz));
+                cont->read(&(*dst));
+                num = cont->read_counter();
+            }
+            else
+            if constexpr (is_trivial_container<T>::value ||
+                          is_trivial_map<T>::value ||
+                          is_container_of_containers<T>::value)
+            {
+                size_t tid = typeid(T).hash_code();
+                data_update_context_ptr cont(create_reader(tid, flt, range()));
+                cont->read(&dst);
+                num = cont->read_counter();
+            }
+            else
+            if constexpr (is_container<T>::value)
+            {
+                if constexpr (is_pointer<typename T::value_type>::value)
+                {
+                    if (descriptor_->has_description<T>())
+                    {
+                        size_t tid = typeid(T).hash_code();
+                        data_update_context_ptr cont(create_reader(tid, flt, pgsz));
+                        cont->read(&dst);
+                        num = cont->read_counter();
+                    }
+                    else
+                    {
+                        using type = typename is_pointer<typename T::value_type>::type;
+                        size_t tid = types_selector<T>::destination_id();
+                        using obj_type = std::conditional_t<std::is_pointer<typename T::value_type>::value, std::unique_ptr<type>, typename T::value_type>;
+                        data_update_context_ptr cont(create_reader(tid, flt, pgsz));
+                        dst.clear();
+                        while(cont->is_ok())
+                        {
+                            obj_type val(_allocate_object<typename T::value_type>());
+                            cont->read(&(*val));
+                            add_to_container(dst, std::move(val));
+                        }
+                        num = cont->read_counter();
+                    }
+                }
+                else
+                {
+                    if (descriptor_->has_description<T>())
+                    {
+                        size_t tid = typeid(T).hash_code();
+                        data_update_context_ptr cont(create_reader(tid, flt, pgsz));
+                        cont->read(&dst);
+                        num = cont->read_counter();
+                    }
+                    else
+                    {
+                        using type = typename T::value_type;
+                        size_t tid = types_selector<T>::destination_id();
+                        data_update_context_ptr cont(create_reader(tid, flt, pgsz));
+                        dst.clear();
+                        while(cont->is_ok())
+                        {
+                            type val;
+                            cont->read(&val);
+                            add_to_container(dst, std::move(val));
+                        }
+                        num = cont->read_counter();
+                    }
+                }
+
+            }
+            else
+            if constexpr (is_any_map<T>::value)
+            {
+                if constexpr (!is_sql_acceptable<typename T::key_type>::value)
+                {
+                    if (descriptor_->has_description<T>())
+                    {
+                        size_t tid = typeid(T).hash_code();
+                        data_update_context_ptr cont(create_reader(tid, flt, pgsz));
+                        cont->read(&dst);
+                    }
+                    else
+                        throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
+                }
+                else
+                if constexpr (is_pointer<typename T::mapped_type>::value)
+                {
+                    if (descriptor_->has_description<T>())
+                    {
+                        size_t tid = typeid(T).hash_code();
+                        data_update_context_ptr cont(create_reader(tid, flt, pgsz));
+                        cont->read(&dst);
+                        num = cont->read_counter();
+                    }
+                    else
+                    {
+                        using k_type = typename T::key_type;
+                        using m_type = typename T::mapped_type;
+                        using obj_type = std::conditional_t<std::is_pointer<typename T::mapped_type>::value, std::unique_ptr<typename is_pointer<m_type>::type>, typename T::mapped_type>;
+                        size_t tid = types_selector<T>::destination_id();
+                        data_update_context_ptr cont(create_reader(tid, flt, pgsz));
+                        dst.clear();
+                        while(cont->is_ok())
+                        {
+                            obj_type val(_allocate_object<m_type>());
+                            cont->read(&(*val));
+                            sql_value key = cont->id_for_members(&(*val));
+                            if (key.empty())
+                                throw sql_bridge_error(to_string() << "Section: " << descriptor_->section_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
+                            add_to_map(dst,key.value<k_type>(),std::move(val));
+                        }
+                        num = cont->read_counter();
+                    }
+                }
+                else
+                {
+                    if (descriptor_->has_description<T>())
+                    {
+                        size_t tid = typeid(T).hash_code();
+                        data_update_context_ptr cont(create_reader(tid, flt, pgsz));
+                        cont->read(&dst);
+                    }
+                    else
+                    {
+                        using k_type = typename T::key_type;
+                        using m_type = typename T::mapped_type;
+                        size_t tid = typeid(m_type).hash_code();
+                        data_update_context_ptr cont(create_reader(tid, flt, pgsz));
+                        m_type val;
+                        dst.clear();
+                        while(cont->is_ok())
+                        {
+                            cont->read(&val);
+                            sql_value key = cont->id_for_members(&val);
+                            if (key.empty())
+                                throw sql_bridge_error(to_string() << "Section: " << descriptor_->section_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
+                            add_to_map(dst,key.value<k_type>(),std::move(val));
+                        }
+                        num = cont->read_counter();
+                    }
+                }
+            }
+            else
+            {
+                size_t tid = typeid(T).hash_code();
+                data_update_context_ptr cont(create_reader(tid, flt, pgsz));
+                cont->read(&dst);
+                num = cont->read_counter();
+            }
         }
-        
-        template<typename T> inline std::enable_if_t<is_pointer<T>::value> _load_page(range pgsz, T& dst, std::string const& flt, size_t& num)
-        {
-            size_t tid = types_selector<T>::destination_id();
-            data_update_context_ptr cont(create_reader(tid, flt, pgsz));
-            cont->read(&(*dst));
-            num = cont->read_counter();
-        }
-        template<typename T> inline std::enable_if_t<is_trivial_container<T>::value ||
-                                                     is_trivial_map<T>::value ||
-                                                     is_container_of_containers<T>::value> _load_page(range, T&, std::string const&, size_t&)
-        {
-            throw sql_bridge_error(g_internal_error_text, g_architecture_error_text);
-        }
-        
-        template<typename T> inline std::enable_if_t<is_container<T>::value &&
-                                                     !is_trivial_container<T>::value &&
-                                                     !is_container_of_containers<T>::value> _load_page(range pgsz, T& dst, std::string const& flt, size_t& num){_load_cont<T>(dst,flt,pgsz,num);}
-        template<typename T> inline std::enable_if_t<is_any_map<T>::value &&
-                                                     !is_trivial_map<T>::value &&
-                                                     !is_container_of_containers<T>::value> _load_page(range pgsz, T& dst, std::string const& flt, size_t& num){_load_map<T>(dst,flt,pgsz,num);}
 
 #pragma mark - load
 
-        template<typename T> inline std::enable_if_t<is_pointer<T>::value> _load(T& dst, std::string const& flt, size_t& num)
+        template<typename T> inline void _load(T& dst, std::string const& flt, size_t& num)
         {
-            size_t tid = types_selector<T>::destination_id();
-            data_update_context_ptr cont(create_reader(tid, flt, range()));
-            cont->read(&(*dst));
-            num = cont->read_counter();
-        }
-        template<typename T> inline std::enable_if_t<!is_pointer<T>::value &&
-                                                     !is_container<T>::value &&
-                                                     !is_any_map<T>::value> _load(T& dst, std::string const& flt, size_t& num)
-        {
-            size_t tid = typeid(T).hash_code();
-            data_update_context_ptr cont(create_reader(tid, flt, range()));
-            cont->read(&dst);
-            num = cont->read_counter();
-        }
-        template<typename T> inline std::enable_if_t<is_trivial_container<T>::value ||
-                                                     is_trivial_map<T>::value ||
-                                                     is_container_of_containers<T>::value> _load(T& dst, std::string const& flt, size_t& num)
-        {
-            size_t tid = typeid(T).hash_code();
-            data_update_context_ptr cont(create_reader(tid, flt, range()));
-            cont->read(&dst);
-            num = cont->read_counter();
-        }
-        template<typename T> inline std::enable_if_t<is_container<T>::value &&
-                                                     !is_trivial_container<T>::value &&
-                                                     !is_container_of_containers<T>::value> _load(T& dst, std::string const& flt, size_t& num){_load_cont(dst,flt,range(),num);}
-        template<typename T> inline std::enable_if_t<is_any_map<T>::value &&
-                                                     !is_trivial_map<T>::value &&
-                                                     !is_container_of_containers<T>::value> _load(T& dst, std::string const& flt, size_t& num){_load_map<T>(dst,flt,range(),num);}
-
-        template<typename T> inline std::enable_if_t<is_pointer<typename T::value_type>::value> _load_cont(T& dst, std::string const& flt, range const& pgsz, size_t& num)
-        {
-            if (descriptor_->has_description<T>())
-            {
-                size_t tid = typeid(T).hash_code();
-                data_update_context_ptr cont(create_reader(tid, flt, pgsz));
-                cont->read(&dst);
-                num = cont->read_counter();
-            }
-            else
-            {
-                using type = typename is_pointer<typename T::value_type>::type;
-                size_t tid = types_selector<T>::destination_id();
-                using obj_type = std::conditional_t<std::is_pointer<typename T::value_type>::value, std::unique_ptr<type>, typename T::value_type>;
-                data_update_context_ptr cont(create_reader(tid, flt, pgsz));
-                dst.clear();
-                while(cont->is_ok())
-                {
-                    obj_type val(_allocate_object<typename T::value_type>());
-                    cont->read(&(*val));
-                    add_to_container(dst, std::move(val));
-                }
-                num = cont->read_counter();
-            }
-        }
-        template<typename T> inline std::enable_if_t<!is_pointer<typename T::value_type>::value> _load_cont(T& dst, std::string const& flt, range const& pgsz, size_t& num)
-        {
-            if (descriptor_->has_description<T>())
-            {
-                size_t tid = typeid(T).hash_code();
-                data_update_context_ptr cont(create_reader(tid, flt, pgsz));
-                cont->read(&dst);
-                num = cont->read_counter();
-            }
-            else
-            {
-                using type = typename T::value_type;
-                size_t tid = types_selector<T>::destination_id();
-                data_update_context_ptr cont(create_reader(tid, flt, pgsz));
-                dst.clear();
-                while(cont->is_ok())
-                {
-                    type val;
-                    cont->read(&val);
-                    add_to_container(dst, std::move(val));
-                }
-                num = cont->read_counter();
-            }
-        }
-        template<typename T> inline std::enable_if_t<is_pointer<typename T::mapped_type>::value> _load_map(T& dst, std::string const& flt, range const& pgsz, size_t& num)
-        {
-            if (descriptor_->has_description<T>())
-            {
-                size_t tid = typeid(T).hash_code();
-                data_update_context_ptr cont(create_reader(tid, flt, pgsz));
-                cont->read(&dst);
-                num = cont->read_counter();
-            }
-            else
-            {
-                using k_type = typename T::key_type;
-                using m_type = typename T::mapped_type;
-                using obj_type = std::conditional_t<std::is_pointer<typename T::mapped_type>::value, std::unique_ptr<typename is_pointer<m_type>::type>, typename T::mapped_type>;
-                size_t tid = types_selector<T>::destination_id();
-                data_update_context_ptr cont(create_reader(tid, flt, pgsz));
-                dst.clear();
-                while(cont->is_ok())
-                {
-                    obj_type val(_allocate_object<m_type>());
-                    cont->read(&(*val));
-                    sql_value key = cont->id_for_members(&(*val));
-                    if (key.empty())
-                        throw sql_bridge_error(to_string() << "Section: " << descriptor_->section_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
-                    add_to_map(dst,key.value<k_type>(),std::move(val));
-                }
-                num = cont->read_counter();
-            }
-        }
-        template<typename T> inline std::enable_if_t<!is_pointer<typename T::mapped_type>::value> _load_map(T& dst, std::string const& flt, range const& pgsz, size_t& num)
-        {
-            if (descriptor_->has_description<T>())
-            {
-                size_t tid = typeid(T).hash_code();
-                data_update_context_ptr cont(create_reader(tid, flt, pgsz));
-                cont->read(&dst);
-            }
-            else
-            {
-                using k_type = typename T::key_type;
-                using m_type = typename T::mapped_type;
-                size_t tid = typeid(m_type).hash_code();
-                data_update_context_ptr cont(create_reader(tid, flt, pgsz));
-                m_type val;
-                dst.clear();
-                while(cont->is_ok())
-                {
-                    cont->read(&val);
-                    sql_value key = cont->id_for_members(&val);
-                    if (key.empty())
-                        throw sql_bridge_error(to_string() << "Section: " << descriptor_->section_name() << ". The undefined field for the key", "You should configure any type of index at least at one field in the definition of table");
-                    add_to_map(dst,key.value<k_type>(),std::move(val));
-                }
-                num = cont->read_counter();
-            }
+            _load_page(range(), dst, flt, num);
         }
         
 #pragma mark - add to container

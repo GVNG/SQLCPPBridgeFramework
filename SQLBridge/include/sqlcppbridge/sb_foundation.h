@@ -198,6 +198,7 @@ namespace sql_bridge
         inline void remove_at(void const* dat,void const* root,sql_value const& extid) {descriptor_->remove_at(dat, root, *this, extid);}
         inline void remove_inheritance(size_t tid,void const* root,sql_value const& extid) {descriptor_->remove_inheritance(tid, root, *this, extid);}
         inline std::string const& forward_ref() const {return link_.target().front().ref_field_name();}
+        inline std::string const& forward_ref_alt() const {return link_.target().back().ref_field_name();}
         inline std::string const& table_name() const {return link_.table_name();}
         inline range const& page() const {return page_;}
         inline bool use_pages() const {return !page_.empty();}
