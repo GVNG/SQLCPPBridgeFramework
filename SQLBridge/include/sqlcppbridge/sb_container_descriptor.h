@@ -453,6 +453,8 @@ namespace sql_bridge
                             cont.read(key);
                             cont.read(dat);
                             cont.next(nullptr);
+                            sql_value extid = cont.id_for_read_members(&dst);
+                            if (!extid.empty()) key = extid;
                             data_update_context_ptr ncnt(cont.context_for_member(ktid, key, refname, range()));
                             k_type mapkey;
                             ncnt->read_comp(&mapkey, key);
@@ -467,6 +469,8 @@ namespace sql_bridge
                         {
                             cont.read(key);
                             cont.next(nullptr);
+                            sql_value extid = cont.id_for_read_members(&dst);
+                            if (!extid.empty()) key = extid;
                             data_update_context_ptr fdcnt(cont.context_for_member(ktid, key, cont.forward_ref(), range()));
                             data_update_context_ptr sdcnt(cont.context_for_member(vltid, key, cont.forward_ref_alt(), range()));
                             k_type mapkey;

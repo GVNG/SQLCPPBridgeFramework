@@ -35,15 +35,9 @@ TEST_F(DBFixture, Case46)
 {
     sql_bridge::context cont(storage()["case46"]);
     Case46Container dst,src;
-    Case46Simple dstS,srcS;
-    for(int i=0; i<10; ++i)
+    for(int i=1; i<10; ++i)
         src.insert({{sql_bridge::to_string() << "a" << i,sql_bridge::to_string() << "b" << i},Case46(i)});
-    for(int i=0; i<100; ++i)
-        srcS.insert({{sql_bridge::to_string() << "a" << i,sql_bridge::to_string() << "b" << i},sql_bridge::to_string() << "c" << i});
     cont.save(src);
     cont.load(dst);
     ASSERT_EQ(src,dst);
-    cont.save(srcS);
-    cont.load(dstS);
-    ASSERT_EQ(srcS,dstS);
 }

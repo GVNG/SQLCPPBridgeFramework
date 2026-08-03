@@ -983,22 +983,16 @@ int main(int argc, char** argv)
             time_tracker trk;
             sql_bridge::context cont(storage["case46"]);
             Case46Container src,dst;
-            Case46Simple srcS,dstS;
             std::cout << "Case 46 ";
-            for(int i=0; i<10; ++i)
+            for(int i=1; i<10; ++i)
                 src.insert({{sql_bridge::to_string() << "a" << i,sql_bridge::to_string() << "b" << i},Case46(i)});
-            for(int i=0; i<100; ++i)
-                srcS.insert({{sql_bridge::to_string() << "a" << i,sql_bridge::to_string() << "b" << i},sql_bridge::to_string() << "c" << i});
             cont.replace(src);
             cont.load(dst);
             assert(src==dst);
-            cont.replace(srcS);
-            cont.load(dstS);
-            assert(srcS==dstS);
             std::cout << "is ok. ";
         }
 #endif
-        
+
         
         
         

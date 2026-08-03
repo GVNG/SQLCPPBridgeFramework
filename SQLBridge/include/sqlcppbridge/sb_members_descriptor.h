@@ -414,6 +414,11 @@ namespace sql_bridge
                         ncnt->read_comp(&(dst.*member_), extkey);
                     }
                     else
+                    if constexpr (!is_sql_acceptable<typename TFn::key_type>::value)
+                    {
+                        
+                    }
+                    else
                     if constexpr (is_pointer<typename TFn::mapped_type>::value)
                     {
                         using k_type = typename TFn::key_type;

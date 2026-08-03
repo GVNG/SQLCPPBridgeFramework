@@ -42,6 +42,7 @@ DEFINE_SQL_TABLE(keys,Case46Key)
 DEFINE_SQL_TABLE(elem,Case46)
 {
     bind("dat",                  &Case46::eid_),
+    bind("smpl",                 &Case46::simple_),
 };
 
 DEFINE_SQL_DATABASE(case46,1,Case46Container,Case46Simple,Case46Key,Case46)::upgrade_structure(size_t from, size_t to)

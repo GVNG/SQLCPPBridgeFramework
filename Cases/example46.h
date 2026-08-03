@@ -46,13 +46,17 @@ public:
     Case46(std::size_t i = 0)
         : eid_(i)
     {
+        if (!i) return;
+        for(std::size_t j=0; j!=100; j++)
+            simple_.insert({{sql_bridge::to_string() << "a" << j,sql_bridge::to_string() << "b" << j},sql_bridge::to_string() << "c" << j*i});
     }
     inline bool operator == (Case46 const& rv) const
     {
-        return  eid_==rv.eid_;
+        return  eid_==rv.eid_ && simple_==rv.simple_;
     }
 private:
     std::size_t eid_;
+    Case46Simple simple_;
 };
 
 #endif // !example46_h
