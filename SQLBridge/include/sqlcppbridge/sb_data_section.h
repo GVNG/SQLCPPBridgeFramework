@@ -819,6 +819,38 @@ namespace sql_bridge
                         dst = sql_value(v);
                     }
                     break;
+                case sql_value::e_key_type::empty:
+                    {
+                        if (reader_.is_text())
+                        {
+                            std::string v;
+                            reader_.read_value(v);
+                            dst = sql_value(v);
+                            break;
+                        }
+                        if (reader_.is_integer())
+                        {
+                            int64_t v;
+                            reader_.read_value(v);
+                            dst = sql_value(v);
+                            break;
+                        }
+                        if (reader_.is_float())
+                        {
+                            double v;
+                            reader_.read_value(v);
+                            dst = sql_value(v);
+                            break;
+                        }
+                        if (reader_.is_blob())
+                        {
+                            bytes_block v;
+                            reader_.read_value(v);
+                            dst = sql_value(v);
+                            break;
+                        }
+                    }
+                    break;
                 default:
                     throw sql_bridge_error(to_string() << "Table: " << table_name() <<". " << g_internal_error_text, g_architecture_error_text);
             }

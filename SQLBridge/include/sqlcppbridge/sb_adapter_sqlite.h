@@ -225,6 +225,10 @@ namespace sql_bridge
             bool next();
             inline bool is_valid() {postponed_init();return valid_;}
             inline bool is_null() {postponed_init();bool ret = sqlite3_column_type(statement_, fld_num_)==SQLITE_NULL; if (ret) fld_num_++; return ret;}
+            inline bool is_text() {postponed_init();return sqlite3_column_type(statement_, fld_num_)==SQLITE_TEXT;}
+            inline bool is_integer() {postponed_init();return sqlite3_column_type(statement_, fld_num_)==SQLITE_INTEGER;}
+            inline bool is_float() {postponed_init();return sqlite3_column_type(statement_, fld_num_)==SQLITE_FLOAT;}
+            inline bool is_blob() {postponed_init();return sqlite3_column_type(statement_, fld_num_)==SQLITE_BLOB;}
             template<typename T> inline std::enable_if_t<is_convertible_to_float<T>::value> read_value(T& v) {postponed_init();v=static_cast<T>(sqlite3_column_double(statement_, fld_num_++));}
             template<typename T> inline std::enable_if_t<is_convertible_to_text<T>::value> read_value(T& v) {postponed_init();v=reinterpret_cast<const char*>(sqlite3_column_text(statement_, fld_num_++));}
             template<typename T> inline std::enable_if_t<is_convertible_to_int<T>::value> read_value(T& v) {postponed_init();v=static_cast<T>(sqlite3_column_int64(statement_, fld_num_++));}

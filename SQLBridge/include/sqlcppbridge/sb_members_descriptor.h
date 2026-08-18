@@ -510,7 +510,7 @@ namespace sql_bridge
                 else
                 if constexpr (is_kind_of_optional<TFn>::value)
                 {
-                    sql_value vr((dst.*member_).value());
+                    sql_value vr(dst.*member_);
                     cont.read(vr);
                     if (vr.empty())
                         dst.*member_ = TMb();
