@@ -677,41 +677,37 @@ namespace sql_bridge
 
 #pragma mark - remove
 
-        template<typename T> inline std::enable_if_t<is_pointer<T>::value> _remove(T const& src)
+        template<typename T> inline void _remove(T const& src)
         {
-            size_t tid = types_selector<T>::destination_id();
-            data_update_context_ptr cont(create_context(tid,"",range()));
-            cont->remove_if_possible(&(*src));
+            if constexpr (is_pointer<T>::value)
+            {
+                size_t tid = types_selector<T>::destination_id();
+                data_update_context_ptr cont(create_context(tid,"",range()));
+                cont->remove_if_possible(&(*src));
+            }
+            else
+            if constexpr (is_container<T>::value)
+            {
+                using _type = typename T::value_type;
+                size_t tid = types_selector<T>::destination_id();
+                data_update_context_ptr cont(create_context(tid,"",range()));
+                if constexpr (is_pointer<_type>::value)
+                {
+                    for(auto const& el : src) cont->remove_if_possible(&(*el));
+                }
+                else
+                {
+                    for(auto const& el : src) cont->remove_if_possible(&el);
+                }
+            }
+            else
+            {
+                size_t tid = typeid(T).hash_code();
+                data_update_context_ptr cont(create_context(tid,"",range()));
+                cont->remove_if_possible(&src);
+            }
         }
-        template<typename T> inline std::enable_if_t<!is_pointer<T>::value &&
-                                                     !is_container<T>::value &&
-                                                     !is_any_map<T>::value> _remove(T const& src)
-        {
-            size_t tid = typeid(T).hash_code();
-            data_update_context_ptr cont(create_context(tid,"",range()));
-            cont->remove_if_possible(&src);
-        }
-
-        template<typename T> inline std::enable_if_t<is_container<T>::value &&
-                                                     !is_trivial_container<T>::value &&
-                                                     !is_container_of_containers<T>::value> _remove(T const& src) {_remove_cont<T>(src);}
-
-        template<typename T> inline std::enable_if_t<is_pointer<typename T::value_type>::value> _remove_cont(T const& src)
-        {
-            size_t tid = types_selector<T>::destination_id();
-            data_update_context_ptr cont(create_context(tid,"",range()));
-            for(auto const& el : src)
-                cont->remove_if_possible(&(*el));
-        }
-
-        template<typename T> inline std::enable_if_t<!is_pointer<typename T::value_type>::value> _remove_cont(T const& src)
-        {
-            size_t tid = types_selector<T>::destination_id();
-            data_update_context_ptr cont(create_context(tid,"",range()));
-            for(auto const& el : src)
-                cont->remove_if_possible(&el);
-        }
-
+        
 #pragma mark - remove_by_key
         
         template<typename T> inline std::enable_if_t<is_any_map<T>::value> _remove_by_key(typename T::key_type const& val)
