@@ -501,13 +501,6 @@ namespace sql_bridge
         {
             if constexpr (is_optional_or_trivial<TFn>::value)
             {
-                if constexpr (is_sql_acceptable<TFn>::value)
-                {
-                    sql_value vr(dst.*member_);
-                    cont.read(vr);
-                    dst.*member_ = vr.value<TMb>();
-                }
-                else
                 if constexpr (is_kind_of_optional<TFn>::value)
                 {
                     sql_value vr(dst.*member_);
@@ -518,25 +511,38 @@ namespace sql_bridge
                         dst.*member_ = vr.value<typename TMb::value_type>();
                 }
                 else
+                if constexpr (is_sql_acceptable<TFn>::value)
+                {
+                    sql_value vr(dst.*member_);
+                    cont.read(vr);
+                    dst.*member_ = vr.value<TMb>();
+                }
+                else
                     static_assert(false, "There is unspecified routine for trivial values");
             }
         }
-        
-        template<typename TFn> inline std::enable_if_t<is_optional_or_trivial<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const&) {}
-        template<typename TFn> inline std::enable_if_t<!is_optional_or_trivial<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
+
+        template<typename TFn> inline void _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
         {
-            if constexpr (is_pointer<TFn>::value)
+            if constexpr (is_optional_or_trivial<TFn>::value)
             {
-                using type = typename is_pointer<TFn>::type;
-                auto& el = dst.*member_;
-                static_assert(is_smart_pointer<has_element_type<TFn>::value,TFn>::value, "There are smart pointers only available here.");
-                el = allocate_object<TFn>();
-                _read_comp_impl(*el,cont,extkey);
+                
             }
             else
-                _read_comp_impl(dst.*member_,cont,extkey);
+            {
+                if constexpr (is_pointer<TFn>::value)
+                {
+                    using type = typename is_pointer<TFn>::type;
+                    auto& el = dst.*member_;
+                    static_assert(is_smart_pointer<has_element_type<TFn>::value,TFn>::value, "There are smart pointers only available here.");
+                    el = allocate_object<TFn>();
+                    _read_comp_impl(*el,cont,extkey);
+                }
+                else
+                    _read_comp_impl(dst.*member_,cont,extkey);
+            }
         }
-        
+
         template<typename TFn> inline void _read_comp_impl(TFn& dst, data_update_context& cont, sql_value const& extkey)
         {
             if constexpr (is_trivial_container<TFn>::value ||
