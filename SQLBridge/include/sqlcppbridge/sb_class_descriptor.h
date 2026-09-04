@@ -132,9 +132,14 @@ namespace sql_bridge
         }
 
 #pragma mark - try cast
-        
-        template<typename TFn> inline static std::enable_if_t<is_sql_acceptable<TFn>::value,sql_value> _try_cast() {return sql_value(TFn());}
-        template<typename TFn> inline static std::enable_if_t<!is_sql_acceptable<TFn>::value,sql_value> _try_cast() {return sql_value();}
+
+        template<typename TFn> inline static sql_value _try_cast()
+        {
+            if constexpr (is_sql_acceptable<TFn>::value)
+                return sql_value(TFn());
+            else
+                return {};
+        }
 
 #pragma mark - create recursive description
         
@@ -194,121 +199,133 @@ namespace sql_bridge
             }
         }
         
-#pragma mark - bind inheritance
-
-        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _bind_inheritance(TFn const&,size_t,data_update_context&,sql_value const&) {}
-        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _bind_inheritance(TFn const& el,size_t tid,data_update_context& cont,sql_value const& extkey)
-        {
-            for(auto const& inh : cont.inheritances())
-                if (inh->type_id()==tid)
-                    inh->bind_comp(&el, cont, extkey);
-        }
-
-#pragma mark - bind at
-        
-        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _bind_at(TFn const&,void const*,data_update_context&,sql_value const&) {}
-        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _bind_at(TFn const& el,void const* memb,data_update_context& cont,sql_value const& extkey)
-        {
-            for(auto const& md : cont.members())
-                if (md->is_this_mem_ptr(&el, memb))
-                    md->bind_comp(&el, cont, extkey);
-        }
-
 #pragma mark - bind
-        
-        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _bind_comp(TFn const&,data_update_context&,sql_value const&) {}
-        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _bind_comp(TFn const& el,data_update_context& cont,sql_value const& extkey)
+
+        template<typename TFn> inline void _bind_inheritance(TFn const& el,size_t tid,data_update_context& cont,sql_value const& extkey)const
         {
-            if (cont.use_pages())
+            if constexpr (!is_sql_acceptable<TFn>::value)
             {
+                for(auto const& inh : cont.inheritances())
+                    if (inh->type_id()==tid)
+                        inh->bind_comp(&el, cont, extkey);
+            }
+        }
+
+        template<typename TFn> inline void _bind_at(TFn const& el,void const* memb,data_update_context& cont,sql_value const& extkey)
+        {
+            if constexpr (!is_sql_acceptable<TFn>::value)
+            {
+                for(auto const& md : cont.members())
+                    if (md->is_this_mem_ptr(&el, memb))
+                        md->bind_comp(&el, cont, extkey);
+            }
+        }
+        
+        template<typename TFn> inline void _bind_comp(TFn const& el,data_update_context& cont,sql_value const& extkey)
+        {
+            if constexpr (!is_sql_acceptable<TFn>::value)
+            {
+                if (cont.use_pages())
+                {
+                    sql_value uid = cont.id_for_members(&el);
+                    if (uid.empty()) return;
+                    for(auto const& md : cont.members())
+                        if (md->index_type()!=e_db_index_type::PrimaryKey)
+                            md->bind_comp(&el, cont, uid);
+                    cont.page().enable();
+                    return;
+                }
+                cont.check_for_update_ability(&el);
+                cont.remove_if_possible(&el);
+                for(auto const& md : cont.members())
+                    if (md->index_type()!=e_db_index_type::PrimaryKey)
+                        md->bind(&el, cont);
+                if (!extkey.empty())
+                    cont.add(extkey);
+                cont.next(&el);
                 sql_value uid = cont.id_for_members(&el);
                 if (uid.empty()) return;
+                for(auto const& inh : cont.inheritances())
+                    inh->bind_comp(&el, cont, uid);
                 for(auto const& md : cont.members())
                     if (md->index_type()!=e_db_index_type::PrimaryKey)
                         md->bind_comp(&el, cont, uid);
-                cont.page().enable();
-                return;
             }
-            cont.check_for_update_ability(&el);
-            cont.remove_if_possible(&el);
-            for(auto const& md : cont.members())
-                if (md->index_type()!=e_db_index_type::PrimaryKey)
-                    md->bind(&el, cont);
-            if (!extkey.empty())
-                cont.add(extkey);
-            cont.next(&el);
-            sql_value uid = cont.id_for_members(&el);
-            if (uid.empty()) return;
-            for(auto const& inh : cont.inheritances())
-                inh->bind_comp(&el, cont, uid);
-            for(auto const& md : cont.members())
-                if (md->index_type()!=e_db_index_type::PrimaryKey)
-                    md->bind_comp(&el, cont, uid);
         }
 
-#pragma mark - read inheritance
-
-        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _read_inheritance(T& dst, size_t tid, data_update_context& cont, sql_value const& extkey) {}
-        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _read_inheritance(T& dst, size_t tid, data_update_context& cont, sql_value const& extkey)
-        {
-            for(auto const& inh : cont.inheritances())
-                if (inh->type_id()==tid)
-                    inh->read_comp(&dst, cont, extkey);
-        }
-
-#pragma mark - read at
-
-        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _read_at(T& dst, void* memb, data_update_context& cont, sql_value const& extkey, std::string const&) {}
-        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _read_at(T& dst, void* memb, data_update_context& cont, sql_value const& extkey, std::string const& flt)
-        {
-            for(auto const& md : cont.members())
-                if (md->is_this_mem_ptr(&dst, memb))
-                    md->read_at(memb, &dst, cont, extkey, flt);
-        }
-        
 #pragma mark - read
-        
-        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _read(T&, data_update_context&) {}
-        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _read(T& dst, data_update_context& cont) {_read_comp<TFn>(dst,cont,sql_value());}
-        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _read_comp(T&, data_update_context&, sql_value const&) {}
-        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
+
+        template<typename TFn> inline void _read_inheritance(T& dst, size_t tid, data_update_context& cont, sql_value const& extkey)
         {
-            cont.read_counter_inc();
-            cont.page().enable();
-            if (!cont.use_pages() || !has_not_empty_members(&dst))
-            {
-                for(auto const& md : cont.members())
-                    md->read(&dst, cont);
-            }
-            cont.next(nullptr);
-            sql_value uid = cont.id_for_members(&dst);
-            if (!uid.empty())
+            if constexpr (!is_sql_acceptable<TFn>::value)
             {
                 for(auto const& inh : cont.inheritances())
-                    inh->read_comp(&dst, cont, uid);
-                for(auto const& md : cont.members())
-                    md->read_comp(&dst, cont, uid);
+                    if (inh->type_id()==tid)
+                        inh->read_comp(&dst, cont, extkey);
             }
         }
 
-#pragma mark - remove at
-        
-        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _remove_at(TFn const&,void const*,data_update_context&,sql_value const&) {}
-        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _remove_at(TFn const& el,void const* memb,data_update_context& cont,sql_value const& extkey)
+        template<typename TFn> inline void _read_at(T& dst, void* memb, data_update_context& cont, sql_value const& extkey, std::string const& flt)
         {
-            for(auto const& md : cont.members())
-                if (md->is_this_mem_ptr(&el, memb))
-                    md->remove_at(memb, &el, cont, extkey);
+            if constexpr (!is_sql_acceptable<TFn>::value)
+            {
+                for(auto const& md : cont.members())
+                    if (md->is_this_mem_ptr(&dst, memb))
+                        md->read_at(memb, &dst, cont, extkey, flt);
+            }
+        }
+        
+        template<typename TFn> inline void _read(T& dst, data_update_context& cont)
+        {
+            if constexpr (!is_sql_acceptable<TFn>::value)
+            {
+                _read_comp<TFn>(dst,cont,sql_value());
+            }
         }
 
-#pragma mark - remove inheritance
-        
-        template<typename TFn> inline std::enable_if_t<is_sql_acceptable<TFn>::value> _remove_inheritance(TFn const&,void const*,data_update_context&,sql_value const&) {}
-        template<typename TFn> inline std::enable_if_t<!is_sql_acceptable<TFn>::value> _remove_inheritance(TFn const& el,size_t tid,data_update_context& cont,sql_value const& extkey)
+        template<typename TFn> inline void _read_comp(T& dst, data_update_context& cont, sql_value const& extkey)
         {
-            for(auto const& inh : cont.inheritances())
-                if (inh->type_id()==tid)
-                    inh->remove_inheritance(tid, &el, cont, extkey);
+            if constexpr (!is_sql_acceptable<TFn>::value)
+            {
+                cont.read_counter_inc();
+                cont.page().enable();
+                if (!cont.use_pages() || !has_not_empty_members(&dst))
+                {
+                    for(auto const& md : cont.members())
+                        md->read(&dst, cont);
+                }
+                cont.next(nullptr);
+                sql_value uid = cont.id_for_members(&dst);
+                if (!uid.empty())
+                {
+                    for(auto const& inh : cont.inheritances())
+                        inh->read_comp(&dst, cont, uid);
+                    for(auto const& md : cont.members())
+                        md->read_comp(&dst, cont, uid);
+                }
+            }
+        }
+
+#pragma mark - remove
+
+        template<typename TFn> inline void _remove_at(TFn const& el,void const* memb,data_update_context& cont,sql_value const& extkey)
+        {
+            if constexpr (!is_sql_acceptable<TFn>::value)
+            {
+                for(auto const& md : cont.members())
+                    if (md->is_this_mem_ptr(&el, memb))
+                        md->remove_at(memb, &el, cont, extkey);
+            }
+        }
+
+        template<typename TFn> inline void _remove_inheritance(TFn const& el,size_t tid,data_update_context& cont,sql_value const& extkey)
+        {
+            if constexpr (!is_sql_acceptable<TFn>::value)
+            {
+                for(auto const& inh : cont.inheritances())
+                    if (inh->type_id()==tid)
+                        inh->remove_inheritance(tid, &el, cont, extkey);
+            }
         }
 
     };
